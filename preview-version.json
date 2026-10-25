@@ -1,10 +1,11 @@
 {
-  "implementation": "d6ed54c98fc2040079629dd4a180d9cc9588692a",
+  "implementation": "65e3230",
   "synthetic": true,
   "status": "draft",
   "limitations": [
     "Mission/Horizon mobile seat-selection tests remain failing",
     "Rules, prizes and peak days are not final"
   ],
-  "adminIncluded": false
+  "adminIncluded": true,
+  "adminMode": "empty browser-local tool; no authentication; no server publishing"
 }

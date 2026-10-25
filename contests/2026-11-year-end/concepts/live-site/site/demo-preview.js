@@ -15,6 +15,9 @@
     cities.forEach((city, i) => select.add(new Option((i + 1) + ' · ' + city, String(i + 1))));
     select.value = String(week);
     select.addEventListener('change', () => { const url = new URL(location.href); url.searchParams.set('demoWeek', select.value); location.assign(url); });
-    bar.append(select); document.body.append(bar);
+    const admin = document.createElement('a');
+    admin.href = '../../../../../admin-demo/index.html'; admin.textContent = '⚙ Admin';
+    admin.style.color = '#fff'; admin.target = '_blank'; admin.rel = 'noopener';
+    bar.append(select, admin); document.body.append(bar);
   });
 })(["צרפת · פריז","איטליה · מילאנו","מרוקו · מרקש","ארה״ב · לאס וגאס","מקסיקו · קנקון","יפן · טוקיו","יוון · אתונה","הודו · ניו דלהי","ישראל · ירושלים"]);
