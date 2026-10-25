@@ -1,11 +1,14 @@
 {
-  "implementation": "f7358ae",
+  "implementation": "fd87dee",
   "synthetic": true,
   "status": "draft",
   "limitations": [
     "Mission/Horizon mobile seat-selection tests remain failing",
-    "Rules, prizes and peak days are not final"
+    "Ambient-animation resume assertion fails",
+    "Rules, prizes, final class allocation and peak days are not final"
   ],
   "adminIncluded": true,
-  "adminMode": "empty browser-local tool; no authentication; no server publishing"
+  "adminMode": "empty browser-local tool; no authentication; no server publishing",
+  "drawRouting": "competition-track-and-flight-class",
+  "finalDrawEnabled": false
 }
