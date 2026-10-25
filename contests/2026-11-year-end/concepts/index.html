@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>קונספטים · 60 יום מסביב לעולם</title>
+<style>
+  /* Fonts from the shared platform folder (contests/platform/public/fonts). */
+  @font-face { font-family: "Simpler"; src: url("../../platform/public/fonts/Simpler-Regular.otf") format("opentype"); font-weight: 400; font-display: swap; }
+  @font-face { font-family: "Simpler"; src: url("../../platform/public/fonts/Simpler-Bold.otf") format("opentype"); font-weight: 700; font-display: swap; }
+  @font-face { font-family: "Simpler"; src: url("../../platform/public/fonts/Simpler-Black.otf") format("opentype"); font-weight: 900; font-display: swap; }
+
+  /* Bezeq shell tokens, same as contests/platform/public/themes/bezeq.css */
+  :root {
+    --navy: #20294d; --navy-raised: #2e3152; --grey: #ebeced; --white: #fff;
+    --fg: #20294d; --fg-2: #555869; --fg-3: #888a9a;
+    --blue: #007aa3; --accent-ui: #0099cc; --accent: #33b5e0;
+    --r-card: 16px; --r-pill: 9999px;
+    --font: "Simpler", "Arial Hebrew", Arial, sans-serif;
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --page: #ebeced; --card: #fff; --line: #cfd0d6; --bar: rgb(235 236 237 / 0.92);
+    --ghost: #ebeced; --chip-on: #20294d; --on-navy: #c9cbd6; --stage: #0f1430;
+  }
+  /* Dark: same navy shell, darker page and cards */
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --page: #12162b; --card: #1c2242; --line: #363c63; --bar: rgb(18 22 43 / 0.92);
+    --fg: #eef0f6; --fg-2: #b8bbcb; --fg-3: #8e92a8; --ghost: #2e3152; --chip-on: #007aa3; color-scheme: dark; } }
+  :root[data-theme="dark"] {
+    --page: #12162b; --card: #1c2242; --line: #363c63; --bar: rgb(18 22 43 / 0.92);
+    --fg: #eef0f6; --fg-2: #b8bbcb; --fg-3: #8e92a8; --ghost: #2e3152; --chip-on: #007aa3; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--page); }
+  body { font-family: var(--font); background: var(--page); color: var(--fg); -webkit-font-smoothing: antialiased; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  a { color: inherit; }
+
+  /* Header */
+  header { background: linear-gradient(135deg, var(--navy-raised), var(--navy)); color: var(--white); padding-block: 28px 22px; }
+  .wrap { max-width: 1280px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .brand { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .brand b { font-weight: 900; font-size: 22px; letter-spacing: -0.01em; }
+  .brand span { color: var(--accent); font-weight: 700; font-size: 14px; }
+  h1 { font-weight: 900; font-size: clamp(28px, 4vw, 44px); line-height: 1.05; margin: 14px 0 6px; letter-spacing: -0.02em; }
+  header p { margin: 0; color: var(--on-navy); font-size: 15px; max-width: 70ch; line-height: 1.5; }
+  .stats { display: flex; gap: 22px; margin-top: 18px; flex-wrap: wrap; }
+  .stats div { font-size: 13px; color: var(--on-navy); }
+  .stats strong { display: block; font-size: 26px; font-weight: 900; color: var(--white); font-variant-numeric: tabular-nums; }
+
+  /* Data status: what the admin page last loaded (this browser's storage, same folder) */
+  .status { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; background: rgb(255 255 255 / .08); border: 1px solid rgb(255 255 255 / .14); border-radius: var(--r-card); padding: 12px 16px; }
+  .status .dot { width: 10px; height: 10px; border-radius: 50%; background: #e0a43a; box-shadow: 0 0 0 4px rgb(224 164 58 / .25); }
+  .status.on .dot { background: #3fd6a0; box-shadow: 0 0 0 4px rgb(63 214 160 / .25); }
+  .status b { font-size: 16px; }
+  .status span { color: var(--on-navy); font-size: 14px; }
+  .status .btn { margin-inline-start: auto; }
+  .kind { margin: 8px 0 18px; padding-top: 22px; border-top: 2px solid var(--line); }
+  .kind:first-child { border-top: 0; padding-top: 0; }
+  .kind h2 { font-size: clamp(22px, 2.6vw, 30px); font-weight: 900; margin: 0 0 4px; }
+  .kind p { margin: 0; color: var(--fg-2); font-size: 15px; max-width: 80ch; }
+  .group.archive .card { opacity: .92; }
+
+  /* Filters */
+  .bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bar); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  .bar .wrap { display: flex; gap: 8px; padding-block: 12px; overflow-x: auto; scrollbar-width: none; }
+  .chip { border: 1px solid var(--line); background: var(--card); color: var(--fg); border-radius: var(--r-pill); padding: 7px 14px; font-size: 14px; font-weight: 700; white-space: nowrap; transition: background .16s var(--ease-out), color .16s var(--ease-out); }
+  .chip[aria-pressed="true"] { background: var(--chip-on); color: var(--white); border-color: var(--chip-on); }
+  .chip small { font-weight: 400; opacity: .7; margin-inline-start: 4px; }
+
+  /* Grid */
+  main { padding-block: 22px 60px; }
+  .group { margin-bottom: 34px; }
+  .group h2 { font-size: 18px; font-weight: 900; margin: 0 0 4px; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .group h2 code { font-family: ui-monospace, Menlo, monospace; font-size: 12px; font-weight: 400; color: var(--fg-3); direction: ltr; }
+  .group > p { margin: 0 0 14px; color: var(--fg-2); font-size: 14px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 16px; }
+  .card { background: var(--card); border-radius: var(--r-card); overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 1px 2px rgb(32 41 77 / .06), 0 8px 24px -12px rgb(32 41 77 / .18); transition: transform .2s var(--ease-out), box-shadow .2s var(--ease-out); }
+  @media (hover: hover) { .card:hover { transform: translateY(-3px); box-shadow: 0 1px 2px rgb(32 41 77 / .06), 0 18px 36px -14px rgb(32 41 77 / .3); } }
+  .thumb { position: relative; aspect-ratio: 16 / 10; background: var(--navy); border: 0; padding: 0; display: block; width: 100%; overflow: hidden; }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+  .thumb.tall img { object-fit: contain; }
+  .thumb .num { position: absolute; top: 10px; inset-inline-start: 10px; background: var(--navy); color: var(--white); font-weight: 900; font-size: 13px; border-radius: var(--r-pill); min-width: 28px; height: 28px; display: grid; place-items: center; padding: 0 8px; }
+  .thumb .play { position: absolute; inset: 0; display: grid; place-items: center; background: linear-gradient(to top, rgb(32 41 77 / .55), transparent 55%); opacity: 0; transition: opacity .2s var(--ease-out); color: var(--white); font-weight: 700; font-size: 15px; }
+  /* Every concept is a demo (23.10.2026): a label on each card, opposite the number. */
+  .demo-tag, .thumb .demo-tag { position: absolute; top: 10px; inset-inline-end: 10px; background: #F5C342; color: #11152B; font-weight: 800; font-size: 13px; border-radius: var(--r-pill); height: 28px; display: grid; place-items: center; padding: 0 12px; }
+  .thumb:hover .play, .thumb:focus-visible .play { opacity: 1; }
+  .body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .body h3 { margin: 0; font-size: 19px; font-weight: 900; line-height: 1.2; }
+  .body .en { font-size: 13px; color: var(--fg-3); direction: ltr; text-align: right; }
+  .body p { margin: 2px 0 0; font-size: 14px; color: var(--fg-2); line-height: 1.5; flex: 1; }
+  .actions { display: flex; gap: 8px; margin-top: 10px; }
+  .btn { border: 0; border-radius: var(--r-pill); padding: 9px 16px; font-weight: 700; font-size: 14px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: transform .16s var(--ease-out); }
+  .btn:active { transform: scale(.97); }
+  .btn.primary { background: var(--blue); color: var(--white); }
+  .btn.ghost { background: var(--ghost); color: var(--fg); }
+  .files { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+  .body .files { margin: 4px 0 0; }
+  .file { border: 1px solid var(--line); background: var(--card); color: var(--fg); border-radius: var(--r-pill); padding: 6px 12px; font-size: 13px; font-weight: 700; display: inline-flex; gap: 6px; align-items: baseline; transition: transform .16s var(--ease-out); }
+  .file:active { transform: scale(.97); }
+  .file small { font-weight: 400; color: var(--fg-3); font-size: 11px; direction: ltr; }
+
+  /* Viewer */
+  .viewer { position: fixed; inset: 0; z-index: 20; background: var(--stage); display: none; flex-direction: column; }
+  .viewer.open { display: flex; }
+  .vbar { display: flex; align-items: center; gap: 10px; padding: calc(10px + env(safe-area-inset-top, 0px)) max(14px, env(safe-area-inset-right, 0px)) 10px max(14px, env(safe-area-inset-left, 0px)); background: var(--navy); color: var(--white); flex-wrap: wrap; }
+  .vbar h2 { margin: 0; font-size: 16px; font-weight: 900; flex: 1; min-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .vbar h2 small { font-weight: 400; color: var(--accent); margin-inline-start: 8px; }
+  .seg { display: inline-flex; background: var(--navy-raised); border-radius: var(--r-pill); padding: 3px; }
+  .seg button { border: 0; background: none; color: var(--on-navy); padding: 6px 12px; border-radius: var(--r-pill); font-size: 13px; font-weight: 700; }
+  .seg button[aria-pressed="true"] { background: var(--white); color: var(--navy); }
+  .vbar select { font: inherit; font-size: 13px; background: var(--navy-raised); color: var(--white); border: 0; border-radius: var(--r-pill); padding: 7px 12px; }
+  .vbar .icon { border: 0; background: var(--navy-raised); color: var(--white); width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-size: 16px; text-decoration: none; }
+  .vbar .hide { display: none; }
+  .stage { flex: 1; display: grid; place-items: center; overflow: auto; padding: 12px max(12px, env(safe-area-inset-left, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)); }
+  .frame { width: 100%; height: 100%; border: 0; background: var(--white); border-radius: 10px; transition: width .3s var(--ease-out); }
+  .stage.phone .frame { width: 390px; height: min(844px, 100%); border-radius: 28px; box-shadow: 0 0 0 10px var(--navy-raised); }
+  .stage video { max-width: 100%; max-height: 100%; border-radius: 10px; background: #000; }
+  .stage.sheet { place-items: start center; }
+  .stage.sheet img { max-width: 100%; height: auto; border-radius: 10px; display: block; }
+
+  footer { color: var(--fg-3); font-size: 13px; text-align: center; padding-block: 0 30px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="brand"><b>בזק</b><span>60 יום מסביב לעולם</span></div>
+    <h1>האתר וכל הקונספטים <span class="demo-tag" style="position:static;display:inline-grid;vertical-align:middle">דמו</span></h1>
+    <p><span id="live-count">21</span> קונספטים מונפשים ואינטראקטיביים. בחרו עיצוב כדי לפתוח את האתר החי במחשב או בנייד. נתוני ההדגמה סינתטיים בלבד.</p>
+    <div class="status" id="status" role="status"></div>
+    <div class="stats" id="stats"></div>
+  </div>
+</header>
+<nav class="bar" aria-label="סינון"><div class="wrap" id="filters"></div></nav>
+<main><div class="wrap" id="groups"></div></main>
+<footer class="wrap">בזק SOHO · קונספטים חיים · נתוני הדגמה סינתטיים</footer>
+
+<div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-labelledby="vtitle">
+  <div class="vbar">
+    <button class="icon" id="vclose" aria-label="סגירה">✕</button>
+    <h2 id="vtitle"></h2>
+    <select id="vweek" aria-label="שבוע"></select>
+    <div class="seg" id="vpeak"><button data-v="0" aria-pressed="true">רגיל</button><button data-v="1" aria-pressed="false">יום שיא</button></div>
+    <div class="seg" id="vdevice"><button data-v="desktop" aria-pressed="true">מחשב</button><button data-v="phone" aria-pressed="false">נייד</button></div>
+    <button class="icon" id="vprev" aria-label="הקודם">→</button>
+    <button class="icon" id="vnext" aria-label="הבא">←</button>
+    <a class="icon" id="vtab" target="_blank" rel="noopener" aria-label="פתיחה בלשונית חדשה">↗</a>
+  </div>
+  <div class="stage" id="stage"></div>
+</div>
+
+
+<script>
+// One entry per concept. A new concept = a new folder in concepts/ and a line here.
+// options: weeks (w=1..9 selector), peak (יום שיא toggle), url(o) builds the link for week/peak,
+// files: extra files (screenshots, specs) shown as links under the group note or on the card.
+const GROUPS = [{kind:'live',id:'live',name:'21 קונספטים חיים',note:'תצוגה אינטראקטיבית עם אנימציות ונתוני הדגמה סינתטיים בלבד.'}];
+const CONCEPTS = [{...{"group":"live","thumb":"live-winzy","he":"Winzy · חשיפת היעד","en":"Country Reveal · new live look","text":"קונספט חי ואינטראקטיבי, מחובר לנתוני הניהול. צילום אמיתי מהיישום עם נתוני בדיקה סינתטיים מסומנים.","peak":true,"url":"live-site/site/index.html?look=winzy"},url:(o)=>"live-site/site/index.html?look=winzy"+(o.peak?'&preview=peak':'')},
+{...{"group":"live","thumb":"live-skyline","he":"Skyline · שער היעד","en":"Destination Portal · new live look","text":"קונספט חי ואינטראקטיבי, מחובר לנתוני הניהול. צילום אמיתי מהיישום עם נתוני בדיקה סינתטיים מסומנים.","peak":true,"url":"live-site/site/index.html?look=skyline"},url:(o)=>"live-site/site/index.html?look=skyline"+(o.peak?'&preview=peak':'')},
+{...{"group":"live","thumb":"live-chainex","he":"Chainex · מרכז התוצאות","en":"Live Performance · new live look","text":"קונספט חי ואינטראקטיבי, מחובר לנתוני הניהול. צילום אמיתי מהיישום עם נתוני בדיקה סינתטיים מסומנים.","peak":true,"url":"live-site/site/index.html?look=chainex"},url:(o)=>"live-site/site/index.html?look=chainex"+(o.peak?'&preview=peak':'')},
+{...{"group":"live","thumb":"live-veluno","he":"Veluno · רגעי ההישג","en":"Prize Gallery · new live look","text":"קונספט חי ואינטראקטיבי, מחובר לנתוני הניהול. צילום אמיתי מהיישום עם נתוני בדיקה סינתטיים מסומנים.","peak":true,"url":"live-site/site/index.html?look=veluno"},url:(o)=>"live-site/site/index.html?look=veluno"+(o.peak?'&preview=peak':'')},
+{...{"group":"live","thumb":"live-network","he":"רשת ההצלחות · בזק SOHO","en":"Connected Journey · new live look","text":"קונספט חי ואינטראקטיבי, מחובר לנתוני הניהול. צילום אמיתי מהיישום עם נתוני בדיקה סינתטיים מסומנים.","peak":true,"url":"live-site/site/index.html?look=network"},url:(o)=>"live-site/site/index.html?look=network"+(o.peak?'&preview=peak':'')},
+{...{"group":"live","thumb":"live-golden","he":"שעת זהב","en":"Golden Hour","text":"כמו בארכיון: כדור ארץ צילומי (Blue Marble של נאס\"א) בגוון של העיר והשעה, קרוב על העיר, ושם המדינה לרוחב התחתית ככותרת של סרט. יום השיא ו\"המצב שלך\" למעלה.","peak":true,"url":"live-site/site/index.html?look=golden"},url:(o)=>"live-site/site/index.html?look=golden"+(o.peak?'&preview=peak':'')},
+{...{"group":"live","thumb":"live-hall","he":"אולם היציאות","en":"The Departures Hall","text":"כמו בארכיון: טרמינל כהה, קיר זכוכית עם המדינה של השבוע מעבר לו, ההשתקפות על הרצפה וסרט בצבע השבוע עד אדן החלון. כרטיס העלייה שלך עם חותמת לכל שבוע עומד על הרצפה.","peak":true,"url":"live-site/site/index.html?look=hall"},url:(o)=>"live-site/site/index.html?look=hall"+(o.peak?'&preview=peak':'')},
+{...{"group":"live","thumb":"live-edition","he":"מהדורת העולם","en":"The World Edition","text":"כמו בארכיון: שער מגזין בצבעי השבוע. תמונה אחת, שם המדינה ענק לאורך התחתית (מה שעובר על התמונה בצבע ההדגשה), הכתבה והטור האישי שלך, וארכיון השערים למטה.","peak":true,"url":"live-site/site/index.html?look=edition"},url:(o)=>"live-site/site/index.html?look=edition"+(o.peak?'&preview=peak':'')},
+{...{"group":"live","thumb":"live-window","he":"מעבר לחלון","en":"Beyond the Window","text":"כמו בארכיון: לוח לבן-כחול סביב חלון אחד. \"המצב שלך\" מימין, החלון עם התמונה של השבוע באמצע, המירוץ ויום השיא משמאל, והמסלול שלך למטה.","url":"live-site/site/index.html?look=window"},url:(o)=>"live-site/site/index.html?look=window"+(o.peak?'&preview=peak':'')},
+{...{"group":"live","thumb":"live-atlas","he":"האטלס החי","en":"The Living Atlas","text":"כמו בארכיון: גלובוס נקודות כחול, המדינה של השבוע עולה ממנו בצבעים שלה, ו\"המצב שלך\" לידו. ועוד: ימי העבודה והמובילים. הקונספט היחיד של משפחת האטלס (לוח ההמראות ותשעה עולמות אוחדו לתוכו).","url":"live-site/site/index.html?look=atlas"},url:(o)=>"live-site/site/index.html?look=atlas"+(o.peak?'&preview=peak':'')},
+{...{"group":"live","thumb":"live-flight","he":"Flight 60 · הגלובוס","en":"The World Is Yours × Flight 60","text":"כמו בארכיון: פס קולנועי בצבעי השבוע. 03/09 ענק, המדינה, העיר, הקואורדינטות והספירה לאחור לנחיתה, ו\"המצב שלך\". מימין התמונה של השבוע עם גלובוס המסלול, וביום שיא שידור חי עם המובילים של היום.","peak":true,"url":"live-site/site/index.html?look=flight"},url:(o)=>"live-site/site/index.html?look=flight"+(o.peak?'&preview=peak':'')},
+{...{"group":"live","thumb":"live-passport","he":"דרכון להצלחה","en":"Passport","text":"דרכון: עמוד לכל שבוע עם השדות שלך, פס ההתקדמות לתנאי הסף, וחותמת לכל שבוע שעבר.","peak":true,"url":"live-site/site/index.html?look=passport"},url:(o)=>"live-site/site/index.html?look=passport"+(o.peak?'&preview=peak':'')},
+{...{"group":"live","thumb":"live-horizon","he":"מעל האופק","en":"The Sovereign Horizon","text":"צילום במסך מלא עם אבק זהב; הכרטיס שלך בפס הזכוכית ומסלול אבני הדרך.","peak":true,"url":"live-site/site/index.html?look=horizon"},url:(o)=>"live-site/site/index.html?look=horizon"+(o.peak?'&preview=peak':'')},
+{...{"group":"live","thumb":"live-mission","he":"חדר הבקרה BZQ-60","en":"Mission Control","text":"חדר בקרה: אריחי טלמטריה, שעון העיר ושעון תל אביב, ספירה לאחור למשימת יום השיא.","peak":true,"url":"live-site/site/index.html?look=mission"},url:(o)=>"live-site/site/index.html?look=mission"+(o.peak?'&preview=peak':'')},
+{...{"group":"live","thumb":"live-board","he":"לוח התוצאות","en":"Journey leaderboard","text":"בעיצוב של הדמו: כותרת כחולה עם המסלול והימים שנותרו, רצועת יעד האגף (התנאי לפרסים), מד לכל מוצר, המחלקות מול 110%, פודיום לכל מגזר וכרטיס לכל יום שיא. נבנה מהדמו journey-leaderboard.","url":"live-site/site/index.html?look=board"},url:(o)=>"live-site/site/index.html?look=board"+(o.peak?'&preview=peak':'')},
+{...{"group":"live","thumb":"live-classes","he":"מחלקות טיסה","en":"Travel classes","text":"בעיצוב של הדמו: המטוס מלמעלה עם תא לכל מחלקה, מושב לכל נציג, רשימת המתנה וקו המחלקה שמעל; לצידו כרטיס העלייה BZQ · FLIGHT 60 ויום ההגרלה. נבנה מהדמו travel-classes.","url":"live-site/site/index.html?look=classes"},url:(o)=>"live-site/site/index.html?look=classes"+(o.peak?'&preview=peak':'')},
+{...{"group":"live","thumb":"live-units","he":"נקודות · מיילים · חותמות","en":"Points, miles or stamps","text":"בעיצוב של הדמו: שלוש אפשרויות בכותרת, ומתחת המספר שלך בעולם של כל אחת: כרטיס מועדון, טיסת לילה עם מונה ומסלול, או עמוד דרכון עם חותמות וויזות. לשאלה 22 בתקנון. נבנה מהדמו unit-options.","url":"live-site/site/index.html?look=units"},url:(o)=>"live-site/site/index.html?look=units"+(o.peak?'&preview=peak':'')},
+{...{"group":"live","thumb":"live-league","he":"ליגת המנהלים","en":"Managers' league","text":"בעיצוב של הדמו: מד הדלק של האגף בכותרת עם פס לכל מוצר, כרטיס לכל מנהל/ת מחלקה עם 100% ו-110%, וליגות ראשי הצוותים בלשוניות עם פודיום וטבלה. נבנה מהדמו managers-league.","url":"live-site/site/index.html?look=league"},url:(o)=>"live-site/site/index.html?look=league"+(o.peak?'&preview=peak':'')},
+{...{"group":"live","thumb":"live-curve","he":"עקומת ההתקדמות שלי","en":"My progress curve","text":"בעיצוב של הדמו: גרף עם רצועת שבוע לכל יעד, העקומה שלך, הקצב עד הסוף, תנאי הסף וחציון המגזר (אפשר להסתיר), וכרטיס נתונים לצידו. בלי היסטוריה יומית בנתונים, הקו עד היום הוא הקצב הממוצע. נבנה מהדמו progress-curve.","url":"live-site/site/index.html?look=curve"},url:(o)=>"live-site/site/index.html?look=curve"+(o.peak?'&preview=peak':'')},
+{...{"group":"live","thumb":"live-route110","he":"המסלול ל-110%","en":"The 110% route","text":"בעיצוב של הדמו: פס האגף בכותרת, וכרטיס לכל מחלקה עם מסלול המראה ומטוס (100% המראה, 110% שיוט ופרס), ארבעה נתונים ליום, והצוותים במחלקה שלך. נבנה מהדמו route-110.","url":"live-site/site/index.html?look=route110"},url:(o)=>"live-site/site/index.html?look=route110"+(o.peak?'&preview=peak':'')},
+{...{"group":"live","thumb":"live-finale","he":"חוזרים הביתה","en":"Homecoming · winners gate","text":"בעיצוב של הדמו: עמוד דרכון \"ברוכים השבים הביתה\" עם חותמת לכל שבוע (סיכום, לא הודעת זכייה), ולצידו שער הזוכים הכהה עם הדלתות, המנעול והשלבים עד שייפתח. נבנה מהדמו finale.","url":"live-site/site/index.html?look=finale"},url:(o)=>"live-site/site/index.html?look=finale"+(o.peak?'&preview=peak':'')}];
+const liveCount = CONCEPTS.filter((c) => c.group === 'live' && c.thumb !== 'update').length;
+document.getElementById('live-count').textContent = liveCount;
+
+// Cards follow the groups' order (live looks first), so the numbers and the viewer's next / previous do too.
+CONCEPTS.sort((a, b) => GROUPS.findIndex((g) => g.id === a.group) - GROUPS.findIndex((g) => g.id === b.group));
+
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+let filter = 'all', current = -1, opts = { w: 1, peak: false }, device = 'desktop';
+// Every extra file gets an index, so a link only carries data-file="k".
+const FILES = [...GROUPS, ...CONCEPTS].flatMap((x) => x.files || []);
+const fileLinks = (list) => !list ? '' : `<div class="files">${list.map((f) =>
+  `<button class="file" data-file="${FILES.indexOf(f)}">${esc(f.label)}<small>${esc(f.type)}</small></button>`).join('')}</div>`;
+
+const kindOf = (c) => GROUPS.find((g) => g.id === c.group)?.kind;
+$('#stats').innerHTML = [
+  [liveCount, 'קונספטים חיים'],
+  [CONCEPTS.filter((c) => kindOf(c) === 'archive' && !c.video).length, 'דמואים בארכיון'],
+  [CONCEPTS.filter((c) => c.video).length, 'סרטונים'],
+  [WEEKS_FIVE.length, `שבועות · ${WEEKS_FIVE.length} יעדים`],
+].map(([n, l]) => `<div><strong>${n}</strong>${l}</div>`).join('');
+
+// What the admin page last loaded: it keeps the site data in this browser's storage under one key per contest,
+// which every live look reads. Shown here so it's clear at a glance whether the looks show real data.
+const SYNC = 'contest-site-data:2026-11-year-end';
+function renderStatus(){ $('#status').className='status on'; $('#status').innerHTML='<b>הדגמה סינתטית · 17.11.2026</b><span>המספרים והשמות הם נתוני בדיקה, לא תוצאות עובדים.</span>'; }
+addEventListener('storage', (e) => { if (e.key === SYNC) renderStatus(); });
+renderStatus();
+
+function renderFilters() {
+  const chips = [['all', 'הכול', CONCEPTS.length], ...GROUPS.map((g) => [g.id, g.name, CONCEPTS.filter((c) => c.group === g.id).length])];
+  $('#filters').innerHTML = chips.map(([id, name, n]) => `<button class="chip" data-f="${id}" aria-pressed="${filter === id}">${esc(name)}<small>${n}</small></button>`).join('');
+}
+const KINDS = {
+  live: ['דמו · האתר החי', `האתר האמיתי ב-${liveCount} קונספטים. כולם מחוברים לדף הניהול ומתעדכנים לבד אחרי כל טעינה. היעדים, הפרסים והזכאות עדיין כפופים לתקנון ולאישור.`],
+  new: ['דמו · קונספטים חדשים', 'רעיונות שעוד לא נכנסו לאתר החי: ימי השיא, שכבר מוזנים לשבועות של כל הקונספטים.'],
+  tool: ['דמו · כלים ומקורות', 'דפים שעוזרים להחליט: בדיקת המועצה.'],
+  archive: ['דמו · ארכיון הדמואים המקוריים', 'הגרסאות הראשונות, על נתוני דמו ועם הערים המקוריות. העיצובים נשמרים לצד הקונספטים החיים; מעבדת ההשראות והטיזר נשארים לעיון.'],
+};
+function renderGroups() {
+  let last = null;
+  $('#groups').innerHTML = GROUPS.filter((g) => filter === 'all' || filter === g.id).map((g) => `
+    ${g.kind !== last && filter === 'all' ? ((last = g.kind), `<div class="kind"><h2>${esc(KINDS[g.kind][0])}</h2><p>${esc(KINDS[g.kind][1])}</p></div>`) : ''}
+    <section class="group ${g.kind}">
+      <h2>${esc(g.name)} <code>${esc(g.path)}</code></h2>
+      <p>${esc(g.note)}</p>
+      ${fileLinks(g.files)}
+      <div class="grid">${CONCEPTS.map((c, i) => c.group !== g.id ? '' : `
+        <article class="card">
+          <button class="thumb${c.tall ? ' tall' : ''}" data-open="${i}" aria-label="תצוגה: ${esc(c.he)}">
+            <img src="_dashboard/thumbs/${c.thumb}.jpg" alt="" loading="lazy">
+            <span class="num">${i + 1}</span><span class="demo-tag">דמו</span><span class="play">${c.video ? '▶ ניגון' : 'תצוגה חיה'}</span>
+          </button>
+          <div class="body">
+            <h3>${esc(c.he)}</h3><div class="en">${esc(c.en)}</div>
+            <p>${esc(c.text)}</p>
+            ${fileLinks(c.files)}
+            <div class="actions">
+              <button class="btn primary" data-open="${i}">${c.video ? 'ניגון' : 'תצוגה'}</button>
+              <a class="btn ghost" href="${c.video || c.url({ w: 1, peak: false })}" target="_blank" rel="noopener">לשונית חדשה ↗</a>
+            </div>
+          </div>
+        </article>`).join('')}</div>
+    </section>`).join('');
+}
+
+const press = (seg, v) => seg.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === String(v)));
+
+function show() {
+  const c = CONCEPTS[current], stage = $('#stage');
+  ['#vprev', '#vnext'].forEach((s) => $(s).classList.remove('hide'));
+  $('#vtitle').innerHTML = `${esc(c.he)}<small>${current + 1} / ${CONCEPTS.length}</small>`;
+  $('#vweek').classList.toggle('hide', !c.weeks);
+  if (c.weeks) $('#vweek').innerHTML = c.weeks.map((w, i) => `<option value="${i + 1}">שבוע ${i + 1} · ${w}</option>`).join('');
+  $('#vpeak').classList.toggle('hide', !c.peak);
+  $('#vdevice').classList.toggle('hide', !!c.video);
+  $('#vweek').value = opts.w; press($('#vpeak'), opts.peak ? 1 : 0); press($('#vdevice'), device);
+  const href = c.video || c.url(opts);
+  $('#vtab').href = href;
+  stage.className = 'stage' + (device === 'phone' && !c.video ? ' phone' : '');
+  // A fresh iframe each time: the demos read their URL once on load.
+  stage.innerHTML = c.video
+    ? `<video src="${href}" controls autoplay playsinline></video>`
+    : `<iframe class="frame" src="${href}" title="${esc(c.he)}"></iframe>`;
+}
+// Extra files: images full width and scrollable, text files (md, json) as plain text.
+function openFile(k) {
+  const f = FILES[k], stage = $('#stage');
+  current = -2; $('#viewer').classList.add('open'); document.body.style.overflow = 'hidden';
+  $('#vtitle').innerHTML = `${esc(f.label)}<small>${esc(f.type)}</small>`;
+  ['#vweek', '#vpeak', '#vdevice', '#vprev', '#vnext'].forEach((s) => $(s).classList.add('hide'));
+  $('#vtab').href = f.href;
+  const img = /\.(png|jpe?g|webp)$/i.test(f.href);
+  stage.className = 'stage' + (img ? ' sheet' : '');
+  stage.innerHTML = img ? `<img src="${f.href}" alt="${esc(f.label)}">` : `<iframe class="frame" src="${f.href}" title="${esc(f.label)}"></iframe>`;
+  $('#vclose').focus();
+}
+function open(i) { current = i; $('#viewer').classList.add('open'); document.body.style.overflow = 'hidden'; show(); $('#vclose').focus(); }
+function close() { $('#viewer').classList.remove('open'); $('#stage').innerHTML = ''; document.body.style.overflow = ''; current = -1; }
+const step = (d) => { current = (current + d + CONCEPTS.length) % CONCEPTS.length; show(); };
+
+document.addEventListener('click', (e) => {
+  const f = e.target.closest('[data-f]'); if (f) { filter = f.dataset.f; renderFilters(); renderGroups(); return; }
+  const o = e.target.closest('[data-open]'); if (o) { open(Number(o.dataset.open)); return; }
+  const fl = e.target.closest('[data-file]'); if (fl) { openFile(Number(fl.dataset.file)); return; }
+  const p = e.target.closest('#vpeak button'); if (p) { opts.peak = p.dataset.v === '1'; show(); return; }
+  const d = e.target.closest('#vdevice button'); if (d) { device = d.dataset.v; show(); }
+});
+$('#vweek').addEventListener('change', (e) => { opts.w = Number(e.target.value); show(); });
+$('#vclose').onclick = close; $('#vprev').onclick = () => step(-1); $('#vnext').onclick = () => step(1);
+document.addEventListener('keydown', (e) => {
+  if (current === -1 || e.target.tagName === 'SELECT') return;
+  if (e.key === 'Escape') close();
+  else if (current < 0) return;              // a file is open: no prev / next
+  else if (e.key === 'ArrowLeft') step(1);   // RTL: left is "next"
+  else if (e.key === 'ArrowRight') step(-1);
+});
+
+renderFilters(); renderGroups();
+</script>
+</body>
+</html>
