@@ -156,7 +156,8 @@
 // One entry per concept. A new concept = a new folder in concepts/ and a line here.
 // options: weeks (w=1..9 selector), peak (יום שיא toggle), url(o) builds the link for week/peak,
 // files: extra files (screenshots, specs) shown as links under the group note or on the card.
-const GROUPS = [{kind:'live',id:'live',name:'21 קונספטים חיים',note:'תצוגה אינטראקטיבית עם אנימציות ונתוני הדגמה סינתטיים בלבד.'}];
+const GROUPS = [{kind:'live',id:'live',path:'',name:'21 קונספטים חיים',note:'תצוגה אינטראקטיבית עם אנימציות ונתוני הדגמה סינתטיים בלבד.'}];
+const WEEKS_FIVE = []; const WEEKS_GLOBE = [];
 const CONCEPTS = [{...{"group":"live","thumb":"live-winzy","he":"Winzy · חשיפת היעד","en":"Country Reveal · new live look","text":"קונספט חי ואינטראקטיבי, מחובר לנתוני הניהול. צילום אמיתי מהיישום עם נתוני בדיקה סינתטיים מסומנים.","peak":true,"url":"live-site/site/index.html?look=winzy"},url:(o)=>"live-site/site/index.html?look=winzy"+(o.peak?'&preview=peak':'')},
 {...{"group":"live","thumb":"live-skyline","he":"Skyline · שער היעד","en":"Destination Portal · new live look","text":"קונספט חי ואינטראקטיבי, מחובר לנתוני הניהול. צילום אמיתי מהיישום עם נתוני בדיקה סינתטיים מסומנים.","peak":true,"url":"live-site/site/index.html?look=skyline"},url:(o)=>"live-site/site/index.html?look=skyline"+(o.peak?'&preview=peak':'')},
 {...{"group":"live","thumb":"live-chainex","he":"Chainex · מרכז התוצאות","en":"Live Performance · new live look","text":"קונספט חי ואינטראקטיבי, מחובר לנתוני הניהול. צילום אמיתי מהיישום עם נתוני בדיקה סינתטיים מסומנים.","peak":true,"url":"live-site/site/index.html?look=chainex"},url:(o)=>"live-site/site/index.html?look=chainex"+(o.peak?'&preview=peak':'')},
@@ -212,7 +213,7 @@ function renderFilters() {
   $('#filters').innerHTML = chips.map(([id, name, n]) => `<button class="chip" data-f="${id}" aria-pressed="${filter === id}">${esc(name)}<small>${n}</small></button>`).join('');
 }
 const KINDS = {
-  live: ['דמו · האתר החי', `האתר האמיתי ב-${liveCount} קונספטים. כולם מחוברים לדף הניהול ומתעדכנים לבד אחרי כל טעינה. היעדים, הפרסים והזכאות עדיין כפופים לתקנון ולאישור.`],
+  live: ['דמו · האתר החי', `האתר המונפש ב-${liveCount} קונספטים. תצוגה אינטראקטיבית עם נתוני הדגמה סינתטיים בלבד.`],
   new: ['דמו · קונספטים חדשים', 'רעיונות שעוד לא נכנסו לאתר החי: ימי השיא, שכבר מוזנים לשבועות של כל הקונספטים.'],
   tool: ['דמו · כלים ומקורות', 'דפים שעוזרים להחליט: בדיקת המועצה.'],
   archive: ['דמו · ארכיון הדמואים המקוריים', 'הגרסאות הראשונות, על נתוני דמו ועם הערים המקוריות. העיצובים נשמרים לצד הקונספטים החיים; מעבדת ההשראות והטיזר נשארים לעיון.'],
