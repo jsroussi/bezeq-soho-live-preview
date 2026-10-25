@@ -1,0 +1,17 @@
+{
+  "implementation": "402096870ec8949a8ae69a7ea8df7d63dd1c50a3",
+  "offlineDashboardFix": "1338c3d3d2907df107fe9e486502d005176ce6a1",
+  "publicAppSHA256": "7a8b4f19f36ad415c2545442ba7768e6b7afdf5e4f44aa2cb94b3b4ddac6bbea",
+  "synthetic": true,
+  "main": 2,
+  "archivedOriginalEntries": 41,
+  "experimentalPrototypes": 1,
+  "localTests": {
+    "passed": 201,
+    "failed": 0,
+    "skipped": 1,
+    "skipReason": "Managed local Chromium blocks file://; pinned CI required"
+  },
+  "scope": "Rules and peak days are drafts; final lottery not yet implemented. No production deployment or merge.",
+  "captureNotes": "UNFOLD captures use final application bytes. Mission/Horizon retained captures predate UNFOLD-only code and footer-attribution fix; their combined layouts are unchanged. Browser motion clip is actual CDP capture, not an FPS benchmark."
+}

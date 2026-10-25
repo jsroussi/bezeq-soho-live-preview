@@ -127,15 +127,16 @@
 <header>
   <div class="wrap">
     <div class="brand"><b>בזק</b><span>60 יום מסביב לעולם</span></div>
-    <h1>האתר וכל הקונספטים <span class="demo-tag" style="position:static;display:inline-grid;vertical-align:middle">דמו</span></h1>
-    <p><span id="live-count">21</span> עיצובים חיים, לצד ההשראות והדמואים העצמאיים המקוריים. בחרו עיצוב ועיר לצפייה באנימציות. נתוני ההדגמה סינתטיים בלבד.</p>
+    <h1>שני כיוונים. מסע אחד. <span class="demo-tag" style="position:static;display:inline-grid;vertical-align:middle">דמו</span></h1>
+    <p><span id="live-count">2</span> כיוונים ראשיים: Mission ו-Horizon. מחלקות טיסה, התקדמות אישית ואטלס מסע בכל גרסה. שאר העיצובים נשמרו בארכיון. נתוני הדגמה סינתטיים בלבד.</p>
     <div class="status" id="status" role="status"></div>
     <div class="stats" id="stats"></div>
+    <p class="prototype"><a class="btn primary" href="live-site/site/index.html?look=unfold&amp;demoWeek=3&amp;preview=intro">UNFOLD · הקונספט החדש: העולם נפתח ←</a><small> אב־טיפוס להשוואה · שני הכיוונים הראשיים נשמרו</small></p>
   </div>
 </header>
 <nav class="bar" aria-label="סינון"><div class="wrap" id="filters"></div></nav>
 <main><div class="wrap" id="groups"></div></main>
-<footer class="wrap">בזק SOHO · קונספטים חיים והשראות מקוריות · נתוני הדגמה סינתטיים · <a href="_review/2026-10-25/">Before / after motion review</a></footer>
+<footer class="wrap">בזק SOHO · קונספטים חיים והשראות מקוריות · נתוני הדגמה סינתטיים · <a href="_review/unfold-2026-10-25/">UNFOLD / Mission / Horizon · תצוגות ובדיקות</a></footer>
 
 <div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-labelledby="vtitle">
   <div class="vbar">
@@ -202,14 +203,16 @@ const CONCEPTS=[{...{"group":"reference-lab","thumb":"council","he":"מעבדת 
 {...{"group":"live","thumb":"live-finale","he":"חוזרים הביתה","en":"Homecoming · winners gate","text":"בעיצוב של הדמו: עמוד דרכון \"ברוכים השבים הביתה\" עם חותמת לכל שבוע (סיכום, לא הודעת זכייה), ולצידו שער הזוכים הכהה עם הדלתות, המנעול והשלבים עד שייפתח. נבנה מהדמו finale.","urls":[["live-site/site/index.html?look=finale&demoWeek=1","live-site/site/index.html?look=finale&demoWeek=1&preview=peak"],["live-site/site/index.html?look=finale&demoWeek=2","live-site/site/index.html?look=finale&demoWeek=2&preview=peak"],["live-site/site/index.html?look=finale&demoWeek=3","live-site/site/index.html?look=finale&demoWeek=3&preview=peak"],["live-site/site/index.html?look=finale&demoWeek=4","live-site/site/index.html?look=finale&demoWeek=4&preview=peak"],["live-site/site/index.html?look=finale&demoWeek=5","live-site/site/index.html?look=finale&demoWeek=5&preview=peak"],["live-site/site/index.html?look=finale&demoWeek=6","live-site/site/index.html?look=finale&demoWeek=6&preview=peak"],["live-site/site/index.html?look=finale&demoWeek=7","live-site/site/index.html?look=finale&demoWeek=7&preview=peak"],["live-site/site/index.html?look=finale&demoWeek=8","live-site/site/index.html?look=finale&demoWeek=8&preview=peak"],["live-site/site/index.html?look=finale&demoWeek=9","live-site/site/index.html?look=finale&demoWeek=9&preview=peak"]],"weeks":["צרפת · פריז","איטליה · מילאנו","מרוקו · מרקש","ארה״ב · לאס וגאס","מקסיקו · קנקון","יפן · טוקיו","יוון · אתונה","הודו · ניו דלהי","ישראל · ירושלים"]},url(o){return this.urls[Math.max(0,Math.min(8,(o.w||1)-1))][o.peak?1:0];}},
 {...{"group":"peak","thumb":"peakdays","he":"תשעה ימי שיא","en":"Nine peak days","text":"יום שיא אחד לכל שבוע, 10–20 דקות במשמרות: Bonjour בפריז עד קו הסיום בירושלים. כולל סדר המדינות, המזוודה, מה לא לעשות וצ׳קליסט לפני בנייה.","weeks":["צרפת","איטליה","מרוקו","ארה״ב","מקסיקו","יפן","יוון","הודו","ישראל"],"urls":[["peak-days/index.html#w=1","peak-days/index.html#w=1"],["peak-days/index.html#w=2","peak-days/index.html#w=2"],["peak-days/index.html#w=3","peak-days/index.html#w=3"],["peak-days/index.html#w=4","peak-days/index.html#w=4"],["peak-days/index.html#w=5","peak-days/index.html#w=5"],["peak-days/index.html#w=6","peak-days/index.html#w=6"],["peak-days/index.html#w=7","peak-days/index.html#w=7"],["peak-days/index.html#w=8","peak-days/index.html#w=8"],["peak-days/index.html#w=9","peak-days/index.html#w=9"]]},url(o){return this.urls[Math.max(0,Math.min(8,(o.w||1)-1))][o.peak?1:0];}}];
 const liveCount = CONCEPTS.filter((c) => c.group === 'live' && c.thumb !== 'update').length;
-document.getElementById('live-count').textContent = liveCount;
+document.getElementById('live-count').textContent = 2;
 
 // Cards follow the groups' order (live looks first), so the numbers and the viewer's next / previous do too.
 CONCEPTS.sort((a, b) => GROUPS.findIndex((g) => g.id === a.group) - GROUPS.findIndex((g) => g.id === b.group));
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-let filter = 'all', current = -1, opts = { w: 1, peak: false }, device = 'desktop';
+const shortlisted = c => c.thumb === 'live-mission' || c.thumb === 'live-horizon';
+const included = c => filter === 'shortlist' ? shortlisted(c) : !shortlisted(c);
+let filter = new URLSearchParams(location.search).get('view') === 'archive' ? 'archive' : 'shortlist', current = -1, opts = { w: 1, peak: false }, device = 'desktop';
 // Every extra file gets an index, so a link only carries data-file="k".
 const FILES = [...GROUPS, ...CONCEPTS].flatMap((x) => x.files || []);
 const fileLinks = (list) => !list ? '' : `<div class="files">${list.map((f) =>
@@ -217,8 +220,8 @@ const fileLinks = (list) => !list ? '' : `<div class="files">${list.map((f) =>
 
 const kindOf = (c) => GROUPS.find((g) => g.id === c.group)?.kind;
 $('#stats').innerHTML = [
-  [liveCount, 'קונספטים חיים'],
-  [CONCEPTS.filter((c) => kindOf(c) === 'archive' && !c.video).length, 'דמואים בארכיון'],
+  [CONCEPTS.filter(shortlisted).length, 'כיוונים ראשיים'],
+  [CONCEPTS.filter(c => !shortlisted(c)).length, 'עיצובים בארכיון'],
   [CONCEPTS.filter((c) => c.video).length, 'סרטונים'],
   [WEEKS_FIVE.length, `שבועות · ${WEEKS_FIVE.length} יעדים`],
 ].map(([n, l]) => `<div><strong>${n}</strong>${l}</div>`).join('');
@@ -231,7 +234,7 @@ addEventListener('storage', (e) => { if (e.key === SYNC) renderStatus(); });
 renderStatus();
 
 function renderFilters() {
-  const chips = [['all', 'הכול', CONCEPTS.length], ...GROUPS.map((g) => [g.id, g.name, CONCEPTS.filter((c) => c.group === g.id).length])];
+  const chips = [['shortlist', 'הכיוונים הראשיים', CONCEPTS.filter(shortlisted).length], ['archive', 'ארכיון העיצובים', CONCEPTS.filter(c => !shortlisted(c)).length]];
   $('#filters').innerHTML = chips.map(([id, name, n]) => `<button class="chip" data-f="${id}" aria-pressed="${filter === id}">${esc(name)}<small>${n}</small></button>`).join('');
 }
 const KINDS = {
@@ -242,13 +245,13 @@ const KINDS = {
 };
 function renderGroups() {
   let last = null;
-  $('#groups').innerHTML = GROUPS.filter((g) => filter === 'all' || filter === g.id).map((g) => `
+  $('#groups').innerHTML = GROUPS.filter((g) => CONCEPTS.some(c => c.group === g.id && included(c))).map((g) => `
     ${g.kind !== last && filter === 'all' ? ((last = g.kind), `<div class="kind"><h2>${esc(KINDS[g.kind][0])}</h2><p>${esc(KINDS[g.kind][1])}</p></div>`) : ''}
     <section class="group ${g.kind}">
-      <h2>${esc(g.name)} <code>${esc(g.path)}</code></h2>
-      <p>${esc(g.note)}</p>
+      <h2>${esc(filter === 'shortlist' ? 'Mission / Horizon · שתי גרסאות משולבות' : g.name)} <code>${esc(g.path)}</code></h2>
+      <p>${esc(filter === 'shortlist' ? 'מחלקות טיסה, עקומת התקדמות ואטלס המסע משולבים בשני הכיוונים. בחרו עיר והשוו את הפתיחה.' : g.note)}</p>
       ${fileLinks(g.files)}
-      <div class="grid">${CONCEPTS.map((c, i) => c.group !== g.id ? '' : `
+      <div class="grid">${CONCEPTS.map((c, i) => c.group !== g.id || !included(c) ? '' : `
         <article class="card">
           <button class="thumb${c.tall ? ' tall' : ''}" data-open="${i}" aria-label="תצוגה: ${esc(c.he)}">
             <img src="_dashboard/thumbs/${c.thumb}.jpg" alt="" loading="lazy">
@@ -300,10 +303,10 @@ function openFile(k) {
 }
 function open(i) { current = i; $('#viewer').classList.add('open'); document.body.style.overflow = 'hidden'; show(); $('#vclose').focus(); }
 function close() { $('#viewer').classList.remove('open'); $('#stage').innerHTML = ''; document.body.style.overflow = ''; current = -1; }
-const step = (d) => { current = (current + d + CONCEPTS.length) % CONCEPTS.length; show(); };
+const step = (d) => { const visible = CONCEPTS.map((c, i) => included(c) ? i : -1).filter(i => i >= 0); current = visible[(visible.indexOf(current) + d + visible.length) % visible.length]; show(); };
 
 document.addEventListener('click', (e) => {
-  const f = e.target.closest('[data-f]'); if (f) { filter = f.dataset.f; renderFilters(); renderGroups(); return; }
+  const f = e.target.closest('[data-f]'); if (f) { filter = f.dataset.f; const url = new URL(location.href); if (filter === 'archive') url.searchParams.set('view', 'archive'); else url.searchParams.delete('view'); history.replaceState(null, '', url); renderFilters(); renderGroups(); return; }
   const o = e.target.closest('[data-open]'); if (o) { open(Number(o.dataset.open)); return; }
   const fl = e.target.closest('[data-file]'); if (fl) { openFile(Number(fl.dataset.file)); return; }
   const p = e.target.closest('#vpeak button'); if (p) { opts.peak = p.dataset.v === '1'; show(); return; }
