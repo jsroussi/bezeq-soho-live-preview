@@ -1,0 +1,671 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!-- Every concept is a demo (23.10.2026): a label only, the page itself is unchanged. -->
+<div class="demo-badge" role="note" dir="rtl" style="position:fixed;top:12px;left:12px;z-index:2147483647;pointer-events:none;background:#F5C342;color:#11152B;font:800 13px/1 Simpler,'Arial Hebrew',Arial,sans-serif;padding:6px 12px;border-radius:999px;box-shadow:0 2px 8px rgb(0 0 0 / .25)">דמו</div>
+
+<title>אוקטובר הגדול 2026</title>
+<!-- Concept: the October 2026 contest leaderboard (division targets, sales and service reps, team leaders, sprints,
+     CSV import), demo data. Brought in from its artifact; team leaders' names replaced by team names. -->
+<meta name="description" content="Leaderboard for the October 2026 SOHO electricity & digital services sales competition">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700;800&display=swap">
+<style>
+/* Layout: navy control band (title, as-of date, days) → tab strip → one panel per competition track. RTL throughout. */
+@font-face{font-family:"Simpler";src:url("../../../platform/public/fonts/Simpler-Light.otf") format("opentype");font-weight:300;font-display:swap}
+@font-face{font-family:"Simpler";src:url("../../../platform/public/fonts/Simpler-Regular.otf") format("opentype");font-weight:400;font-display:swap}
+@font-face{font-family:"Simpler";src:url("../../../platform/public/fonts/Simpler-Bold.otf") format("opentype");font-weight:700;font-display:swap}
+@font-face{font-family:"Simpler";src:url("../../../platform/public/fonts/Simpler-Black.otf") format("opentype");font-weight:900;font-display:swap}
+:root{
+  --bg:#F2F5FA; --surface:#FFFFFF; --surface-2:#F7F9FC; --line:#DDE3EC; --ink:#08192A; --ink-2:#4A5B70;
+  --primary:#0059DE; --primary-ink:#FFFFFF; --primary-soft:#E3ECFC;
+  --band:#08192A; --band-ink:#FFFFFF; --band-ink-2:#A9B8CC; --lime:#CFF200; --lime-ink:#08192A;
+  --good:#0F8A5F; --good-soft:#DDF4EA; --bad:#D22F3C; --bad-soft:#FBE3E5; --pend:#5A6B80; --pend-soft:#E8ECF2;
+  --track:#E6EBF2;
+  --font:"Simpler","Assistant",system-ui,"Segoe UI",Arial,sans-serif;
+  --r-sm:6px; --r-md:10px; --r-lg:16px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#06111D; --surface:#0E1E30; --surface-2:#12253A; --line:#203750; --ink:#E9F0F8; --ink-2:#9BB0C7;
+  --primary:#4D8DFF; --primary-ink:#06111D; --primary-soft:#14305A;
+  --band:#0B1B2D; --band-ink:#FFFFFF; --band-ink-2:#93A8C0; --lime:#CFF200; --lime-ink:#08192A;
+  --good:#3FD6A0; --good-soft:#0F3A2E; --bad:#FF6B76; --bad-soft:#41161C; --pend:#9BB0C7; --pend-soft:#1A2D44;
+  --track:#1A2E45; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#06111D; --surface:#0E1E30; --surface-2:#12253A; --line:#203750; --ink:#E9F0F8; --ink-2:#9BB0C7;
+  --primary:#4D8DFF; --primary-ink:#06111D; --primary-soft:#14305A;
+  --band:#0B1B2D; --band-ink:#FFFFFF; --band-ink-2:#93A8C0; --lime:#CFF200; --lime-ink:#08192A;
+  --good:#3FD6A0; --good-soft:#0F3A2E; --bad:#FF6B76; --bad-soft:#41161C; --pend:#9BB0C7; --pend-soft:#1A2D44;
+  --track:#1A2E45; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.5;margin:0}
+.num{font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:isolate}
+.wrap{max-width:1180px;margin-inline:auto;padding-inline:16px}
+header.band{background:var(--band);color:var(--band-ink);padding-block:22px 18px}
+.band-top{display:flex;flex-wrap:wrap;gap:16px 28px;align-items:flex-end;justify-content:space-between}
+.brand{font-weight:700;font-size:13px;letter-spacing:.02em;color:var(--band-ink-2)}
+.brand b{color:var(--band-ink)}
+h1{font-weight:900;font-size:clamp(28px,5vw,44px);line-height:1.05;margin:4px 0 6px;letter-spacing:-.01em;text-wrap:balance}
+h1 .hl{color:var(--lime)}
+.sub{color:var(--band-ink-2);font-size:14px}
+.demo{display:inline-flex;align-items:center;gap:6px;background:var(--lime);color:var(--lime-ink);font-weight:700;font-size:12px;padding:3px 10px;border-radius:999px;margin-inline-start:8px;vertical-align:middle}
+.asof{display:grid;gap:6px;min-width:min(100%,340px)}
+.asof label{font-size:12px;color:var(--band-ink-2);font-weight:700;letter-spacing:.03em}
+.asof-row{display:flex;gap:12px;align-items:center}
+.asof input[type=range]{flex:1;accent-color:var(--lime);min-width:0}
+.asof output{font-weight:700;font-size:18px;min-width:5.5ch;text-align:center}
+.days{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;font-size:13px;color:var(--band-ink-2)}
+.days b{color:var(--band-ink);font-size:16px}
+.daybar{height:6px;background:rgba(255,255,255,.12);border-radius:99px;margin-top:10px;overflow:hidden;position:relative}
+.daybar span{position:absolute;inset-block:0;right:0;background:var(--lime);border-radius:99px}
+.daybar i{position:absolute;inset-block:-2px;width:2px;background:var(--band-ink-2)}
+
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.tabs .wrap{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.tabs button{appearance:none;border:0;background:none;color:var(--ink-2);font:inherit;font-weight:700;font-size:14px;padding:14px 12px;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected=true]{color:var(--primary);border-bottom-color:var(--primary)}
+.tabs button:focus-visible,.seg button:focus-visible,.btn:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+
+main{padding-block:24px 48px}
+section.panel{display:grid;gap:22px}
+h2{font-size:20px;font-weight:900;margin:0;text-wrap:balance}
+h3{font-size:15px;font-weight:700;margin:0}
+.lede{color:var(--ink-2);margin:4px 0 0;max-width:72ch;font-size:14px}
+.head{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:flex-end;justify-content:space-between}
+
+.meters{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.meter{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:16px;display:grid;gap:8px;min-width:0}
+.meter .k{font-size:13px;color:var(--ink-2);font-weight:700}
+.meter .v{font-size:26px;font-weight:900;line-height:1}
+.meter .v small{font-size:13px;font-weight:400;color:var(--ink-2)}
+.bar{height:8px;background:var(--track);border-radius:99px;position:relative;overflow:visible}
+.bar>span{position:absolute;inset-block:0;right:0;border-radius:99px;background:var(--primary);max-width:100%}
+.bar>i{position:absolute;inset-block:-4px;width:2px;background:var(--ink);opacity:.55;border-radius:2px}
+.bar.done>span{background:var(--good)}
+.meter .foot{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--ink-2);flex-wrap:wrap}
+
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.pill.good{background:var(--good-soft);color:var(--good)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.pend{background:var(--pend-soft);color:var(--pend)}
+.pill.win{background:var(--lime);color:var(--lime-ink)}
+.pill.blue{background:var(--primary-soft);color:var(--primary)}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:16px;display:grid;gap:10px;align-content:start;min-width:0}
+.card .row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.prize{font-weight:900;font-size:18px}
+.mini{display:grid;gap:8px}
+.mini .line{display:grid;grid-template-columns:minmax(80px,auto) 1fr auto;gap:10px;align-items:center;font-size:13px}
+.mini .line .bar{height:6px}
+.note{font-size:12px;color:var(--ink-2)}
+
+.seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{appearance:none;border:0;background:none;font:inherit;font-size:13px;font-weight:700;color:var(--ink-2);padding:6px 14px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--primary);color:var(--primary-ink)}
+
+.pools{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.pool{border-radius:var(--r-md);padding:14px 16px;border:1px solid var(--line);background:var(--surface);display:grid;gap:6px;min-width:0}
+.pool.top{background:var(--band);color:var(--band-ink);border-color:var(--band)}
+.pool.top .note{color:var(--band-ink-2)}
+.pool .t{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.pool .t b{font-size:15px}
+.pool .names{font-size:13px;line-height:1.7}
+.pool.top .count{color:var(--lime)}
+.count{font-weight:900;font-size:22px}
+
+.tablebox{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:640px}
+th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:12px;color:var(--ink-2);font-weight:700;background:var(--surface-2);position:sticky;top:0}
+tbody tr:last-child td{border-bottom:0}
+td.rank{width:44px;font-weight:900;color:var(--ink-2)}
+tr.q td.rank{color:var(--primary)}
+td.name b{font-weight:700}
+td.name .note{display:block}
+.pct{display:grid;grid-template-columns:52px 1fr;gap:8px;align-items:center;min-width:140px}
+.pct .bar{height:6px}
+.comp{white-space:nowrap}
+.comp.ok{color:var(--good);font-weight:700}
+
+.heats{display:grid;gap:16px}
+.heat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px;display:grid;gap:14px}
+.heat-h{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+.heat-h h3{font-size:17px;font-weight:900}
+.heat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.hc{background:var(--surface-2);border-radius:var(--r-md);padding:14px;display:grid;gap:8px;min-width:0}
+.hc .entry{font-size:13px;color:var(--ink-2)}
+.hc .entry b{color:var(--ink)}
+
+details.assume{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:12px 16px}
+details.assume summary{cursor:pointer;font-weight:700}
+details.assume ul{margin:10px 0 0;padding-inline-start:20px;color:var(--ink-2);font-size:13px;display:grid;gap:4px}
+
+.btn{appearance:none;border:1px solid var(--primary);background:var(--primary);color:var(--primary-ink);font:inherit;font-weight:700;font-size:14px;padding:9px 18px;border-radius:999px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--primary)}
+.drop{border:2px dashed var(--line);border-radius:var(--r-lg);padding:28px 18px;text-align:center;display:grid;gap:10px;justify-items:center;background:var(--surface)}
+.drop.over{border-color:var(--primary);background:var(--primary-soft)}
+pre.code{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-sm);padding:12px;overflow-x:auto;font-size:12.5px;direction:ltr;text-align:left;margin:0;white-space:pre}
+.msg{font-size:14px;font-weight:700}
+.msg.err{color:var(--bad)} .msg.ok{color:var(--good)}
+@media (max-width:520px){.asof-row output{font-size:16px}.meter .v{font-size:22px}}
+@media (prefers-reduced-motion:no-preference){.bar>span,.daybar span{transition:width .25s ease-out}}
+</style>
+
+<div dir="rtl" lang="he">
+<header class="band">
+  <div class="wrap">
+    <div class="band-top">
+      <div>
+        <div class="brand"><b>בזק energy</b> · אגף סוהו חשמל ושירותי דיגיטל</div>
+        <h1>אוקטובר <span class="hl">הגדול</span> 2026</h1>
+        <div class="sub">תחרות מכירות · <span class="num">01.10–31.10.2026</span> · <span class="num">20.7</span> ימי עבודה<span class="demo" id="srcBadge">נתוני דמו</span></div>
+      </div>
+      <div class="asof">
+        <label for="asof">מצב נכון לסוף יום</label>
+        <div class="asof-row">
+          <input type="range" id="asof" min="1" max="31" value="5" aria-describedby="asofOut">
+          <output id="asofOut" class="num"></output>
+        </div>
+      </div>
+    </div>
+    <div class="days">
+      <span>ימי עבודה שחלפו <b class="num" id="dElapsed"></b> מתוך <b class="num">20.7</b></span>
+      <span>קצב נדרש עד היום <b class="num" id="dPace"></b></span>
+      <span id="dHeat"></span>
+    </div>
+    <div class="daybar" aria-hidden="true"><span id="dBar"></span></div>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="מסלולי התחרות">
+  <div class="wrap" role="tablist">
+    <button role="tab" id="t-overview" aria-selected="true" data-tab="overview">סקירת אגף</button>
+    <button role="tab" id="t-sales" aria-selected="false" data-tab="sales">נציגי מכירות</button>
+    <button role="tab" id="t-service" aria-selected="false" data-tab="service">נציגי שירות</button>
+    <button role="tab" id="t-managers" aria-selected="false" data-tab="managers">מנהלי צוות</button>
+    <button role="tab" id="t-heats" aria-selected="false" data-tab="heats">מקצים</button>
+    <button role="tab" id="t-import" aria-selected="false" data-tab="import">ייבוא נתונים</button>
+  </div>
+</nav>
+
+<main class="wrap">
+  <section class="panel" id="p-overview" role="tabpanel" aria-labelledby="t-overview"></section>
+  <section class="panel" id="p-sales" role="tabpanel" aria-labelledby="t-sales" hidden></section>
+  <section class="panel" id="p-service" role="tabpanel" aria-labelledby="t-service" hidden></section>
+  <section class="panel" id="p-managers" role="tabpanel" aria-labelledby="t-managers" hidden></section>
+  <section class="panel" id="p-heats" role="tabpanel" aria-labelledby="t-heats" hidden></section>
+  <section class="panel" id="p-import" role="tabpanel" aria-labelledby="t-import" hidden>
+    <div>
+      <h2>ייבוא דוח קליק</h2>
+      <p class="lede">כשתהיה גישה לדוח, גררו לכאן קובץ CSV והלוח יחושב מחדש מיד. הקובץ נקרא רק בדפדפן שלכם ולא נשלח לשום מקום. כרגע מוצגים נתוני דמו. את מבנה העמודות נתאים לייצוא האמיתי של קליק כשיגיע.</p>
+    </div>
+    <div class="drop" id="drop">
+      <b>גררו קובץ CSV לכאן</b>
+      <span class="note">או</span>
+      <label class="btn" for="file">בחירת קובץ</label>
+      <input type="file" id="file" accept=".csv,text/csv" hidden>
+      <span class="msg" id="impMsg" role="status"></span>
+      <button class="btn ghost" id="resetDemo" type="button" hidden>חזרה לנתוני הדמו</button>
+    </div>
+    <div class="card">
+      <div class="row"><h3>מבנה העמודות הנוכחי (זמני)</h3><button class="btn ghost" id="copyTpl" type="button">העתקת כותרות</button></div>
+      <pre class="code" id="tpl">open_date,close_date,rep,team,dept,role,product,status,source
+2026-10-04,2026-10-06,דנה ל.,מכירות סוהו,soho,sales,biznet,active,
+2026-10-04,2026-10-04,אבי מ.,חשמל 1,elec,sales,elec,active,bezeq_gen</pre>
+      <ul class="note" style="margin:0;padding-inline-start:18px;display:grid;gap:3px">
+        <li><b>dept</b>: soho · field · ads · elec · b144</li>
+        <li><b>role</b>: sales · service</li>
+        <li><b>product</b>: biznet · centrix · c2ch · guide · reseller · elec · elead (ליד חשמל ממומש) · lead144</li>
+        <li><b>status</b>: active · cancelled (הזמנות מבוטלות לא נספרות)</li>
+        <li><b>source</b>: bezeq_gen מוחרג מהיעד האישי של נציגי חשמל ונספר ליעד המוקד</li>
+        <li>תאריכים בפורמט YYYY-MM-DD או DD/MM/YYYY. close_date ריק = הזמנה פתוחה.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+</div>
+
+<script>
+(function(){
+"use strict";
+/* ---------- calendar (per rulebook: 20.7 days; heat 1 = 5.7) ---------- */
+const DAYW = {}; // day-of-month -> working weight
+for(let d=1; d<=31; d++){
+  const dow = new Date(2026,9,d).getDay(); // 0 Sun
+  DAYW[d] = d===1 ? 0.7 : (d>=4 && dow>=0 && dow<=4 ? 1 : 0);
+}
+const TOTAL_DAYS = 20.7;
+const elapsed = (to, from=1) => { let s=0; for(let d=from; d<=to; d++) s+=DAYW[d]; return Math.round(s*10)/10; };
+const HEATS = [
+  {id:1, name:"מקצה 1", from:1, to:8, days:5.7, kind:"פתיחות", leads:20},
+  {id:2, name:"מקצה 2", from:11, to:15, days:5, kind:"פתיחות", leads:25},
+  {id:3, name:"מקצה 3", from:18, to:22, days:5, kind:"סגירות", leads:20},
+];
+
+/* ---------- rulebook constants ---------- */
+const DIV = {biznet:53, centrix:22, guide:30, reseller:9, elec:135}; // per working day
+const DIV_M = {biznet:1097, centrix:456, guide:621, reseller:186, elec:2794};
+const PL = {biznet:"ביזנט", centrix:"סנטריקס", c2ch:"C2CH", guide:"מדריך סולו", reseller:"ריסלר", elec:"הסכמי חשמל", elead:"לידים ממומשים", lead144:"לידים 144"};
+const DEPT = {soho:"מוקד סוהו", field:"סוכני שטח", ads:"פרסום דיגיטלי", elec:"מוקד חשמל", b144:"מעבירי לידים 144"};
+const SECTOR_OF = {soho:"soho", field:"soho", ads:"ads", elec:"elec"};
+const SECTOR_NAME = {soho:"סוהו", ads:"פרסום", elec:"חשמל"};
+const SALES_RULES = {
+  soho:[{k:"biz", label:"שירותים עסקיים", t:42}, {k:"c2ch", label:"C2CH", t:5}],
+  ads:[{k:"guide", label:"מדריך סולו", t:18}, {k:"reseller", label:"ריסלר", t:4}],
+  elec:[{k:"elecRep", label:"הסכמים", t:115}],
+};
+const SERVICE_RULES = {
+  soho:[{k:"biznet", label:"ביזנט מותקן", t:7}, {k:"c2ch", label:"C2CH מותקן", t:2}],
+  ads:[{k:"adsAny", label:"מדריך/ריסלר", t:3}],
+  elec:[{k:"elead", label:"לידים ממומשים", t:40}],
+};
+const DYSON_SLOTS = {soho:3, ads:2, elec:2};
+
+/* ---------- demo data (seeded, deterministic) ---------- */
+function rng(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function demoData(){
+  const R = rng(20261005);
+  const pois = l => { const L=Math.exp(-l); let k=0,p=1; do{k++; p*=R();}while(p>L); return k-1; };
+  const first = ["דנה","אבי","מיכל","יוסי","נועה","רון","שירה","עומר","טל","גלית","אלון","הילה","משה","ליאור","יעל","דוד","אורית","אסף","מורן","עידו","סיון","ניר","רותם","אייל","לימור","בן","מאיה","גיל","ענבל","אריאל","קרן","שי","הדר","נדב","אפרת","תומר","רוני","חן","עדי","יונתן","שקד","איתי","אביטל","אורי","נטע","רז","דקלה","עמית","ליה","אלעד"];
+  const last = "אבגדהזחטיכלמנסעפצקרש";
+  const used = new Set(); let ni=0;
+  const name = () => { for(;;){ const n = first[ni%first.length]+" "+last[(ni*7+Math.floor(ni/first.length)*3)%last.length]+"."; ni++; if(!used.has(n)){used.add(n); return n;} } };
+  const groups = [
+    {dept:"soho", role:"sales", team:"מכירות סוהו", n:16, rates:{biznet:2.5, centrix:1.0, c2ch:.3}},
+    {dept:"field", role:"sales", team:"סוכני שטח", n:6, rates:{biznet:2.6, centrix:1.05, c2ch:.32}},
+    {dept:"ads", role:"sales", team:"פרסום 1", n:9, rates:{guide:1.25, reseller:.4}},
+    {dept:"ads", role:"sales", team:"פרסום 2", n:9, rates:{guide:1.25, reseller:.4}},
+    {dept:"ads", role:"sales", team:"פרסום 3", n:8, rates:{guide:1.25, reseller:.4}},
+    {dept:"elec", role:"sales", team:"חשמל 1", n:11, rates:{elec:7.2}},
+    {dept:"elec", role:"sales", team:"חשמל 2", n:11, rates:{elec:7.2}},
+    {dept:"b144", role:"sales", team:"לידים 144", n:8, rates:{lead144:3.0}},
+    {dept:"soho", role:"service", team:"שירות סוהו", n:10, rates:{biznet:.42, c2ch:.13}},
+    {dept:"ads", role:"service", team:"שירות פרסום", n:6, rates:{guide:.12, reseller:.05}},
+    {dept:"elec", role:"service", team:"שירות חשמל", n:6, rates:{elead:2.1}},
+  ];
+  const rows = [];
+  for(const g of groups){
+    for(let i=0;i<g.n;i++){
+      const rep = name(); const skill = .55 + R()*.85;
+      for(let d=1; d<=31; d++){
+        const w = DAYW[d]; if(!w) continue;
+        const dayN = .7 + R()*.6;
+        for(const p in g.rates){
+          const n = pois(g.rates[p]*w*skill*dayN);
+          for(let k=0;k<n;k++){
+            const instant = (p==="elec"||p==="elead"||p==="lead144"||p==="guide"||p==="reseller");
+            let cd = instant ? d : d + Math.floor(R()*7);
+            const status = R()<.05 ? "cancelled" : "active";
+            rows.push({od:d, cd:cd, rep, team:g.team, dept:g.dept, role:g.role, product:p, status,
+              source: (p==="elec" && R()<.08) ? "bezeq_gen" : ""});
+          }
+        }
+      }
+    }
+  }
+  return rows;
+}
+
+/* ---------- state ---------- */
+let ROWS = demoData();
+let SOURCE = "demo";
+let ASOF = 5;
+let TAB = "overview";
+let SECTOR = "soho", SVC_SECTOR = "soho";
+try{ const t = localStorage.getItem("og26-tab"); if(t) TAB=t; }catch(e){}
+
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt = n => Math.round(n).toLocaleString("he-IL");
+const pctS = x => Math.round(x*100)+"%";
+const live = r => r.status !== "cancelled";
+const closedBy = (r, d) => live(r) && r.cd!=null && r.cd<=d && r.od<=31;
+function bar(frac, expect, done){
+  const w = Math.max(0, Math.min(1, frac))*100;
+  const m = expect!=null ? `<i style="right:calc(${Math.min(1,expect)*100}% - 1px)" title="קצב נדרש"></i>` : "";
+  return `<div class="bar${done?" done":""}"><span style="width:${w}%"></span>${m}</div>`;
+}
+function paceFor(frac, expect){
+  if(frac>=1) return `<span class="pill win">עמד ביעד</span>`;
+  if(ASOF>=31 || expect>=1) return `<span class="pill bad">לא עמד</span>`;
+  return frac >= expect ? `<span class="pill good">בקצב</span>` : `<span class="pill bad">מתחת לקצב</span>`;
+}
+const EXP = () => elapsed(ASOF)/TOTAL_DAYS;
+
+/* count closed (active) rows through ASOF matching a predicate */
+function count(pred, d=ASOF){ let n=0; for(const r of ROWS) if(closedBy(r,d) && pred(r)) n++; return n; }
+
+/* per-rep metrics */
+function repMetrics(){
+  const reps = new Map();
+  for(const r of ROWS){
+    if(!reps.has(r.rep)) reps.set(r.rep, {rep:r.rep, team:r.team, dept:r.dept, role:r.role, m:{biz:0,c2ch:0,guide:0,reseller:0,elecRep:0,biznet:0,adsAny:0,elead:0,lead144:0}});
+    if(!closedBy(r, ASOF)) continue;
+    const m = reps.get(r.rep).m;
+    if(r.product==="biznet"||r.product==="centrix") m.biz++;
+    if(r.product==="biznet") m.biznet++;
+    if(r.product==="c2ch") m.c2ch++;
+    if(r.product==="guide") { m.guide++; m.adsAny++; }
+    if(r.product==="reseller") { m.reseller++; m.adsAny++; }
+    if(r.product==="elec" && r.source!=="bezeq_gen") m.elecRep++;
+    if(r.product==="elead") m.elead++;
+    if(r.product==="lead144") m.lead144++;
+  }
+  return [...reps.values()];
+}
+function score(rep, rules){
+  const parts = rules.map(x => ({...x, v:rep.m[x.k], f:rep.m[x.k]/x.t}));
+  const pct = parts.reduce((s,p)=>s+p.f,0)/parts.length;
+  return {...rep, parts, pct, q: parts.every(p=>p.f>=1)};
+}
+
+/* ---------- header ---------- */
+function renderHeader(){
+  $("asofOut").textContent = ASOF+".10";
+  const e = elapsed(ASOF);
+  $("dElapsed").textContent = e.toLocaleString("he-IL");
+  $("dPace").textContent = pctS(e/TOTAL_DAYS);
+  $("dBar").style.width = (e/TOTAL_DAYS*100)+"%";
+  const h = HEATS.find(h=>ASOF>=h.from && ASOF<=h.to);
+  const next = HEATS.find(h=>ASOF<h.from);
+  $("dHeat").innerHTML = h ? `מקצה פעיל: <b>${h.name}</b> <span class="num">(${h.from}–${h.to}.10)</span>`
+    : next ? `המקצה הבא: <b>${next.name}</b> מתחיל ב-<span class="num">${next.from}.10</span>` : `כל המקצים הסתיימו`;
+  $("srcBadge").textContent = SOURCE==="demo" ? "נתוני דמו" : "נתונים מיובאים";
+}
+
+/* ---------- overview ---------- */
+function renderOverview(){
+  const exp = EXP();
+  const act = {
+    biznet: count(r=>r.product==="biznet"), centrix: count(r=>r.product==="centrix"),
+    guide: count(r=>r.product==="guide"), reseller: count(r=>r.product==="reseller"),
+    elec: count(r=>r.product==="elec"),
+  };
+  const meters = Object.keys(DIV_M).map(k=>{
+    const f = act[k]/DIV_M[k];
+    return `<div class="meter">
+      <div class="row" style="display:flex;justify-content:space-between;gap:8px;align-items:center"><span class="k">${PL[k]}</span>${paceFor(f, exp)}</div>
+      <div class="v num">${fmt(act[k])} <small>/ ${fmt(DIV_M[k])}</small></div>
+      ${bar(f, exp, f>=1)}
+      <div class="foot"><span class="num">${pctS(f)}</span><span>נדרש עד היום <span class="num">${fmt(DIV_M[k]*exp)}</span></span></div>
+    </div>`;
+  }).join("");
+
+  // department prizes (team shares of division targets by sales headcount — demo assumption)
+  const reps = repMetrics().filter(r=>r.role==="sales");
+  const head = d => reps.filter(r=>r.dept===d).length;
+  const sohoShare = head("soho")/(head("soho")+head("field") || 1);
+  const deptAct = (d, p) => count(r=>r.dept===d && r.product===p);
+  const line = (label, a, t) => { const f=a/t; return `<div class="line"><span>${label}</span>${bar(f, exp, f>=1)}<span class="num">${fmt(a)}/${fmt(t)}</span></div>`; };
+  const deptCard = (title, prize, lines, extra) => {
+    const ok = lines.every(l=>l.a>=l.t);
+    const st = ok ? `<span class="pill win">עמדה ביעד</span>` : (ASOF>=31 ? `<span class="pill bad">לא עמדה</span>` : (lines.every(l=>l.a/l.t>=exp) ? `<span class="pill good">בקצב</span>` : `<span class="pill bad">מתחת לקצב</span>`));
+    return `<div class="card"><div class="row"><h3>${title}</h3>${st}</div>
+      <div class="prize num">₪${fmt(prize)}</div>
+      <div class="mini">${lines.map(l=>line(l.label,l.a,l.t)).join("")}</div>${extra||""}</div>`;
+  };
+  const churn = (b, c, full, one) => `<div class="note"><span class="pill pend">יימדד בסוף נובמבר</span> 50% מהפרס מותנה ביעדי פחת: ביזנט ${b}%, סנטריקס ${c}%. עמידה בפחת של מוצר אחד בלבד: ₪${one}.</div>`;
+  const cards = [
+    deptCard("מוקד סוהו", 1500, [
+      {label:"ביזנט", a:deptAct("soho","biznet"), t:DIV_M.biznet*sohoShare},
+      {label:"סנטריקס", a:deptAct("soho","centrix"), t:DIV_M.centrix*sohoShare}], churn(70,82,1500,375)),
+    deptCard("סוכני שטח סוהו", 1000, [
+      {label:"ביזנט", a:deptAct("field","biznet"), t:DIV_M.biznet*(1-sohoShare)},
+      {label:"סנטריקס", a:deptAct("field","centrix"), t:DIV_M.centrix*(1-sohoShare)}], churn(80,84,1000,250)),
+    deptCard("מוקד 144 חיפה ופרסום דיגיטלי ת״א", 1500, [
+      {label:"מדריך סולו", a:act.guide, t:DIV_M.guide},
+      {label:"ריסלר", a:act.reseller, t:DIV_M.reseller}]),
+    deptCard("מוקד חשמל", 1500, [
+      {label:"הסכמים חתומים", a:act.elec, t:DIV_M.elec}], `<div class="note">כולל הסכמים שהגיעו כליד מבזק ג׳ן (<span class="num">${fmt(count(r=>r.product==="elec"&&r.source==="bezeq_gen"))}</span> עד כה).</div>`),
+  ].join("");
+
+  const sales = repMetrics().filter(r=>r.role==="sales" && SALES_RULES[SECTOR_OF[r.dept]]).map(r=>score(r, SALES_RULES[SECTOR_OF[r.dept]]));
+  const svc = repMetrics().filter(r=>r.role==="service").map(r=>score(r, SERVICE_RULES[r.dept]));
+  $("p-overview").innerHTML = `
+    <div class="head"><div><h2>יעדי האגף לתחרות</h2><p class="lede">סגירות פעילות עד סוף היום הנבחר, ללא הזמנות מבוטלות. הקו האנכי בכל פס מסמן את הקצב הנדרש עד היום.</p></div></div>
+    <div class="meters">${meters}</div>
+    <div class="cards">
+      <div class="card"><div class="row"><h3>נציגי מכירות בתנאי סף</h3></div><div class="count num">${sales.filter(s=>s.q).length} <small class="note">מתוך ${sales.length}</small></div><div class="note">אייפון 17 · מחשב נייד Lenovo ״15.6 · BUYME ₪1,500</div></div>
+      <div class="card"><div class="row"><h3>נציגי שירות בתנאי סף</h3></div><div class="count num">${svc.filter(s=>s.q).length} <small class="note">מתוך ${svc.length}</small></div><div class="note">מעצב שיער דייסון · BUYME ₪500</div></div>
+    </div>
+    <div><h2>פרסי מחלקות</h2><p class="lede">כל מחלקה שתעמוד ב-100% מהיעד זוכה בפרס מחלקתי. תומכי מכירה של מחלקות שעמדו ביעד נכנסים להגרלת סט מזוודות.</p></div>
+    <div class="cards">${cards}</div>
+    ${assumptions()}`;
+}
+
+function assumptions(){
+  return `<details class="assume"><summary>הנחות חישוב שעדיין דורשות אישור</summary><ul>
+    <li>אחוז עמידה של נציג עם שני רכיבים = ממוצע אחוזי העמידה ברכיבים. כניסה להגרלה רק כשכל רכיב ב-100%.</li>
+    <li>״שירותים עסקיים״ = ביזנט + סנטריקס. סנטריקס מטופל כ-IPC.</li>
+    <li>יעד מחלקתי של מוקד סוהו וסוכני שטח מחולק לפי מספר נציגי המכירות בכל אחד מהם.</li>
+    <li>יעד צוות למנהל = חלק יחסי מיעד המחלקה לפי מספר הנציגים בצוות.</li>
+    <li>״מוקד 144 חיפה ופרסום דיגיטלי ת״א״ מוצגים כמחלקה אחת עם פרס אחד.</li>
+    <li>יעד חודשי לצוות מעבירי לידים 144 לא מופיע בתקנון. לצורך הדמו: 20 ליום × 20.7.</li>
+    <li>יעדי מקצה של פרסום (30/9) ושל חשמל (150) מחושבים ליום עבודה. תנאי הסף לנציג חשמל במקצה: 7 × ימי המקצה.</li>
+    <li>תנאי הסף לנציג מכירות סוהו במקצים (״X״) טרם הוגדר בתקנון.</li>
+  </ul></details>`;
+}
+
+/* ---------- sales reps ---------- */
+function rankSector(list, sec){
+  return list.filter(s=>SECTOR_OF[s.dept]===sec).sort((a,b)=> (b.q-a.q) || (b.pct-a.pct));
+}
+function renderSales(){
+  const all = repMetrics().filter(r=>r.role==="sales" && SALES_RULES[SECTOR_OF[r.dept]]).map(r=>score(r, SALES_RULES[SECTOR_OF[r.dept]]));
+  const iphone=[], laptop=[], buyme=[];
+  for(const sec of ["soho","ads","elec"]){
+    const q = rankSector(all, sec).filter(s=>s.q);
+    if(q[0]) iphone.push(q[0]);
+    laptop.push(...q.slice(1,4));
+    buyme.push(...q);
+  }
+  const tag = new Map();
+  iphone.forEach(s=>tag.set(s.rep,"iphone")); laptop.forEach(s=>tag.set(s.rep,"laptop"));
+  const exp = EXP();
+  const rows = rankSector(all, SECTOR).map((s,i)=>{
+    const t = tag.get(s.rep);
+    const chip = !s.q ? `<span class="pill pend">טרם בתנאי סף</span>` : t==="iphone" ? `<span class="pill win">מאגר אייפון</span>` : t==="laptop" ? `<span class="pill blue">מאגר מחשב נייד</span>` : `<span class="pill good">מאגר BUYME</span>`;
+    return `<tr class="${s.q?"q":""}"><td class="rank num">${i+1}</td>
+      <td class="name"><b>${esc(s.rep)}</b><span class="note">${esc(DEPT[s.dept])} · צוות ${esc(s.team)}</span></td>
+      ${s.parts.map(p=>`<td class="comp num ${p.f>=1?"ok":""}">${p.v} / ${p.t}</td>`).join("")}
+      <td><div class="pct"><span class="num">${pctS(s.pct)}</span>${bar(s.pct, exp, s.q)}</div></td>
+      <td>${chip}</td></tr>`;
+  }).join("");
+  const names = l => l.length ? l.map(s=>esc(s.rep)+` <span class="note">(${SECTOR_NAME[SECTOR_OF[s.dept]]})</span>`).join(" · ") : `<span class="note">עדיין אין נציגים שעמדו בתנאי הסף</span>`;
+  const rules = SALES_RULES[SECTOR];
+  $("p-sales").innerHTML = `
+    <div class="head"><div><h2>נציגי מכירות</h2><p class="lede">דירוג לפי אחוז עמידה ביעד, מהגבוה לנמוך. המאגרים מתעדכנים עד סוף התחרות. ההגרלה לפי המצב ב-<span class="num">31.10</span>.</p></div></div>
+    <div class="pools">
+      <div class="pool top"><div class="t"><b>אייפון 17</b><span class="count num">${iphone.length}/3</span></div><div class="note">המקום הראשון מכל מגזר. שני מי שלא יזכו עוברים להגרלת המחשב הנייד.</div><div class="names">${names(iphone)}</div></div>
+      <div class="pool"><div class="t"><b>מחשב נייד Lenovo ״15.6</b><span class="count num">${laptop.length}/9 +2</span></div><div class="note">מקומות 2–4 בכל מגזר, ועוד 2 שלא זכו באייפון.</div><div class="names">${names(laptop)}</div></div>
+      <div class="pool"><div class="t"><b>BUYME ₪1,500</b><span class="count num">${buyme.length}</span></div><div class="note">כל מי שעמד ביעד, ועוד מי שלא זכה בהגרלות הקודמות.</div></div>
+    </div>
+    <div class="head"><div class="seg" role="group" aria-label="מגזר">
+      ${["soho","ads","elec"].map(s=>`<button type="button" data-sec="${s}" aria-pressed="${s===SECTOR}">${SECTOR_NAME[s]}</button>`).join("")}
+    </div><span class="note">תנאי סף: ${rules.map(r=>`<span class="num">${r.t}</span> ${r.label}`).join(" + ")}${SECTOR==="elec"?" (לא כולל לידים מבזק ג׳ן)":""}</span></div>
+    <div class="tablebox"><table><thead><tr><th>#</th><th>נציג</th>${rules.map(r=>`<th>${r.label}</th>`).join("")}<th>אחוז עמידה</th><th>סטטוס</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  $("p-sales").querySelectorAll("[data-sec]").forEach(b=>b.onclick=()=>{SECTOR=b.dataset.sec; renderSales();});
+}
+
+/* ---------- service reps ---------- */
+function renderService(){
+  const all = repMetrics().filter(r=>r.role==="service" && SERVICE_RULES[r.dept]).map(r=>score(r, SERVICE_RULES[r.dept]));
+  const dyson=[], buyme=[];
+  for(const sec of ["soho","ads","elec"]){
+    const q = all.filter(s=>s.dept===sec && s.q).sort((a,b)=>b.pct-a.pct);
+    dyson.push(...q.slice(0, DYSON_SLOTS[sec])); buyme.push(...q);
+  }
+  const inDyson = new Set(dyson.map(s=>s.rep));
+  const exp = EXP();
+  const rules = SERVICE_RULES[SVC_SECTOR];
+  const rows = all.filter(s=>s.dept===SVC_SECTOR).sort((a,b)=>(b.q-a.q)||(b.pct-a.pct)).map((s,i)=>`
+    <tr class="${s.q?"q":""}"><td class="rank num">${i+1}</td><td class="name"><b>${esc(s.rep)}</b><span class="note">${esc(s.team)}</span></td>
+    ${s.parts.map(p=>`<td class="comp num ${p.f>=1?"ok":""}">${p.v} / ${p.t}</td>`).join("")}
+    <td><div class="pct"><span class="num">${pctS(s.pct)}</span>${bar(s.pct, exp, s.q)}</div></td>
+    <td>${!s.q?`<span class="pill pend">טרם בתנאי סף</span>`:inDyson.has(s.rep)?`<span class="pill win">מאגר דייסון</span>`:`<span class="pill good">מאגר BUYME</span>`}</td></tr>`).join("");
+  const names = l => l.length ? l.map(s=>esc(s.rep)).join(" · ") : `<span class="note">עדיין אין נציגים שעמדו בתנאי הסף</span>`;
+  $("p-service").innerHTML = `
+    <div class="head"><div><h2>נציגי שירות</h2><p class="lede">תחרות לנציגי שירות בכל המחלקות. כניסה להגרלה בעמידה ביעד לפי המגזר.</p></div></div>
+    <div class="pools">
+      <div class="pool top"><div class="t"><b>מעצב שיער דייסון</b><span class="count num">${dyson.length}/7</span></div><div class="note">סוהו 3 · פרסום 2 · חשמל 2, לפי אחוז העמידה הגבוה ביותר.</div><div class="names">${names(dyson)}</div></div>
+      <div class="pool"><div class="t"><b>BUYME ₪500</b><span class="count num">${buyme.length}</span></div><div class="note">כל מי שעמד ביעד, ועוד מי שלא זכה בהגרלה הקודמת.</div></div>
+    </div>
+    <div class="head"><div class="seg" role="group" aria-label="מגזר">
+      ${["soho","ads","elec"].map(s=>`<button type="button" data-sec="${s}" aria-pressed="${s===SVC_SECTOR}">${SECTOR_NAME[s]}</button>`).join("")}
+    </div><span class="note">תנאי סף: ${rules.map(r=>`<span class="num">${r.t}</span> ${r.label}`).join(" + ")}</span></div>
+    <div class="tablebox"><table><thead><tr><th>#</th><th>נציג</th>${rules.map(r=>`<th>${r.label}</th>`).join("")}<th>אחוז עמידה</th><th>סטטוס</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  $("p-service").querySelectorAll("[data-sec]").forEach(b=>b.onclick=()=>{SVC_SECTOR=b.dataset.sec; renderService();});
+}
+
+/* ---------- managers ---------- */
+function renderManagers(){
+  const exp = EXP();
+  const reps = repMetrics().filter(r=>r.role==="sales");
+  const teams = new Map();
+  for(const r of reps){ const k=r.dept+"|"+r.team; if(!teams.has(k)) teams.set(k,{dept:r.dept, team:r.team, n:0}); teams.get(k).n++; }
+  const deptN = d => reps.filter(r=> d==="sohoAll" ? (r.dept==="soho"||r.dept==="field") : r.dept===d).length;
+  const teamAct = (t, pred) => count(r=>r.role==="sales" && r.team===t.team && r.dept===t.dept && pred(r));
+  const divOk = {
+    soho: count(r=>r.product==="biznet")>=DIV_M.biznet && count(r=>r.product==="centrix")>=DIV_M.centrix,
+    ads: count(r=>r.product==="guide")>=DIV_M.guide && count(r=>r.product==="reseller")>=DIV_M.reseller,
+    elec: count(r=>r.product==="elec")>=DIV_M.elec,
+    b144: true,
+  };
+  const cards = [...teams.values()].map(t=>{
+    let lines;
+    if(t.dept==="soho"||t.dept==="field"){ const sh=t.n/deptN("sohoAll");
+      lines=[{label:"ביזנט",a:teamAct(t,r=>r.product==="biznet"),t:DIV_M.biznet*sh},{label:"סנטריקס",a:teamAct(t,r=>r.product==="centrix"),t:DIV_M.centrix*sh}]; }
+    else if(t.dept==="ads"){ const sh=t.n/deptN("ads");
+      lines=[{label:"מדריך סולו",a:teamAct(t,r=>r.product==="guide"),t:DIV_M.guide*sh},{label:"ריסלר",a:teamAct(t,r=>r.product==="reseller"),t:DIV_M.reseller*sh}]; }
+    else if(t.dept==="elec"){ const sh=t.n/deptN("elec");
+      lines=[{label:"הסכמים חתומים",a:teamAct(t,r=>r.product==="elec"),t:DIV_M.elec*sh}]; }
+    else { lines=[{label:"לידים ממומשים",a:teamAct(t,r=>r.product==="lead144"),t:20*TOTAL_DAYS}]; }
+    const ok = lines.every(l=>l.a>=l.t);
+    const sec = t.dept==="field"?"soho":t.dept;
+    const bonus = ok && t.dept!=="b144" && divOk[sec];
+    const prize = t.dept==="b144" ? "פרס ₪500" : (bonus ? "הגרלה על ₪700" : "הגרלה על ₪500");
+    const st = ok ? `<span class="pill win">${t.dept==="b144"?"זכאית לפרס":"בהגרלה"}</span>` : (ASOF>=31?`<span class="pill bad">לא עמד</span>`:(lines.every(l=>l.a/l.t>=exp)?`<span class="pill good">בקצב</span>`:`<span class="pill bad">מתחת לקצב</span>`));
+    return `<div class="card"><div class="row"><h3>${esc(t.team)}</h3>${st}</div>
+      <div class="note">${esc(DEPT[t.dept])} · <span class="num">${t.n}</span> נציגים</div>
+      <div class="mini">${lines.map(l=>{const f=l.a/l.t;return `<div class="line"><span>${l.label}</span>${bar(f,exp,f>=1)}<span class="num">${fmt(l.a)}/${fmt(l.t)}</span></div>`;}).join("")}</div>
+      <div class="row"><span class="prize">${prize}</span>${t.dept!=="b144"?`<span class="note">₪700 אם גם האגף יעמוד ביעדים</span>`:""}</div></div>`;
+  }).join("");
+  $("p-managers").innerHTML = `
+    <div class="head"><div><h2>מנהלי צוותים</h2><p class="lede">תנאי סף: 100% מיעדי הצוות. בסוהו ובפרסום חובה לעמוד בשני המוצרים. עמידה במוצר אחד בלבד לא מזכה בכניסה.</p></div></div>
+    <div class="cards">${cards}</div>`;
+}
+
+/* ---------- heats ---------- */
+function renderHeats(){
+  const html = HEATS.map(h=>{
+    const end = Math.min(h.to, ASOF);
+    const status = ASOF < h.from ? `<span class="pill pend">טרם התחיל</span>` : ASOF <= h.to ? `<span class="pill blue">פעיל</span>` : `<span class="pill pend">הסתיים</span>`;
+    const elapsedH = ASOF < h.from ? 0 : elapsed(end, h.from);
+    const exp = elapsedH / h.days;
+    const inH = (r, useClose) => live(r) && (useClose ? (r.cd!=null && r.cd>=h.from && r.cd<=end) : (r.od>=h.from && r.od<=end));
+    const cnt = (pred, useClose=false) => ASOF<h.from ? 0 : ROWS.reduce((n,r)=>n+(inH(r,useClose)&&pred(r)?1:0),0);
+    const useClose = h.kind==="סגירות";
+    const card = (title, lines, entry) => {
+      const ok = lines.every(l=>l.a>=l.t);
+      const st = ok ? `<span class="pill win">עמד · מתקיימת הגרלה</span>` : ASOF>h.to ? `<span class="pill bad">לא עמד · אין הגרלה</span>` : ASOF<h.from ? "" : (lines.every(l=>l.a/l.t>=exp)?`<span class="pill good">בקצב</span>`:`<span class="pill bad">מתחת לקצב</span>`);
+      return `<div class="hc"><div class="row" style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center"><h3>${title}</h3>${st}</div>
+        <div class="mini">${lines.map(l=>{const f=l.a/l.t;return `<div class="line"><span>${l.label}</span>${bar(f, ASOF>=h.from&&ASOF<=h.to?exp:null, f>=1)}<span class="num">${fmt(l.a)}/${fmt(l.t)}</span></div>`;}).join("")}</div>
+        <div class="entry">${entry}</div></div>`;
+    };
+    // rep entries
+    const per = (pred, dept) => { const m=new Map(); if(ASOF<h.from) return m; for(const r of ROWS){ if(r.dept===dept && r.role==="sales" && inH(r,false) && pred(r)) m.set(r.rep,(m.get(r.rep)||0)+1);} return m; };
+    const elecM = per(r=>r.product==="elec" && r.source!=="bezeq_gen","elec");
+    const elecIn = [...elecM.values()].filter(v=>v>=7*h.days).length;
+    const adsIn = per(r=>r.product==="reseller","ads").size;
+    const tickets = [...per(r=>r.product==="lead144","b144").values()].reduce((a,b)=>a+b,0);
+    return `<div class="heat"><div class="heat-h"><h3>${h.name} · <span class="num">${h.from}–${h.to}.10</span></h3><div style="display:flex;gap:8px;flex-wrap:wrap"><span class="pill blue">יעד ${h.kind}</span><span class="pill pend"><span class="num">${h.days}</span>&nbsp;ימי עבודה</span>${status}</div></div>
+      <div class="heat-grid">
+        ${card("מוקד סוהו / סוכני שטח", [
+          {label:"ביזנט", a:cnt(r=>r.product==="biznet"&&(r.dept==="soho"||r.dept==="field"), useClose), t:DIV.biznet*h.days},
+          {label:"סנטריקס", a:cnt(r=>r.product==="centrix"&&(r.dept==="soho"||r.dept==="field"), useClose), t:DIV.centrix*h.days}],
+          `כניסה להגרלה: <b>X מכירות</b>. תנאי הסף טרם הוגדר בתקנון.`)}
+        ${card("מוקדי פרסום דיגיטלי", [
+          {label:"מדריך סולו", a:cnt(r=>r.product==="guide"), t:DIV.guide*h.days},
+          {label:"ריסלר", a:cnt(r=>r.product==="reseller"), t:DIV.reseller*h.days}],
+          `נציגים עם מכירת ריסלר/חבילה משולבת: <b class="num">${adsIn}</b>`)}
+        ${card("מעבירי לידים 144", [
+          {label:"לידים ממומשים", a:cnt(r=>r.product==="lead144"), t:h.leads*h.days}],
+          `כרטיסים בהגרלה (ליד ממומש = כרטיס): <b class="num">${tickets}</b> · יעד <span class="num">${h.leads}</span> ליום`)}
+        ${card("מוקד חשמל", [
+          {label:"הסכמים", a:cnt(r=>r.product==="elec"), t:150*h.days}],
+          `נציגים מעל 7 הסכמים ליום (<span class="num">${fmt(7*h.days)}</span> במקצה): <b class="num">${elecIn}</b>`)}
+      </div></div>`;
+  }).join("");
+  $("p-heats").innerHTML = `<div class="head"><div><h2>מקצים</h2><p class="lede">כל מקצה עם יעד מותאם. הגרלות המקצה מתקיימות רק בעמידה של 100% ביעד המקצה. מקור הנתונים: קליק, ללא הזמנות מבוטלות.</p></div></div><div class="heats">${html}</div>`;
+}
+
+/* ---------- import ---------- */
+function parseDate(s){
+  s=(s||"").trim(); if(!s) return null;
+  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if(m) return {y:+m[1],mo:+m[2],d:+m[3]};
+  m = s.match(/^(\d{1,2})[\/.](\d{1,2})[\/.](\d{2,4})/); if(m) return {y:+m[3]<100?2000+ +m[3]:+m[3],mo:+m[2],d:+m[1]};
+  return undefined;
+}
+function toDay(p){ if(p==null) return null; if(p.y===2026&&p.mo===10) return p.d; if(p.y===2026&&p.mo===11&&p.d<=14) return 31+p.d; return p.mo<10||p.y<2026 ? 0 : 99; }
+function parseCSV(text){
+  const out=[]; let row=[], cur="", q=false;
+  for(let i=0;i<text.length;i++){ const c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=c; }
+    else if(c==='"') q=true; else if(c===','){row.push(cur);cur="";} else if(c==='\n'){row.push(cur);out.push(row);row=[];cur="";} else if(c!=='\r') cur+=c; }
+  if(cur!==""||row.length){row.push(cur);out.push(row);}
+  return out.filter(r=>r.some(x=>x.trim()!==""));
+}
+function importText(text){
+  const msg=$("impMsg");
+  const rows=parseCSV(text.replace(/^﻿/,""));
+  if(rows.length<2){ msg.className="msg err"; msg.textContent="הקובץ ריק או שאין בו שורות נתונים."; return; }
+  const h=rows[0].map(x=>x.trim().toLowerCase());
+  const need=["open_date","close_date","rep","team","dept","role","product","status"];
+  const miss=need.filter(n=>!h.includes(n));
+  if(miss.length){ msg.className="msg err"; msg.textContent="חסרות עמודות: "+miss.join(", ")+". בדקו את שורת הכותרות מול המבנה למטה."; return; }
+  const ix=Object.fromEntries(h.map((n,i)=>[n,i]));
+  const res=[]; let bad=0, maxDay=1;
+  for(const r of rows.slice(1)){
+    const od=toDay(parseDate(r[ix.open_date])), cdP=parseDate(r[ix.close_date]);
+    if(od==null||od===undefined||isNaN(od)||cdP===undefined){bad++;continue;}
+    if(od<1||od>31) continue; // only orders opened during the competition
+    const cd=toDay(cdP);
+    const rec={od, cd, rep:(r[ix.rep]||"").trim(), team:(r[ix.team]||"").trim(), dept:(r[ix.dept]||"").trim().toLowerCase(),
+      role:(r[ix.role]||"").trim().toLowerCase(), product:(r[ix.product]||"").trim().toLowerCase(),
+      status:(r[ix.status]||"").trim().toLowerCase(), source: ix.source!=null ? (r[ix.source]||"").trim().toLowerCase() : ""};
+    if(!rec.rep||!DEPT[rec.dept]||!PL[rec.product]){bad++;continue;}
+    maxDay=Math.max(maxDay, Math.min(31, od), Math.min(31, cd||0));
+    res.push(rec);
+  }
+  if(!res.length){ msg.className="msg err"; msg.textContent="לא נמצאו שורות תקינות מתקופת התחרות."; return; }
+  ROWS=res; SOURCE="import"; ASOF=maxDay; $("asof").value=ASOF;
+  msg.className="msg ok"; msg.textContent=`יובאו ${fmt(res.length)} שורות`+(bad?` · ${fmt(bad)} שורות דולגו (תאריך, מחלקה או מוצר לא מזוהים)`:"")+".";
+  $("resetDemo").hidden=false; renderAll();
+}
+function readFile(f){ if(!f) return; const fr=new FileReader(); fr.onload=()=>importText(String(fr.result)); fr.onerror=()=>{ $("impMsg").className="msg err"; $("impMsg").textContent="לא ניתן לקרוא את הקובץ."; }; fr.readAsText(f,"utf-8"); }
+
+/* ---------- wiring ---------- */
+function showTab(t){
+  TAB=t; try{localStorage.setItem("og26-tab",t);}catch(e){}
+  document.querySelectorAll(".tabs [role=tab]").forEach(b=>b.setAttribute("aria-selected", String(b.dataset.tab===t)));
+  document.querySelectorAll("section.panel").forEach(p=>p.hidden = p.id!=="p-"+t);
+}
+function renderAll(){ renderHeader(); renderOverview(); renderSales(); renderService(); renderManagers(); renderHeats(); }
+document.querySelectorAll(".tabs [role=tab]").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
+$("asof").addEventListener("input", e=>{ ASOF=+e.target.value; renderAll(); });
+$("file").addEventListener("change", e=>readFile(e.target.files[0]));
+const drop=$("drop");
+["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("over");}));
+["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("over");}));
+drop.addEventListener("drop", e=>readFile(e.dataTransfer.files[0]));
+$("resetDemo").addEventListener("click",()=>{ ROWS=demoData(); SOURCE="demo"; ASOF=5; $("asof").value=5; $("impMsg").textContent=""; $("resetDemo").hidden=true; renderAll(); });
+$("copyTpl").addEventListener("click",()=>{ const t=$("tpl").textContent.split("\n")[0]; const b=$("copyTpl");
+  navigator.clipboard.writeText(t).then(()=>{b.textContent="הועתק";setTimeout(()=>b.textContent="העתקת כותרות",1500);})
+  .catch(()=>{ const r=document.createRange(); r.selectNodeContents($("tpl")); const s=getSelection(); s.removeAllRanges(); s.addRange(r); }); });
+$("asof").value = ASOF;
+renderAll(); showTab(["overview","sales","service","managers","heats","import"].includes(TAB)?TAB:"overview");
+})();
+</script>
+
+</body></html>

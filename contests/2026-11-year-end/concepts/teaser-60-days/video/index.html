@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>60 יום מסביב לעולם: טיזר וידאו</title>
+<style>
+  html, body { margin: 0; background: #161c38; }
+  canvas { display: block; width: 100vw; height: auto; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+// Every frame is a pure function of t (seconds). render.mjs calls window.renderFrame(t) and screenshots the canvas.
+// One musical grid drives picture and sound (music.mjs uses the same BPM and bar map).
+const BPM = 120, BEAT = 60 / BPM, BAR = 4 * BEAT;          // 2 s per bar, 12 bars = 24 s
+const T = (bar, beat = 0) => bar * BAR + beat * BEAT;
+window.DURATION = T(12);
+
+const Q = new URLSearchParams(location.search);
+const SCALE = Number(Q.get('scale') || 1);
+const WIDE = Q.get('ar') === '16x9';                        // ?ar=16x9 -> desktop / screen version
+const W = WIDE ? 1920 : 1080, H = WIDE ? 1080 : 1920;
+window.SIZE = [W, H];
+// Every position that differs between the two formats lives here; the shots read only from L.
+const L = WIDE ? {
+  glow: [W / 2, 420, 900], globeCy: [560, 980], globeR: 420, routeY: 820, routeLift: 700, routePad: 260,
+  n60: [W / 2, 300, 300], title: { inline: true, y: 590, size: 150 }, tag1: [W / 2, 760, 54], tag2: [W / 2, 840],
+  st: { hx: W - 150, halign: 'right', h1y: 400, h2y: 520, hsize: 104, cy: 650, csize: 44, gw: 260, gap: 26, x0: 150, y0: 127 },
+  pz: { hy: 160, sy: 255, hsize: 100, ssize: 50, tw: 760, th: 150, gx: 40, gy: 30, y0: 340, cols: 2 },
+  ps: { px: 820, py: 220, pw: 960, ph: 620, sx: 1600, sy: 820, lw: 380, lx: 420, ly: 250, fy: 760, fsize: 46 },
+} : {
+  glow: [W / 2, 760, 820], globeCy: [760, 1500], globeR: 430, routeY: 980, routeLift: 760, routePad: 110,
+  n60: [W / 2, 640, 420], title: { inline: false, y1: 960, y2: 1120, size: 150 }, tag1: [W / 2, 1300, 58], tag2: [W / 2, 1385],
+  st: { hx: W / 2, halign: 'center', h1y: 280, h2y: 405, hsize: 110, cy: 1490, csize: 50, gw: 280, gap: 30, x0: (W - (3 * 280 + 2 * 30)) / 2, y0: 520 },
+  pz: { hy: 300, sy: 400, hsize: 104, ssize: 54, tw: 860, th: 160, gx: 0, gy: 34, y0: 500, cols: 1 },
+  ps: { px: 90, py: 380, pw: W - 180, ph: 640, sx: W - 300, sy: 1000, lw: 330, lx: W / 2, ly: 1210, fy: 1140, fsize: 54 },
+};
+const cv = document.getElementById('c');
+cv.width = W * SCALE; cv.height = H * SCALE;
+const ctx = cv.getContext('2d');
+
+const C = {
+  navy: '#20294d', raised: '#2e3152', deep: '#161c38', accent: '#33b5e0', ui: '#0099cc',
+  blue: '#007aa3', amber: '#e8a33d', white: '#ffffff', grey: '#ebeced', muted: '#888a9a', fg2: '#555869',
+};
+const FONT = '"Simpler", "Arial Hebrew", Arial, sans-serif';
+
+// ---------- motion primitives ----------
+function spring(t, t0, zeta = 0.42, w = 17) {
+  const s = t - t0; if (s <= 0) return 0;
+  if (zeta >= 1) return 1 - Math.exp(-w * s) * (1 + w * s);
+  const wd = w * Math.sqrt(1 - zeta * zeta);
+  return 1 - Math.exp(-zeta * w * s) * (Math.cos(wd * s) + (zeta * w / wd) * Math.sin(wd * s));
+}
+const POP = [0.42, 17], SLIDE = [0.7, 12], LAND = [0.35, 10], SOFT = [1, 14];
+const sp = (t, t0, p) => spring(t, t0, p[0], p[1]);
+const clamp01 = x => Math.max(0, Math.min(1, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+// fast exit before a cut: 1 -> 0 over ~0.25 s, no overshoot
+const exitK = (t, tCut) => 1 - spring(t, tCut - 0.28, 1, 24);
+
+function text(str, x, y, { size = 60, weight = 700, color = C.white, align = 'center', dir = 'rtl', alpha = 1 } = {}) {
+  ctx.save();
+  ctx.globalAlpha *= alpha;
+  ctx.font = `${weight} ${size}px ${FONT}`;
+  ctx.direction = dir; ctx.textAlign = align; ctx.textBaseline = 'middle';
+  ctx.fillStyle = color; ctx.fillText(str, x, y);
+  ctx.restore();
+}
+function rrect(x, y, w, h, r) {
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+// draw fn() with transform around (cx, cy): scale s, alpha a, translate dx/dy, rotate rot
+function group(cx, cy, { s = 1, a = 1, dx = 0, dy = 0, rot = 0 }, fn) {
+  if (a <= 0.001) return;
+  ctx.save(); ctx.globalAlpha *= clamp01(a);
+  ctx.translate(cx + dx, cy + dy); ctx.rotate(rot); ctx.scale(s, s); ctx.translate(-cx, -cy);
+  fn(); ctx.restore();
+}
+
+// ---------- background: night gradient + slowly turning wireframe globe ----------
+function background(t, globeK) {
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, C.navy); g.addColorStop(1, C.deep);
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  const glow = ctx.createRadialGradient(L.glow[0], L.glow[1], 40, L.glow[0], L.glow[1], L.glow[2]);
+  glow.addColorStop(0, 'rgba(0,153,204,0.26)'); glow.addColorStop(1, 'rgba(0,153,204,0)');
+  ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
+
+  const cx = W / 2, cy = globeK.cy, R = L.globeR * globeK.s;
+  ctx.save(); ctx.globalAlpha = globeK.a; ctx.strokeStyle = 'rgba(51,181,224,0.32)'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
+  for (let i = 1; i <= 2; i++) { ctx.beginPath(); ctx.ellipse(cx, cy, R, R * i / 3, 0, 0, Math.PI * 2); ctx.stroke(); }
+  ctx.beginPath(); ctx.moveTo(cx - R, cy); ctx.lineTo(cx + R, cy); ctx.stroke();
+  const spin = t * 0.35;                                   // longitudes turn: rx = R * |cos(phase)|
+  for (let i = 0; i < 6; i++) {
+    const ph = spin + i * Math.PI / 6;
+    ctx.beginPath(); ctx.ellipse(cx, cy, Math.abs(Math.cos(ph)) * R, R, 0, 0, Math.PI * 2); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// dashed flight route (quadratic arc) + plane, k = 0..1 progress
+function route(k, a, y0 = L.routeY) {
+  if (a <= 0) return;
+  const p0 = [L.routePad, y0], p1 = [W / 2, y0 - L.routeLift], p2 = [W - L.routePad, y0];
+  const pt = u => [(1 - u) ** 2 * p0[0] + 2 * (1 - u) * u * p1[0] + u * u * p2[0], (1 - u) ** 2 * p0[1] + 2 * (1 - u) * u * p1[1] + u * u * p2[1]];
+  ctx.save(); ctx.globalAlpha *= a; ctx.strokeStyle = C.amber; ctx.lineWidth = 5; ctx.setLineDash([14, 18]); ctx.lineCap = 'round';
+  ctx.beginPath(); const N = 80;
+  for (let i = 0; i <= N * k; i++) { const [x, y] = pt(i / N); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+  ctx.stroke(); ctx.setLineDash([]);
+  if (k > 0.01 && k < 1) {
+    const [x, y] = pt(k), [x2, y2] = pt(Math.min(1, k + 0.01));
+    ctx.translate(x, y); ctx.rotate(Math.atan2(y2 - y, x2 - x)); ctx.fillStyle = C.amber;
+    ctx.beginPath(); ctx.moveTo(30, 0); ctx.lineTo(-22, -16); ctx.lineTo(-12, 0); ctx.lineTo(-22, 16); ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
+}
+
+// ---------- shots ----------
+// Shot 1 (bars 0-4): plane draws the route, "60" lands, title and tagline.
+function shotOpen(t) {
+  const out = exitK(t, T(4));
+  const fly = clamp01(t / T(1));
+  const flyE = fly * fly * (3 - 2 * fly);
+  route(flyE, (1 - sp(t, T(1, 2), SOFT) * 0.55) * out);
+
+  const k60 = sp(t, T(1), LAND);
+  const [nx, ny, nsize] = L.n60;
+  group(nx, ny, { s: lerp(1.7, 1, k60) * (1 + 0.012 * Math.sin(t * 2.2)), a: Math.min(1, k60 * 3) * out, dy: -40 * (1 - out) }, () =>
+    text('60', nx, ny, { size: nsize, weight: 900, color: C.accent, dir: 'ltr' }));
+
+  const k1 = sp(t, T(2), POP), k2 = sp(t, T(2, 1), POP), TL = L.title;
+  let w1 = [W / 2, TL.y1, 'center'], w2 = [W / 2, TL.y2, 'center'];
+  if (TL.inline) {                                   // one line: "יום מסביב" on the right, "לעולם" on the left
+    ctx.font = `900 ${TL.size}px ${FONT}`;
+    const a = ctx.measureText('יום מסביב').width, b = ctx.measureText('לעולם').width, gap = TL.size * 0.3;
+    const half = (a + gap + b) / 2;
+    w1 = [W / 2 + half - a / 2, TL.y, 'center']; w2 = [W / 2 - half + b / 2, TL.y, 'center'];
+  }
+  group(w1[0], w1[1], { s: lerp(0.86, 1, k1), a: Math.min(1, k1 * 2) * out, dy: 50 * (1 - k1) }, () =>
+    text('יום מסביב', w1[0], w1[1], { size: TL.size, weight: 900 }));
+  group(w2[0], w2[1], { s: lerp(0.86, 1, k2), a: Math.min(1, k2 * 2) * out, dy: 50 * (1 - k2) }, () =>
+    text('לעולם', w2[0], w2[1], { size: TL.size, weight: 900 }));
+
+  const l1 = sp(t, T(3), SLIDE), l2 = sp(t, T(3, 2), SLIDE), [t1x, t1y, tsize] = L.tag1, [t2x, t2y] = L.tag2;
+  group(t1x, t1y, { a: l1 * out, dy: 30 * (1 - l1) }, () =>
+    text('כל שבוע מדינה אחרת.', t1x, t1y, { size: tsize, weight: 400, color: 'rgba(255,255,255,0.86)' }));
+  group(t2x, t2y, { a: l2 * out, dy: 30 * (1 - l2) }, () =>
+    text('כל שבוע הפנינג אחר.', t2x, t2y, { size: tsize, weight: 700, color: C.accent }));
+}
+
+// Shot 2 (bars 4-7): passport, 9 hidden stamps.
+const WEEKS = [['1.11', '7.11'], ['8.11', '14.11'], ['15.11', '21.11'], ['22.11', '28.11'], ['29.11', '5.12'],
+  ['6.12', '12.12'], ['13.12', '19.12'], ['20.12', '26.12'], ['27.12', '31.12']];
+function stamp(i, x, y, w, h, t, glint) {
+  ctx.fillStyle = i === 0 ? C.blue : C.raised; rrect(x, y, w, h, 26); ctx.fill();
+  ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,0.16)'; ctx.lineWidth = 3; ctx.setLineDash([10, 9]);
+  rrect(x + 12, y + 12, w - 24, h - 24, 18); ctx.stroke(); ctx.restore();
+  text('שבוע ' + (i + 1), x + w - 34, y + 50, { size: 34, weight: 700, color: C.accent, align: 'right' });
+  const pulse = 1 + 0.06 * glint;
+  group(x + w / 2, y + h / 2 + 6, { s: pulse, rot: i === 0 ? -0.14 : 0 }, () =>
+    text('?', x + w / 2, y + h / 2 + 6, { size: 130, weight: 900, color: i === 0 ? C.amber : 'rgba(255,255,255,0.22)', dir: 'ltr' }));
+  text(WEEKS[i][0] + '–' + WEEKS[i][1], x + 34, y + h - 44, { size: 28, weight: 400, color: 'rgba(255,255,255,0.7)', align: 'left', dir: 'ltr' });
+}
+function shotStamps(t) {
+  const out = exitK(t, T(7));
+  const h1 = sp(t, T(4), POP);
+  const S = L.st;
+  group(S.hx, S.h1y, { a: Math.min(1, h1 * 2) * out, dy: 40 * (1 - h1) }, () => {
+    text('9 שבועות.', S.hx, S.h1y, { size: S.hsize, weight: 900, align: S.halign });
+  });
+  const h2 = sp(t, T(4, 1), POP);
+  group(S.hx, S.h2y, { a: Math.min(1, h2 * 2) * out, dy: 40 * (1 - h2) }, () =>
+    text('9 יעדים סודיים.', S.hx, S.h2y, { size: S.hsize, weight: 900, color: C.accent, align: S.halign }));
+
+  const gw = S.gw, gh = S.gw, gap = S.gap, x0 = S.x0, y0 = S.y0;
+  const gcx = x0 + (3 * gw + 2 * gap) / 2, gcy = y0 + (3 * gh + 2 * gap) / 2;
+  for (let i = 0; i < 9; i++) {
+    const col = i % 3, row = Math.floor(i / 3);
+    const x = x0 + (2 - col) * (gw + gap), y = y0 + row * (gh + gap);          // RTL: week 1 top-right
+    const t0 = T(4, 2) + i * BEAT / 2;                                        // one per eighth note
+    const k = sp(t, t0, POP);
+    const glint = t > T(6) ? Math.max(0, Math.sin((t - T(6)) * 4 - i * 0.7)) : 0;      // glint travels across the stamps
+    const push = 1 + 0.035 * clamp01((t - T(5)) / (T(7) - T(5)));                        // slow push-in
+    const float = 7 * Math.sin(t * 2.2 + i * 0.9);
+    group(x + gw / 2, y + gh / 2, { s: lerp(1.5, 1, k) * (1 - 0.06 * (1 - out)) * push, a: Math.min(1, k * 4) * out, dx: (x + gw / 2 - gcx) * (push - 1), dy: (y + gh / 2 - gcy) * (push - 1) + float * k, rot: (1 - k) * (i % 2 ? 0.2 : -0.2) }, () =>
+      stamp(i, x, y, gw, gh, t, glint));
+  }
+  const c = sp(t, T(6), SLIDE);
+  group(S.hx, S.cy, { a: c * out, dy: 30 * (1 - c) }, () => {
+    text('כל יעד נחשף רק כשהשבוע שלו מתחיל', S.hx, S.cy, { size: S.csize, weight: 700, color: 'rgba(255,255,255,0.88)', align: S.halign });
+  });
+}
+
+// Shot 3 (bars 7-10): luggage tags = prizes.
+const PRIZES = [['חופשות', 'בארץ ובחו"ל'], ["מסאז'ים", 'כי מגיע לכם'], ['ארוחות שף', 'שוברים למסעדות'],
+  ['ארוחות בוקר', 'להתחיל את היום נכון'], ['מזוודות', 'לטיסה הבאה'], ['שוברי קניות', 'ועוד הפתעות בדרך']];
+function tag(i, x, y, w, h) {
+  ctx.fillStyle = C.white; rrect(x, y, w, h, 28); ctx.fill();
+  ctx.fillStyle = i % 2 ? C.ui : C.amber; rrect(x + w - 22, y + 26, 10, h - 52, 5); ctx.fill();      // colour strip, inline-start
+  ctx.fillStyle = C.deep; ctx.beginPath(); ctx.arc(x + 64, y + h / 2, 16, 0, Math.PI * 2); ctx.fill();  // tag hole
+  ctx.strokeStyle = C.grey; ctx.lineWidth = 6; ctx.stroke();
+  text(PRIZES[i][0], x + w - 60, y + h / 2 - 26, { size: 64, weight: 900, color: C.navy, align: 'right' });
+  text(PRIZES[i][1], x + w - 60, y + h / 2 + 38, { size: 38, weight: 400, color: C.fg2, align: 'right' });
+}
+function shotPrizes(t) {
+  const out = exitK(t, T(10));
+  const h = sp(t, T(7), POP);
+  const P = L.pz;
+  group(W / 2, P.hy, { a: Math.min(1, h * 2) * out, dy: 40 * (1 - h) + 8 * Math.sin(t * 2.6), s: 1 + 0.02 * Math.sin(t * 2.6 + 1) }, () =>
+    text('מה נכנס למזוודה?', W / 2, P.hy, { size: P.hsize, weight: 900 }));
+  const s = sp(t, T(9), SLIDE);
+  group(W / 2, P.sy, { a: s * out, dy: 20 * (1 - s) }, () =>
+    text('פרסים בסגנון חופשה', W / 2, P.sy, { size: P.ssize, weight: 700, color: C.accent }));
+
+  const tw = P.tw, th = P.th, gap = P.gy, y0 = P.y0, rowW = P.cols * tw + (P.cols - 1) * P.gx;
+  for (let i = 0; i < 6; i++) {
+    const t0 = T(7, 2) + i * BEAT;
+    const k = sp(t, t0, SLIDE);
+    const swing = (1 - sp(t, t0, [0.25, 9])) * (i % 2 ? 0.12 : -0.12) + 0.006 * Math.sin(t * 2.4 + i);   // pendulum settle + breath
+    const col = i % P.cols, row = Math.floor(i / P.cols);
+    const x = (W + rowW) / 2 - tw - col * (tw + P.gx), y = y0 + row * (th + gap);   // RTL: first tag on the right
+    group(x + 64, y + th / 2, { a: Math.min(1, k * 2.5) * out, dx: (1 - k) * 700, rot: swing }, () => tag(i, x, y, tw, th));
+  }
+}
+
+// Shot 4 (bars 10-12): boarding pass, take-off stamp, sign-off.
+function shotPass(t) {
+  const k = sp(t, T(10), SLIDE);
+  const { px, py, pw, ph } = L.ps;
+  group(px + pw / 2, py + ph / 2, { a: Math.min(1, k * 2), dy: (1 - k) * 500 + 10 * Math.sin(t * 2.4), s: 1 + 0.018 * Math.sin(t * 1.8) }, () => {
+    ctx.fillStyle = C.white; rrect(px, py, pw, ph, 36); ctx.fill();
+    const stubY = py + ph - 190;
+    ctx.save(); ctx.strokeStyle = C.grey; ctx.lineWidth = 5; ctx.setLineDash([16, 12]);
+    ctx.beginPath(); ctx.moveTo(px + 30, stubY); ctx.lineTo(px + pw - 30, stubY); ctx.stroke(); ctx.restore();
+    text('כרטיס עלייה למטוס', px + pw - 60, py + 80, { size: 36, weight: 700, color: C.muted, align: 'right' });
+    text('ישראל', px + pw - 60, py + 200, { size: 104, weight: 900, color: C.navy, align: 'right' });
+    text('העולם', px + 60, py + 200, { size: 104, weight: 900, color: C.navy, align: 'left' });
+    ctx.save(); ctx.strokeStyle = C.ui; ctx.lineWidth = 9; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    const ax = px + pw / 2 - 80 + 60 * (1 - sp(t, T(10, 2), POP));
+    ctx.beginPath(); ctx.moveTo(ax + 90, py + 200); ctx.lineTo(ax, py + 200); ctx.moveTo(ax + 30, py + 172); ctx.lineTo(ax, py + 200); ctx.lineTo(ax + 30, py + 228); ctx.stroke(); ctx.restore();
+    text('המראה', px + pw - 60, py + 330, { size: 36, weight: 700, color: C.muted, align: 'right' });
+    text('1.11.2026', px + pw - 60, py + 395, { size: 64, weight: 900, color: C.blue, align: 'right', dir: 'ltr' });
+    text('שער', px + 60, py + 330, { size: 36, weight: 700, color: C.muted, align: 'left' });
+    text('60', px + 60, py + 395, { size: 64, weight: 900, color: C.blue, align: 'left', dir: 'ltr' });
+    ctx.fillStyle = C.navy;                                          // barcode (fixed pattern)
+    const bars = [3, 1, 2, 1, 4, 1, 1, 3, 2, 1, 1, 2, 3, 1, 2, 4, 1, 1, 2, 3, 1, 2, 1, 1, 3, 2, 1, 4, 1, 2, 1, 3, 1, 1, 2, 2, 3, 1, 1, 2];
+    let bx = px + 60; for (let i = 0; i < bars.length; i++) { if (i % 2 === 0) ctx.fillRect(bx, stubY + 50, bars[i] * 6, 90); bx += bars[i] * 6; }
+  });
+
+  // amber "boarding" stamp slams onto the pass
+  const sk = sp(t, T(11), LAND);
+  const sx = L.ps.sx, sy = L.ps.sy;
+  group(sx, sy, { s: lerp(2.4, 1, sk), a: Math.min(1, sk * 3) * 0.95, rot: -0.18 }, () => {
+    ctx.save(); ctx.strokeStyle = C.amber; ctx.lineWidth = 10;
+    ctx.fillStyle = 'rgba(22,28,56,0.92)'; rrect(sx - 190, sy - 80, 380, 160, 22); ctx.fill(); ctx.stroke();
+    text('יוצאים לדרך', sx, sy, { size: 72, weight: 900, color: C.amber });
+    ctx.restore();
+  });
+
+  // division logo lands, then the sign-off line
+  const lk = sp(t, T(11, 2), LAND);
+  const { lw, lx, ly, fy, fsize } = L.ps, lh = lw * LOGO.naturalHeight / LOGO.naturalWidth;
+  group(lx, ly + lh / 2, { s: lerp(0.4, 1, lk), a: Math.min(1, lk * 3) }, () =>
+    ctx.drawImage(LOGO, lx - lw / 2, ly, lw, lh));
+  const f1 = sp(t, T(11, 3), SLIDE);
+  group(lx, fy, { a: f1, dy: 30 * (1 - f1) }, () =>
+    text('התקנון והסטטוסים האישיים בדרך', lx, fy, { size: fsize, weight: 700 }));
+}
+
+window.renderFrame = function (t) {
+  ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+  // globe: big behind the opening, then drifts down and dims as the backdrop
+  const g = sp(t, 0, [1, 6]);
+  const settle = sp(t, T(4) - 0.3, SLIDE);
+  background(t, { cy: lerp(L.globeCy[0], L.globeCy[1], settle), s: lerp(0.85, 1, g) * lerp(1, 1.35, settle), a: lerp(1, 0.55, settle) * g });
+  if (t < T(4)) shotOpen(t);
+  else if (t < T(7)) shotStamps(t);
+  else if (t < T(10)) shotPrizes(t);
+  else shotPass(t);
+};
+
+const LOGO = new Image(); LOGO.src = 'assets/soho-logo.png';
+window.ready = Promise.all([document.fonts.load(`900 100px "Simpler"`), document.fonts.load(`400 50px "Simpler"`), document.fonts.load(`700 50px "Simpler"`), LOGO.decode()]).then(() => { window.renderFrame(0); return true; });
+</script>
+<style>
+  @font-face { font-family: "Simpler"; src: url("../../../../platform/public/fonts/Simpler-Regular.otf") format("opentype"); font-weight: 400; }
+  @font-face { font-family: "Simpler"; src: url("../../../../platform/public/fonts/Simpler-Bold.otf") format("opentype"); font-weight: 700; }
+  @font-face { font-family: "Simpler"; src: url("../../../../platform/public/fonts/Simpler-Black.otf") format("opentype"); font-weight: 900; }
+</style>
+</body>
+</html>

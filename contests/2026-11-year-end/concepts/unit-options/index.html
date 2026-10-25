@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>נקודות, מיילים או חותמות</title>
+<!-- Concept: three names for what the reps collect (takanon question #22), each with its own design, and the travel
+     classes in each (the takanon's gold / silver / bronze under their new names): ראשונה, עסקים, פרימיום by the
+     ranking bands (10% / 20% / 20% of the sector), תיירים for everyone else; the lines shown are today's. Demo data;
+     opens from disk, no server. ?unit=points|miles|stamps -->
+<style>
+@font-face { font-family: Simpler; font-weight: 400; src: url("../../../platform/public/fonts/Simpler-Regular.otf"); }
+@font-face { font-family: Simpler; font-weight: 700; src: url("../../../platform/public/fonts/Simpler-Bold.otf"); }
+@font-face { font-family: Simpler; font-weight: 900; src: url("../../../platform/public/fonts/Simpler-Black.otf"); }
+:root {
+  --navy: #20294d; --navy-2: #2e3152; --accent: #33b5e0; --on-navy: #c9cbd6;
+  --bg: #ebeced; --card: #fff; --ink: #20294d; --muted: #6b6e80; --line: #d9dae0;
+  --first: #B08D2E; --biz: #4A5A7A; --prem: #2E8C8C; --eco: #9AA0B0;
+  --r: 16px; --pill: 999px; --font: Simpler, "Heebo", "Arial Hebrew", Arial, sans-serif;
+  --shadow: 0 1px 2px rgb(32 41 77 / .06), 0 14px 34px -18px rgb(32 41 77 / .35);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #12162b; --card: #1c2242; --ink: #eef0f6; --muted: #a3a7bd; --line: #363c63; color-scheme: dark; } }
+:root[data-theme="dark"] { --bg: #12162b; --card: #1c2242; --ink: #eef0f6; --muted: #a3a7bd; --line: #363c63; color-scheme: dark; }
+* { box-sizing: border-box; }
+html { background: var(--bg); color: var(--ink); }
+body { margin: 0; font: 400 16px/1.5 var(--font); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+h1, h2, h3, h4, p { margin: 0; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 16px; }
+.ltr { direction: ltr; unicode-bidi: isolate; display: inline-block; }
+.muted { color: var(--muted); } .small { font-size: 14px; }
+
+header { background: linear-gradient(135deg, var(--navy-2), var(--navy)); color: #fff; padding-block: 24px 26px; }
+.brand { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; font-size: 14px; }
+.brand b { font-size: 20px; font-weight: 900; } .brand span { color: var(--accent); font-weight: 700; }
+.demo { margin-inline-start: auto; background: rgb(255 255 255 / .12); padding: 2px 10px; border-radius: var(--pill); color: var(--on-navy) !important; font-weight: 400 !important; }
+h1 { font-weight: 900; font-size: clamp(30px, 5vw, 52px); line-height: 1.05; margin-top: 12px; }
+.lede { color: var(--on-navy); max-width: 70ch; margin-top: 8px; }
+.switch { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 18px; max-width: 760px; }
+.opt { text-align: start; border: 1px solid rgb(255 255 255 / .18); background: rgb(255 255 255 / .06); color: #fff; border-radius: 14px; padding: 12px 14px; cursor: pointer; display: grid; gap: 2px; }
+.opt b { font-size: 20px; font-weight: 900; } .opt small { color: var(--on-navy); font-size: 13px; line-height: 1.35; }
+.opt[aria-selected="true"] { background: #fff; color: var(--navy); border-color: #fff; }
+.opt[aria-selected="true"] small { color: var(--muted); }
+
+main { padding-block: 22px 40px; }
+.stage { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+@media (max-width: 880px) { .stage { grid-template-columns: minmax(0, 1fr); } }
+.panel { border-radius: 20px; overflow: hidden; box-shadow: var(--shadow); min-width: 0; }
+.notes { display: grid; gap: 14px; }
+.box { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 18px; display: grid; gap: 10px; min-width: 0; }
+.box h3 { font-size: 18px; font-weight: 900; }
+.pc { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 14px; }
+.pc ul { margin: 0; padding-inline-start: 18px; display: grid; gap: 4px; }
+.pc h4 { font-size: 13px; color: var(--muted); font-weight: 700; margin-bottom: 4px; }
+.words { display: flex; flex-wrap: wrap; gap: 6px; }
+.words span { background: color-mix(in srgb, var(--accent) 12%, var(--card)); border-radius: var(--pill); padding: 3px 10px; font-size: 13px; }
+.compare { width: 100%; border-collapse: collapse; font-size: 14px; }
+.compare th, .compare td { text-align: start; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.compare th { color: var(--muted); font-weight: 700; font-size: 12px; }
+.compare tr.on td { background: color-mix(in srgb, var(--accent) 10%, transparent); font-weight: 700; }
+.scroll { overflow-x: auto; }
+footer { color: var(--muted); font-size: 13px; padding-bottom: 40px; }
+
+/* Shared class ladder, re-skinned by each option */
+.ladder { display: grid; gap: 8px; }
+.rung { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 12px; border-radius: 12px; }
+.rung .ico { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-weight: 900; color: #fff; font-size: 18px; }
+.rung h4 { font-size: 16px; font-weight: 900; }
+.rung p { font-size: 13px; }
+.rung .at { font-weight: 900; font-variant-numeric: tabular-nums; }
+.rung.here { outline: 2px solid currentColor; outline-offset: -2px; }
+.tag-here { font-size: 11px; font-weight: 900; padding: 1px 8px; border-radius: var(--pill); margin-inline-start: 6px; vertical-align: middle; }
+
+/* ---------- Option 1: נקודות, a frequent-flyer club (El Al style: navy and white, quiet, clear) ---------- */
+.points { background: #f6f8fc; color: #142047; padding: 22px; display: grid; gap: 18px; }
+.club-card { position: relative; aspect-ratio: 1.586; max-width: 420px; width: 100%; border-radius: 18px; padding: 20px 22px; color: #fff; overflow: hidden;
+  background: radial-gradient(120% 90% at 100% 0%, #3d5aa8 0%, #1a2a6c 45%, #0e1840 100%); box-shadow: 0 20px 40px -18px rgb(14 24 64 / .7); display: grid; grid-template-rows: auto 1fr auto; }
+.club-card::after { content: ""; position: absolute; inset: auto -30% -60% auto; width: 80%; aspect-ratio: 1; border-radius: 50%; border: 28px solid rgb(255 255 255 / .06); }
+.club-top { display: flex; justify-content: space-between; align-items: center; font-size: 13px; letter-spacing: .04em; }
+.club-top b { font-size: 16px; font-weight: 900; letter-spacing: 0; }
+.club-tier { justify-self: start; align-self: center; font-size: 13px; font-weight: 900; padding: 3px 12px; border-radius: var(--pill); background: #fff; color: #1a2a6c; }
+.club-bottom { display: flex; justify-content: space-between; align-items: end; }
+.club-bottom .n { font-size: 40px; font-weight: 900; line-height: 1; }
+.club-bottom small { display: block; font-size: 12px; opacity: .8; }
+.pt-bar { display: grid; gap: 6px; }
+.pt-track { position: relative; height: 12px; border-radius: var(--pill); background: #dfe5f2; }
+.pt-track i { position: absolute; inset: 0 0 0 auto; border-radius: inherit; background: linear-gradient(270deg, #3d5aa8, #1a2a6c); }
+.pt-track b { position: absolute; top: -4px; bottom: -4px; width: 2px; background: #142047; }
+.pt-scale { position: relative; height: 18px; font-size: 11px; color: #5a6488; }
+.pt-scale span { position: absolute; translate: 50% 0; white-space: nowrap; }
+.points .next { font-size: 15px; } .points .next b { color: #1a2a6c; }
+.points .ladder .rung { background: #fff; color: #142047; box-shadow: 0 1px 0 #e3e8f3; }
+.points .board { background: #fff; border-radius: 14px; padding: 6px 14px; }
+.board ol { margin: 0; padding: 0; list-style: none; }
+.board li { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid rgb(0 0 0 / .06); font-size: 14px; }
+.board li:last-child { border-bottom: 0; }
+.board li.me { font-weight: 900; }
+.board .cls { font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: var(--pill); color: #fff; }
+
+/* ---------- Option 2: מיילים, the flight (night sky, a route with the classes as waypoints, split-flap counter) ---------- */
+.miles { background: radial-gradient(120% 80% at 80% 0%, #1d3a6b 0%, #0b1530 55%, #060b1c 100%); color: #e9eefc; padding: 22px; display: grid; gap: 18px; }
+.flap { display: flex; gap: 4px; direction: ltr; justify-content: flex-end; }
+.flap span { width: 46px; height: 62px; border-radius: 8px; background: linear-gradient(#1b2547 50%, #141c38 50%); display: grid; place-items: center; font-size: 40px; font-weight: 900; color: #ffd166; box-shadow: inset 0 -1px 0 rgb(0 0 0 / .5), 0 6px 14px -6px #000; position: relative; }
+.flap span::after { content: ""; position: absolute; inset: 50% 0 auto; height: 1px; background: rgb(0 0 0 / .55); }
+.mi-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; flex-wrap: wrap; }
+.mi-head h3 { font-size: 15px; font-weight: 700; color: #9fb0d8; letter-spacing: .03em; }
+.mi-head p { font-size: 13px; color: #9fb0d8; }
+.route { position: relative; }
+.route svg { width: 100%; display: block; overflow: visible; }
+.miles .next { font-size: 15px; color: #c9d4f3; } .miles .next b { color: #ffd166; }
+.miles .ladder .rung { background: rgb(255 255 255 / .05); border: 1px solid rgb(255 255 255 / .08); color: #e9eefc; }
+.miles .ladder .rung p { color: #9fb0d8; }
+.pass { display: grid; grid-template-columns: minmax(0, 1fr) 96px; background: #f4f1e8; color: #12204a; border-radius: 14px; overflow: hidden; }
+.pass-main { padding: 14px 16px; display: grid; gap: 8px; }
+.pass-main .row { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; color: #5b6487; }
+.pass-main .row b { display: block; font-size: 18px; color: #12204a; font-weight: 900; }
+.pass-stub { border-inline-start: 2px dashed #c9c2ad; display: grid; place-items: center; align-content: center; gap: 4px; padding: 10px; text-align: center; }
+.pass-stub b { font-size: 26px; font-weight: 900; }
+.pass-stub small { font-size: 11px; color: #5b6487; }
+
+/* ---------- Option 3: חותמות, a passport page (paper, guilloche, ink stamps, the classes as visas) ---------- */
+.stamps { color: #2a1f14; padding: 22px; display: grid; gap: 18px;
+  background: repeating-radial-gradient(circle at 20% 30%, rgb(30 80 90 / .045) 0 2px, transparent 2px 9px), linear-gradient(160deg, #f3ead6, #e9dcc0); }
+.pp-head { display: flex; justify-content: space-between; align-items: end; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid rgb(42 31 20 / .2); padding-bottom: 10px; }
+.pp-head h3 { font-size: 13px; letter-spacing: .14em; font-weight: 700; color: #6a5636; }
+.pp-head .n { font-size: 46px; font-weight: 900; line-height: 1; color: #6b1e2a; }
+.pp-head small { font-size: 13px; color: #6a5636; display: block; }
+.ink { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 12px; padding: 4px; }
+.st { aspect-ratio: 1; display: grid; place-items: center; text-align: center; font-weight: 900; line-height: 1.1; color: var(--c); border: 3px double var(--c); opacity: .86; mix-blend-mode: multiply; padding: 6px; font-size: 12px; position: relative; }
+.st.round { border-radius: 50%; } .st.rect { border-radius: 6px; aspect-ratio: 1.25; }
+.st b { display: block; font-size: 22px; }
+.st small { font-size: 10px; font-weight: 700; letter-spacing: .06em; }
+.st.empty { --c: #b4a589; border-style: dashed; opacity: .55; }
+.stamps .next { font-size: 15px; } .stamps .next b { color: #6b1e2a; }
+.visas { display: grid; gap: 10px; }
+.visa { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 12px 14px; border: 2px solid var(--c); border-radius: 10px; color: var(--c); position: relative; background: rgb(255 255 255 / .25); }
+.visa h4 { font-size: 15px; font-weight: 900; letter-spacing: .02em; }
+.visa p { font-size: 12px; color: #6a5636; }
+.visa .at { font-weight: 900; }
+.visa.got::after { content: "אושר"; position: absolute; inset: 50% auto auto 70px; translate: 0 -50%; rotate: -14deg; font-weight: 900; font-size: 18px; color: #2f7a3d; border: 3px solid #2f7a3d; border-radius: 8px; padding: 0 8px; opacity: .8; mix-blend-mode: multiply; }
+.visa.locked { opacity: .55; border-style: dashed; }
+@media (max-width: 520px) { .flap span { width: 36px; height: 50px; font-size: 30px; } .pc { grid-template-columns: 1fr; } .switch { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<!-- Every concept is a demo (23.10.2026): a label only, the page itself is unchanged. -->
+<div class="demo-badge" role="note" dir="rtl" style="position:fixed;top:12px;left:12px;z-index:2147483647;pointer-events:none;background:#F5C342;color:#11152B;font:800 13px/1 Simpler,'Arial Hebrew',Arial,sans-serif;padding:6px 12px;border-radius:999px;box-shadow:0 2px 8px rgb(0 0 0 / .25)">דמו</div>
+
+<header><div class="wrap">
+  <div class="brand"><b>בזק</b><span>60 יום מסביב לעולם</span><span class="demo">קונספט · נתוני דמו</span></div>
+  <h1>נקודות, מיילים או חותמות</h1>
+  <p class="lede">אותו נציג, אותם מספרים, שלוש מילים ושלושה עיצובים. בכל אחד גם מחלקות הטיסה של התקנון (ראשונה, עסקים, פרימיום) לפי הדירוג. לבחירה בפגישת התקנון (שאלה 22).</p>
+  <div class="switch" role="tablist" aria-label="האפשרות">
+    <button class="opt" role="tab" id="t-points" data-u="points" aria-selected="false"><b>נקודות</b><small>מועדון נוסע מתמיד, כמו באל על. פשוט ומוכר.</small></button>
+    <button class="opt" role="tab" id="t-miles" data-u="miles" aria-selected="false"><b>מיילים</b><small>הטיסה עצמה: מסלול, מונה וכרטיס עלייה.</small></button>
+    <button class="opt" role="tab" id="t-stamps" data-u="stamps" aria-selected="false"><b>חותמות</b><small>דרכון: חותמת לכל מכירה, ויזה לכל מחלקה.</small></button>
+  </div>
+</div></header>
+
+<main class="wrap">
+  <div class="stage">
+    <section class="panel" id="panel" role="tabpanel" aria-live="polite"></section>
+    <div class="notes">
+      <div class="box" id="about"></div>
+      <div class="box"><h3>המחלקות</h3>
+        <p class="small muted">המחלקות לפי התקנון: לפי הדירוג בחותמות בכל מגזר, 10% הראשונים בראשונה, 20% הבאים בעסקים ו-20% הבאים בפרימיום, מבין מי שעבר את תנאי הסף (350 בסוהו). כל השאר: תיירים. המספרים כאן הם הקווים של היום (החותמות של המושב האחרון בכל מחלקה), והם זזים עם המכירות. בתפקידים שיש להם רק שתי מחלקות, אין ראשונה. בסוף התחרות, הגרלה בכל מחלקה קובעת מי זוכה באיזה פרס.</p></div>
+      <div class="box"><h3>השוואה</h3>
+        <div class="scroll"><table class="compare" id="compare"><thead><tr><th></th><th>המקור</th><th>חזק ב…</th><th>לשים לב</th></tr></thead><tbody></tbody></table></div></div>
+    </div>
+  </div>
+</main>
+<footer class="wrap">קונספט לפי תקנון טיוטה 2, בלי כלובים. השמות והמספרים הם דמו. המילה באתר היא הגדרה אחת (stamps.unit), אז כל בחירה נכנסת בשורה.</footer>
+
+<script src="../_shared/admin-weeks.js"></script>
+<script>
+// The week's city from the admin page's weeks table (../_shared/admin-weeks.js), else the contest's first weeks.
+const cityOfWeek = (i) => (window.ADMIN_WEEKS ? window.ADMIN_WEEKS.weeks[i].he : ['פריז', 'מילאנו', 'מרקש'][i]);
+// ---------- The visitor and the race (demo) ----------
+const ME = { name: 'נועה כהן', team: 'מכירות סוהו', n: 412, sales: { 'ביזנט': 72, 'IPC': 49, 'אינטרנט / סיב': 23 } };
+const RACE = [['אורי לוי', 734], ['שירה מזרחי', 561], ['נועה כהן', 412], ['איתי פרץ', 398], ['מאיה ביטון', 351], ['דניאל אזולאי', 287]];
+// The classes by the takanon's bands (10% / 20% / 20% of the sector, by stamps, past the 350 threshold). `at` is
+// today's line in a demo sector of 21: the stamps of the last seat in each class, so it moves with the sales.
+const CLASSES = [
+  { id: 'first', he: 'ראשונה', at: 690, color: 'var(--first)', letter: 'F' },
+  { id: 'biz', he: 'עסקים', at: 520, color: 'var(--biz)', letter: 'J' },
+  { id: 'prem', he: 'פרימיום', at: 400, color: 'var(--prem)', letter: 'W' },
+  { id: 'eco', he: 'תיירים', at: 0, color: 'var(--eco)', letter: 'Y' },
+];
+const classOf = (n) => CLASSES.find((c) => n >= c.at);
+const nextOf = (n) => [...CLASSES].reverse().find((c) => c.at > n);
+const MAX = 800;
+
+// ---------- The three words, with the forms the site needs (stamps.unit) ----------
+const UNITS = {
+  points: { he: 'נקודות', one: 'נקודה', next: 'הנקודה הבאה', mine: 'הנקודות שלך', src: 'מועדון הנוסע המתמיד של אל על (נקודות; הסטטוס ביהלומים)',
+    pros: ['כולם מכירים, אין מה להסביר', 'אין בלבול עם שום מילה אחרת', 'עובד גם בשיחה וגם בוואטסאפ'], cons: ['הכי פחות "טיסה"', 'מילה כללית: כל מועדון לקוחות משתמש בה'] },
+  miles: { he: 'מיילים', one: 'מייל', next: 'המייל הבא', mine: 'המיילים שלך', src: 'כרטיסי המיילים וחברות התעופה הזרות (Miles & More, Skywards)',
+    pros: ['הכי מתאים למסע "מסביב לעולם"', 'מספרים גדולים מרגישים טבעי ("350 מייל")', 'אפשר להראות את ההתקדמות כמסלול טיסה'], cons: ['מייל הוא גם אימייל ("שלחו לי מיילים")', 'פחות מוכר למי שלא טס הרבה'] },
+  stamps: { he: 'חותמות', one: 'חותמת', next: 'החותמת הבאה', mine: 'החותמות שלך', src: 'המילה של התקנון, כמו חותמות ויזה בדרכון',
+    pros: ['זו המילה בתקנון, אין מה לשנות', 'מתאים למסע בין מדינות: חותמת בכל מדינה', 'הכי ויזואלי: דרכון, דיו, ויזות'], cons: ['"350 חותמות" זה הרבה חותמות לדרכון אחד', 'לא מתאים למספרים חלקיים (חצי חותמת)'] },
+};
+
+const $ = (s) => document.querySelector(s);
+const nextSale = (unit) => `עוד ביזנט אחד = <b class="ltr">+3</b> ${unit.he}`;
+
+function ladder(n, skin) {
+  return `<div class="ladder">${CLASSES.map((c) => {
+    const here = classOf(n) === c, got = n >= c.at;
+    return `<div class="rung${here ? ' here' : ''}" style="${here ? `color:${skin.here}` : ''}"><span class="ico" style="background:${c.color}">${c.letter}</span>
+      <div><h4>${c.he}${here ? `<span class="tag-here" style="background:${c.color};color:#fff">אתם כאן</span>` : ''}</h4><p class="${skin.muted ?? 'muted'}">${c.at ? `${got ? 'הושג' : `עוד ${c.at - n}`}` : 'עד תנאי הסף'}</p></div>
+      <span class="at ltr">${c.at ? c.at : '0'}</span></div>`;
+  }).join('')}</div>`;
+}
+function board(unit) {
+  return `<ol>${RACE.map(([name, n], i) => { const c = classOf(n);
+    return `<li class="${name === ME.name ? 'me' : ''}"><span>${i + 1}</span><span>${name}</span><span class="cls" style="background:${c.color}">${c.he}</span><b class="ltr">${n}</b></li>`; }).join('')}</ol>`;
+}
+
+// ---------- Option 1: points ----------
+function points() {
+  const u = UNITS.points, c = classOf(ME.n), nx = nextOf(ME.n);
+  const marks = CLASSES.filter((x) => x.at).map((x) => `<b style="right:${x.at / MAX * 100}%"></b>`).join('');
+  const scale = CLASSES.filter((x) => x.at).map((x) => `<span style="right:${x.at / MAX * 100}%">${x.he} ${x.at}</span>`).join('');
+  return `<div class="points">
+    <div class="club-card" aria-label="כרטיס המועדון">
+      <div class="club-top"><b>מועדון 60</b><span class="ltr">BEZEQ · FLIGHT 60</span></div>
+      <span class="club-tier" style="background:${c.color};color:#fff">${c.he}</span>
+      <div class="club-bottom"><div><small>${ME.name}</small><small>${ME.team}</small></div><div style="text-align:left"><span class="n ltr">${ME.n}</span><small>${u.he}</small></div></div>
+    </div>
+    <div class="pt-bar"><div class="pt-track"><i style="width:${ME.n / MAX * 100}%"></i>${marks}</div><div class="pt-scale">${scale}</div></div>
+    <p class="next">${nx ? `עוד <b class="ltr">${nx.at - ME.n}</b> ${u.he} ל${nx.he}. ` : ''}${nextSale(u)}.</p>
+    ${ladder(ME.n, { here: '#1a2a6c' })}
+    <div class="board"><h4 class="small muted" style="padding-top:8px">המובילים · מכירות סוהו</h4>${board(u)}</div>
+  </div>`;
+}
+
+// ---------- Option 2: miles ----------
+function miles() {
+  const u = UNITS.miles, c = classOf(ME.n), nx = nextOf(ME.n);
+  const digits = String(ME.n).padStart(4, '0').split('').map((d) => `<span>${d}</span>`).join('');
+  // The route: an arc from TLV (right) to the far end (left); the classes as waypoints at their thresholds.
+  const W = 520, H = 170, P = (t) => { const x = W - 30 - t * (W - 60), y = 140 - Math.sin(Math.PI * t) * 110; return [x, y]; };
+  const path = Array.from({ length: 41 }, (_, i) => P(i / 40)).map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`).join(' ');
+  const done = Array.from({ length: 41 }, (_, i) => P((i / 40) * (ME.n / MAX))).map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`).join(' ');
+  const [px, py] = P(ME.n / MAX), [qx, qy] = P(Math.min(1, ME.n / MAX + 0.01));
+  const ang = Math.atan2(qy - py, qx - px) * 180 / Math.PI;
+  const wps = CLASSES.filter((x) => x.at).map((x) => { const [wx, wy] = P(x.at / MAX); const got = ME.n >= x.at;
+    return `<circle cx="${wx}" cy="${wy}" r="7" fill="${got ? '#ffd166' : '#0b1530'}" stroke="#ffd166" stroke-width="2"/><text x="${wx}" y="${wy - 14}" fill="#c9d4f3" font-size="12" text-anchor="middle" font-family="Simpler, Arial">${x.he} · ${x.at}</text>`; }).join('');
+  return `<div class="miles">
+    <div class="mi-head"><div><h3>${u.mine.toUpperCase()}</h3><p>${ME.name} · ${ME.team}</p></div><div class="flap" aria-label="${ME.n} ${u.he}">${digits}</div></div>
+    <div class="route"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="המסלול: ${ME.n} מתוך ${MAX} ${u.he}">
+      <path d="${path}" fill="none" stroke="#3a4f80" stroke-width="2" stroke-dasharray="4 6"/>
+      <path d="${done}" fill="none" stroke="#ffd166" stroke-width="3" stroke-linecap="round"/>
+      ${wps}
+      <text x="${W - 30}" y="${H - 4}" fill="#9fb0d8" font-size="12" text-anchor="middle" font-family="Simpler, Arial">TLV · 0</text>
+      <g transform="translate(${px} ${py}) rotate(${ang})"><path d="M10 0 L-6 -7 L-3 0 L-6 7 Z" fill="#fff"/></g>
+    </svg></div>
+    <p class="next">${nx ? `עוד <b class="ltr">${nx.at - ME.n}</b> ${u.he} עד ${nx.he}. ` : ''}${nextSale(u)}.</p>
+    <div class="pass"><div class="pass-main">
+      <div class="row"><span>נוסע/ת<b>${ME.name}</b></span><span>טיסה<b class="ltr">BZQ 60</b></span></div>
+      <div class="row"><span>מחלקה<b>${c.he}</b></span><span>${u.he}<b class="ltr">${ME.n}</b></span><span>מושב<b class="ltr">3C</b></span></div>
+    </div><div class="pass-stub" style="color:${c.color}"><b class="ltr">${c.letter}</b><small>${c.he}</small></div></div>
+    ${ladder(ME.n, { here: '#ffd166', muted: '' })}
+  </div>`;
+}
+
+// ---------- Option 3: stamps ----------
+function stamps() {
+  const u = UNITS.stamps, c = classOf(ME.n), nx = nextOf(ME.n);
+  const inks = ['#6b1e2a', '#1f4e79', '#2f6b3a', '#7a4a12', '#4b2a6b'];
+  const sales = Object.entries(ME.sales);
+  const st = [
+    ...sales.map(([p, k], i) => `<div class="st round" style="--c:${inks[i]};rotate:${[-8, 6, -3][i]}deg"><span><small>${p}</small><b class="ltr">${k}</b><small>×${p === 'אינטרנט / סיב' ? 2 : 3}</small></span></div>`),
+    `<div class="st rect" style="--c:${inks[3]};rotate:4deg"><span><small>${cityOfWeek(0)} · שבוע 1</small><b class="ltr">96</b><small>חותמות</small></span></div>`,
+    `<div class="st rect" style="--c:${inks[4]};rotate:-6deg"><span><small>${cityOfWeek(1)} · שבוע 2</small><b class="ltr">131</b><small>חותמות</small></span></div>`,
+    `<div class="st round" style="--c:${inks[0]};rotate:9deg"><span><small>${cityOfWeek(2)} · שבוע 3</small><b class="ltr">185</b><small>עד היום</small></span></div>`,
+    `<div class="st round empty"><span><small>שבוע 4</small><b>?</b></span></div>`,
+  ].join('');
+  const visas = CLASSES.filter((x) => x.at).map((x) => { const got = ME.n >= x.at;
+    return `<div class="visa ${got ? 'got' : 'locked'}" style="--c:${x.color}"><div><h4>ויזה · ${x.he}</h4><p>${got ? 'הונפקה' : `עוד ${x.at - ME.n} חותמות`}</p></div><span class="at ltr">${x.at}</span></div>`; }).join('');
+  return `<div class="stamps">
+    <div class="pp-head"><div><h3>דרכון · FLIGHT 60</h3><small>${ME.name} · ${ME.team}</small></div><div style="text-align:left"><span class="n ltr">${ME.n}</span><small>${u.he}</small></div></div>
+    <div class="ink">${st}</div>
+    <p class="next">${nx ? `עוד <b class="ltr">${nx.at - ME.n}</b> ${u.he} לוויזת ${nx.he}. ` : ''}${nextSale(u)}.</p>
+    <div class="visas">${visas}</div>
+    <p class="small" style="color:#6a5636">מתחת לתנאי הסף (350): תיירים, עוד בלי ויזה. ${c.he === 'תיירים' ? '' : `כרגע: ${c.he}.`}</p>
+  </div>`;
+}
+
+const DRAW = { points, miles, stamps };
+function show(id) {
+  for (const b of document.querySelectorAll('.opt')) b.setAttribute('aria-selected', String(b.dataset.u === id));
+  $('#panel').setAttribute('aria-labelledby', `t-${id}`);
+  $('#panel').innerHTML = DRAW[id]();
+  const u = UNITS[id];
+  $('#about').innerHTML = `<h3>${u.he}</h3><p class="small muted">${u.src}</p>
+    <div class="pc"><div><h4>בעד</h4><ul>${u.pros.map((x) => `<li>${x}</li>`).join('')}</ul></div><div><h4>לשים לב</h4><ul>${u.cons.map((x) => `<li>${x}</li>`).join('')}</ul></div></div>
+    <h4 class="small muted">איך זה נשמע באתר</h4><div class="words"><span>${ME.n} ${u.he}</span><span>${u.next}</span><span>${u.mine}</span><span>מקום לפי ה${u.he}</span></div>`;
+  $('#compare tbody').innerHTML = Object.entries(UNITS).map(([k, x]) => `<tr class="${k === id ? 'on' : ''}"><td><b>${x.he}</b></td><td>${x.src.split(' (')[0]}</td><td>${x.pros[0]}</td><td>${x.cons[0]}</td></tr>`).join('');
+  try { history.replaceState(null, '', `?unit=${id}`); } catch (e) {}
+}
+document.querySelector('.switch').addEventListener('click', (e) => { const b = e.target.closest('.opt'); if (b) show(b.dataset.u); });
+const q = new URLSearchParams(location.search).get('unit');
+show(UNITS[q] ? q : 'points');
+</script>
+</body>
+</html>

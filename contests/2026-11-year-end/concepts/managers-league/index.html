@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ליגת המנהלים</title>
+<!-- Concept: the managers' side of takanon draft 2. The division's weighted target as a fuel gauge every prize depends
+     on, the four department managers against 110%, and the team leaders' leagues (entry at 100% of the weighted team
+     target, +10 above it, places 30 / 10 / 3, bonuses). Team leaders appear by role. Demo data; opens from disk. -->
+<style>
+@font-face { font-family: Simpler; font-weight: 300; src: url("../../../platform/public/fonts/Simpler-Light.otf"); }
+@font-face { font-family: Simpler; font-weight: 400; src: url("../../../platform/public/fonts/Simpler-Regular.otf"); }
+@font-face { font-family: Simpler; font-weight: 700; src: url("../../../platform/public/fonts/Simpler-Bold.otf"); }
+@font-face { font-family: Simpler; font-weight: 900; src: url("../../../platform/public/fonts/Simpler-Black.otf"); }
+:root {
+  --navy: #20294d; --navy-2: #2e3152; --accent: #33b5e0; --on-navy: #c9cbd6;
+  --bg: #ebeced; --card: #fff; --ink: #20294d; --muted: #6b6e80; --line: #d9dae0; --field: #f4f4f7;
+  --gold: #C9A227; --silver: #8E99A6; --bronze: #B8733A; --good: #1f8a5b; --warn: #c27c0e; --bad: #c0362c;
+  --r: 16px; --pill: 999px; --font: Simpler, "Heebo", "Arial Hebrew", Arial, sans-serif;
+  --shadow: 0 1px 2px rgb(32 41 77 / .06), 0 12px 30px -16px rgb(32 41 77 / .28);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12162b; --card: #1c2242; --ink: #eef0f6; --muted: #a3a7bd; --line: #363c63; --field: #232a50; --good: #4fd19a; --warn: #f0b44c; --bad: #ff7a70; color-scheme: dark; } }
+:root[data-theme="dark"] { --bg: #12162b; --card: #1c2242; --ink: #eef0f6; --muted: #a3a7bd; --line: #363c63; --field: #232a50; --good: #4fd19a; --warn: #f0b44c; --bad: #ff7a70; color-scheme: dark; }
+* { box-sizing: border-box; }
+html { background: var(--bg); color: var(--ink); }
+body { margin: 0; font: 400 16px/1.5 var(--font); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+h1, h2, h3, h4, p { margin: 0; }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 16px; }
+.ltr { direction: ltr; unicode-bidi: isolate; display: inline-block; }
+.muted { color: var(--muted); } .small { font-size: 14px; }
+
+header { background: linear-gradient(135deg, var(--navy-2), var(--navy)); color: #fff; padding-block: 26px 0; }
+.brand { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; font-size: 14px; }
+.brand b { font-size: 20px; font-weight: 900; } .brand span { color: var(--accent); font-weight: 700; }
+.demo { margin-inline-start: auto; background: rgb(255 255 255 / .12); padding: 2px 10px; border-radius: var(--pill); color: var(--on-navy) !important; font-weight: 400 !important; }
+h1 { font-weight: 900; font-size: clamp(36px, 6vw, 64px); line-height: 1; letter-spacing: -0.02em; margin-top: 14px; }
+.lede { color: var(--on-navy); max-width: 64ch; margin-top: 10px; }
+
+/* The division's fuel gauge, in the header */
+.fuel { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 24px 36px; align-items: center; padding-block: 24px 30px; }
+@media (max-width: 760px) { .fuel { grid-template-columns: minmax(0, 1fr); } }
+.gauge { position: relative; width: 100%; max-width: 300px; margin: 0 auto; }
+.gauge svg { display: block; width: 100%; overflow: visible; }
+.gauge .read { text-align: center; margin-top: 4px; }
+.gauge .read b { display: block; font-size: 44px; font-weight: 900; line-height: 1; }
+.gauge .read small { color: var(--on-navy); }
+.fuel h2 { font-size: 22px; font-weight: 900; }
+.cond { display: inline-flex; align-items: center; gap: 8px; margin-top: 8px; padding: 4px 12px; border-radius: var(--pill); font-weight: 700; font-size: 14px; }
+.cond.ok { background: rgb(79 209 154 / .16); color: #6fe0ae; } .cond.no { background: rgb(240 180 76 / .16); color: #f0c46c; }
+.mix { display: grid; gap: 8px; margin-top: 14px; }
+.mix-row { display: grid; grid-template-columns: minmax(0, 150px) minmax(0, 1fr) 54px; gap: 10px; align-items: center; font-size: 14px; }
+.mix-row .w { color: var(--on-navy); font-size: 12px; }
+.track { height: 8px; border-radius: var(--pill); background: rgb(255 255 255 / .12); position: relative; overflow: hidden; }
+.track i { position: absolute; inset: 0 0 0 auto; border-radius: inherit; background: var(--accent); transition: width .4s; }
+.mix-row b { text-align: start; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; padding-block: 18px; }
+.day { display: flex; align-items: center; gap: 10px; flex: 1 1 320px; }
+.day input { flex: 1; accent-color: var(--accent); }
+.day b { min-width: 120px; }
+.play { border: 0; background: var(--accent); color: #0b2230; font-weight: 700; border-radius: var(--pill); padding: 7px 16px; cursor: pointer; }
+
+section.block { padding-bottom: 34px; display: grid; gap: 14px; }
+.block-head h2 { font-size: 26px; font-weight: 900; }
+.block-head p { color: var(--muted); max-width: 70ch; }
+
+/* Department managers */
+.depts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 14px; }
+.dept { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 18px; display: grid; gap: 12px; align-content: start; }
+.dept h3 { font-size: 18px; font-weight: 900; }
+.dept .who { color: var(--muted); font-size: 13px; }
+.big { display: flex; align-items: baseline; gap: 8px; }
+.big b { font-size: 38px; font-weight: 900; line-height: 1; }
+.meter { position: relative; height: 12px; border-radius: var(--pill); background: var(--field); }
+.meter i { position: absolute; inset: 0 0 0 auto; border-radius: inherit; background: var(--accent); transition: width .4s; max-width: 100%; }
+.meter .mark { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--muted); }
+.meter .mark.prize { width: 4px; background: var(--gold); top: -6px; bottom: -6px; border-radius: 2px; }
+.meter-key { display: flex; gap: 12px; font-size: 11px; color: var(--muted); margin-top: 8px; flex-wrap: wrap; }
+.meter-key i { display: inline-block; width: 3px; height: 10px; vertical-align: middle; margin-inline-end: 4px; background: var(--muted); }
+.meter-key i.prize { width: 4px; background: var(--gold); }
+.meter-scale { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 18px; }
+.chip { justify-self: start; display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: var(--pill); font-size: 13px; font-weight: 700; width: fit-content; }
+.chip.ok { background: color-mix(in srgb, var(--good) 15%, transparent); color: var(--good); }
+.chip.no { background: var(--field); color: var(--muted); }
+.chip.warn { background: color-mix(in srgb, var(--warn) 15%, transparent); color: var(--warn); }
+.parts { display: grid; gap: 6px; }
+.part { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; font-size: 13px; }
+.part .bar { grid-column: 1 / -1; height: 5px; border-radius: var(--pill); background: var(--field); position: relative; overflow: hidden; }
+.part .bar i { position: absolute; inset: 0 0 0 auto; background: var(--navy); border-radius: inherit; transition: width .4s; opacity: .8; }
+
+/* Team leaders' leagues */
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tab { border: 1px solid var(--line); background: var(--card); border-radius: var(--pill); padding: 7px 16px; font-weight: 700; cursor: pointer; }
+.tab[aria-pressed="true"] { background: var(--navy); color: #fff; border-color: var(--navy); }
+.league { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 20px; display: grid; gap: 18px; }
+.rules { display: flex; flex-wrap: wrap; gap: 8px; }
+.rules span { background: var(--field); border-radius: var(--pill); padding: 4px 12px; font-size: 13px; }
+.podium { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; align-items: end; max-width: 620px; margin: 0 auto; width: 100%; }
+.step { display: grid; gap: 6px; text-align: center; }
+.step .who { font-weight: 900; font-size: 15px; line-height: 1.2; min-height: 2.4em; display: grid; align-items: end; }
+.step .pct { font-size: 13px; color: var(--muted); }
+.block-p { border-radius: 12px 12px 4px 4px; color: #fff; display: grid; place-items: center; align-content: center; gap: 2px; padding: 10px 4px; transition: height .4s; }
+.block-p b { font-size: 30px; font-weight: 900; line-height: 1; }
+.block-p small { font-size: 12px; opacity: .9; }
+.p1 .block-p { background: var(--gold); height: 150px; } .p2 .block-p { background: var(--silver); height: 112px; } .p3 .block-p { background: var(--bronze); height: 84px; }
+.step.empty .block-p { background: var(--field); color: var(--muted); }
+.prize { font-size: 12px; font-weight: 700; color: var(--good); }
+table.rank { width: 100%; border-collapse: collapse; font-size: 14px; }
+.rank th { text-align: start; color: var(--muted); font-weight: 700; font-size: 12px; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+.rank td { padding: 9px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.rank tr.out td { color: var(--muted); }
+.rank tr.line td { padding: 0; border: 0; }
+.rank tr.line div { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); padding: 6px 0; }
+.rank tr.line div::before, .rank tr.line div::after { content: ""; flex: 1; border-top: 1px dashed currentColor; opacity: .6; }
+.mini { width: 120px; height: 6px; border-radius: var(--pill); background: var(--field); position: relative; display: inline-block; vertical-align: middle; margin-inline-end: 8px; }
+.mini i { position: absolute; inset: 0 0 0 auto; background: var(--accent); border-radius: inherit; max-width: 100%; }
+.mini .m100 { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); right: calc(100% / 1.3); }
+.tags { display: flex; gap: 4px; flex-wrap: wrap; }
+.tag { font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: var(--pill); background: var(--field); white-space: nowrap; }
+.tag.plus { background: color-mix(in srgb, var(--accent) 18%, transparent); }
+.scroll { overflow-x: auto; }
+.open { font-size: 13px; color: var(--muted); border-inline-start: 3px solid var(--warn); padding-inline-start: 10px; }
+footer { padding: 4px 0 40px; color: var(--muted); font-size: 13px; }
+@media (max-width: 560px) { .mini { width: 70px; } .hide-s { display: none; } .league { padding: 14px; } }
+@media (prefers-reduced-motion: reduce) { .track i, .meter i, .part .bar i, .block-p { transition: none; } }
+</style>
+</head>
+<body>
+<!-- Every concept is a demo (23.10.2026): a label only, the page itself is unchanged. -->
+<div class="demo-badge" role="note" dir="rtl" style="position:fixed;top:12px;left:12px;z-index:2147483647;pointer-events:none;background:#F5C342;color:#11152B;font:800 13px/1 Simpler,'Arial Hebrew',Arial,sans-serif;padding:6px 12px;border-radius:999px;box-shadow:0 2px 8px rgb(0 0 0 / .25)">דמו</div>
+
+<header>
+  <div class="wrap">
+    <div class="brand"><b>בזק</b><span>60 יום מסביב לעולם</span><span class="demo">קונספט · נתוני דמו</span></div>
+    <h1>ליגת המנהלים</h1>
+    <p class="lede">מנהלי המחלקות ומנהלי הצוותים, לפי היעדים המשוקללים בתקנון. הכול מתחיל במד הדלק של האגף: כל הפרסים בתחרות תלויים בו.</p>
+    <div class="fuel">
+      <div class="gauge" id="gauge"></div>
+      <div>
+        <h2>מד הדלק של האגף</h2>
+        <p class="small" style="color:var(--on-navy)">היעד המשוקלל של האגף הוא תנאי לכל הפרסים. חמישה מדדים, כל אחד במשקל שלו.</p>
+        <div id="cond"></div>
+        <div class="mix" id="mix"></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="controls">
+    <div class="day"><button class="play" id="play" type="button">▶ ניגון</button>
+      <input type="range" id="day" min="1" max="61" value="45" aria-label="יום בתחרות"><b id="dayLabel"></b></div>
+  </div>
+
+  <section class="block">
+    <div class="block-head"><h2>מנהלי המחלקות</h2>
+      <p>ארבעה מנהלים, פרס אישי לכל אחד. מחלקה שמגיעה ל-<span class="ltr">110%</span> מהיעד המשוקלל שלה זוכה גם בפרס מחלקתי.</p></div>
+    <div class="depts" id="depts"></div>
+  </section>
+
+  <section class="block">
+    <div class="block-head"><h2>ליגות מנהלי הצוותים</h2>
+      <p>נכנסים לליגה ב-<span class="ltr">100%</span> מהיעד הצוותי המשוקלל. מעל <span class="ltr">100%</span>: עוד 10 חותמות. המקומות: ראשון 30 חותמות, שני 10, שלישי 3. הדירוג לפי אחוז העמידה.</p></div>
+    <div class="tabs" id="tabs" role="group" aria-label="ליגה"></div>
+    <div class="league" id="league"></div>
+  </section>
+  <footer>קונספט לפי תקנון טיוטה 2. מנהלי הצוותים מופיעים לפי תפקיד; המספרים הם דמו. נקודות פתוחות מסומנות בכתום וממתינות לתשובות מאורית.</footer>
+</div>
+
+<script>
+// ---------- The takanon (draft 2) for managers ----------
+const DIVISION = [
+  { id: 'net', he: 'גיוס אינטרנט / סיב', w: 0.10 }, { id: 'biznet', he: 'ביזנט', w: 0.25 }, { id: 'ipc', he: 'IPC', w: 0.25 },
+  { id: 'b144', he: 'מכירות B144', w: 0.25 }, { id: 'elec', he: 'הסכמי חשמל', w: 0.15 },
+];
+const DEPTS = [
+  { id: 'soho', he: 'מוקד סוהו', parts: [['ביזנט', 0.45], ['IPC', 0.35], ['אינטרנט / סיב', 0.20]], quality: 'סקר 24: ציון 9 ולכל היותר 10.6% סקרים נמוכים' },
+  { id: 'haifa', he: 'מוקד 144 חיפה', parts: [['מדריך עסקי', 0.60], ['ריסלר', 0.40]] },
+  { id: 'tlv', he: 'פרסום דיגיטלי ת"א', parts: [['מדריך עסקי', 0.60], ['ריסלר', 0.40]] },
+  { id: 'elec', he: 'מוקד חשמל', parts: [['הסכמים חתומים', 1]] },
+];
+// Each league: its team leaders (by role), how the team target is weighted, the places' stamps, prizes and bonuses.
+const LEAGUES = [
+  { id: 'soho', he: 'מכירות סוהו ושטח', prizes: 2,
+    rules: ['ר"צ מכירות סוהו: ביזנט 45% · IPC 35% · אינטרנט 20%', 'ר"צ שטח: ביזנט 35% · IPC 45% · אינטרנט 20%'],
+    tls: [['ר"צ מכירות סוהו', 'מכירות סוהו'], ['ר"צ שטח סוהו 1', 'שטח סוהו'], ['ר"צ שטח סוהו 2', 'שטח סוהו']] },
+  { id: 'service', he: 'שירות סוהו', prizes: 2, quality: 9.0,
+    rules: ['ביזנט 45% · IPC ממומש 30% · אינטרנט 25%', 'תנאי סף: ציון סקר 24 של 9'],
+    open: 'בטיוטה, המקומות והפרסים כתובים פעם אחת לכל מנהלי הצוותים בסוהו. כאן הנחנו שגם לשירות יש ליגה משלה עם אותם מקומות.',
+    tls: [['ר"צ חניכה סוהו', 'חניכה סוהו'], ['ר"צ סוהו 1', 'סוהו 1'], ['ר"צ סוהו ווטסאפ', 'סוהו ווטסאפ'], ['ר"צ קורס מוקד סוהו', 'קורס מוקד']] },
+  { id: 'ads', he: 'פרסום דיגיטלי', prizes: 2, topBonus: 10,
+    rules: ['מכירות B144: ריסלר 40% · מדריך 60%', 'שימור: אחוז הסרות, 50 פניות שימור, סקר 24 של 8.2', 'מענה 144: יעד לידים ממומשים', 'הגבוה מכולם: עוד 10 חותמות'],
+    open: 'בטיוטה "הגבוה מביניהן" מתייחס לתנאי של 20 לידים שנמחק. כאן הבונוס ניתן למקום הראשון בליגה.',
+    tls: [['ר"צ מכירות חיפה 1', 'מכירות B144'], ['ר"צ מכירות חיפה 2', 'מכירות B144'], ['ר"צ העלאת ערך', 'מכירות B144'], ['ר"צ שימור חיפה', 'שימור'], ['ר"צ שימור ת"א', 'שימור'], ['ר"צ מענה 144', 'מענה 144']] },
+  { id: 'elec', he: 'חשמל', prizes: 1, leadBonus: true, topBonus: 10,
+    rules: ['מכירות: הסכמים חתומים', 'שירות: 100% מיעד לידי החשמל וסקר 24 של 8.5', '20 לידים ממומשים ומעלה: 5 חותמות, והגבוה מביניהם עוד 10'],
+    tls: [['ר"צ חשמל 1', 'מכירות חשמל'], ['ר"צ חשמל 2', 'מכירות חשמל'], ['ר"צ חשמל 3', 'שירות חשמל']] },
+];
+const PLACES = [30, 10, 3];
+
+// ---------- Demo trajectories: attainment by the end, and how the month goes (fast start or strong finish) ----------
+let seed = 11;
+const rnd = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+const DAYS = 61, START = new Date('2026-11-01T12:00:00');
+const traj = () => ({ end: 0.78 + rnd() * 0.5, late: rnd() * 2 - 1 });
+// Attainment so far against the target to date (on pace = 100%): settles from noisy to the final value.
+const at = (t, day) => Math.max(0, t.end * (1 + 0.25 * t.late * (day / DAYS - 1)) * (0.92 + 0.08 * Math.min(1, day / 12)));
+const division = DIVISION.map((m) => ({ ...m, t: traj() }));
+const depts = DEPTS.map((d) => ({ ...d, t: d.parts.map(() => traj()), q: 8.7 + rnd() * 0.6 }));
+const leagues = LEAGUES.map((l) => ({ ...l, tls: l.tls.map(([role, team]) => ({ role, team, t: traj(), q: 8.6 + rnd() * 0.8, leads: Math.round(12 + rnd() * 18) })) }));
+
+// ---------- Drawing ----------
+const $ = (s) => document.querySelector(s);
+const pct = (x) => `${Math.round(x * 100)}%`;
+const state = { day: 45, league: 'soho' };
+const fmtDay = (d) => new Date(START.getTime() + (d - 1) * 864e5).toLocaleDateString('he-IL', { day: 'numeric', month: 'long' });
+
+function gauge(v) {
+  // A half-dial from 0 to 130%; the needle at v; the condition (100%) marked.
+  const max = 1.3, a = (x) => Math.PI * (1 - Math.min(max, x) / max), R = 120, cx = 150, cy = 140;
+  const pt = (x, r = R) => [cx + r * Math.cos(a(x)), cy - r * Math.sin(a(x))];
+  const arc = (x0, x1, col, w = 16) => { const [x0p, y0p] = pt(x0), [x1p, y1p] = pt(x1); return `<path d="M${x0p} ${y0p} A${R} ${R} 0 0 1 ${x1p} ${y1p}" stroke="${col}" stroke-width="${w}" fill="none" stroke-linecap="round"/>`; };
+  const [nx, ny] = pt(v, R - 34), [mx1, my1] = pt(1, R - 14), [mx2, my2] = pt(1, R + 14), [lx, ly] = pt(1, R + 28);
+  return `<svg viewBox="0 0 300 170" role="img" aria-label="האגף ב-${pct(v)} מהיעד המשוקלל">
+    ${arc(0, 1.3, 'rgb(255 255 255 / .12)')}${arc(0, Math.max(0.01, Math.min(1.3, v)), v >= 1 ? '#4fd19a' : '#33b5e0')}
+    <line x1="${mx1}" y1="${my1}" x2="${mx2}" y2="${my2}" stroke="#fff" stroke-width="3"/>
+    <text x="${lx}" y="${ly}" fill="#c9cbd6" font-size="12" text-anchor="middle" font-family="Simpler, Arial">100%</text>
+    <line x1="${cx}" y1="${cy}" x2="${nx}" y2="${ny}" stroke="#fff" stroke-width="4" stroke-linecap="round" style="transition: all .4s"/>
+    <circle cx="${cx}" cy="${cy}" r="8" fill="#fff"/></svg>
+    <div class="read"><b class="ltr">${pct(v)}</b><small>מהיעד המשוקלל עד היום</small></div>`;
+}
+
+function render() {
+  const d = state.day;
+  // Division
+  const parts = division.map((m) => ({ ...m, v: at(m.t, d) }));
+  const total = parts.reduce((s, m) => s + m.w * m.v, 0);
+  $('#gauge').innerHTML = gauge(total);
+  $('#cond').innerHTML = total >= 1 ? '<span class="cond ok">✓ התנאי מתקיים: הפרסים פתוחים</span>' : `<span class="cond no">חסרים <span class="ltr">${pct(1 - total)}</span> כדי לפתוח את הפרסים</span>`;
+  $('#mix').innerHTML = parts.map((m) => `<div class="mix-row"><span>${m.he} <span class="w ltr">${pct(m.w)}</span></span>
+    <div class="track"><i style="width:${Math.min(100, m.v / 1.3 * 100)}%"></i></div><b class="ltr">${pct(m.v)}</b></div>`).join('');
+
+  // Department managers: weighted attainment, the 110% department prize line, the quality condition where there is one.
+  $('#depts').innerHTML = depts.map((dp) => {
+    const vs = dp.t.map((t) => at(t, d) * 1.05), v = dp.parts.reduce((s, [, w], i) => s + w * vs[i], 0);
+    const scale = 1.4, q = dp.quality ? dp.q >= 9 : true;
+    return `<article class="dept"><div><h3>${dp.he}</h3><p class="who">מנהל/ת המחלקה</p></div>
+      <div class="big"><b class="ltr">${pct(v)}</b><span class="muted small">מהיעד המשוקלל</span></div>
+      <div><div class="meter"><i style="width:${Math.min(100, v / scale * 100)}%"></i>
+        <span class="mark" style="right:${100 / scale}%"></span><span class="mark prize" style="right:${110 / scale}%"></span></div>
+        <div class="meter-key"><span><i></i>100%</span><span><i class="prize"></i>110% · פרס מחלקתי</span></div></div>
+      ${v >= 1.1 && q ? '<span class="chip ok">🏆 בדרך לפרס המחלקתי</span>' : v >= 1 ? `<span class="chip warn">עוד <span class="ltr">${pct(1.1 - v)}</span> לפרס המחלקתי</span>` : '<span class="chip no">מתחת ליעד</span>'}
+      ${dp.quality ? `<span class="chip ${q ? 'ok' : 'warn'}">${q ? '✓' : '!'} ${dp.quality} · עכשיו <span class="ltr">${dp.q.toFixed(1)}</span></span>` : ''}
+      <div class="parts">${dp.parts.map(([he, w], i) => `<div class="part"><span>${he} <span class="muted ltr">${pct(w)}</span></span><b class="ltr">${pct(vs[i])}</b>
+        <span class="bar"><i style="width:${Math.min(100, vs[i] / scale * 100)}%"></i></span></div>`).join('')}</div></article>`;
+  }).join('');
+
+  league();
+  $('#dayLabel').textContent = `יום ${d} · ${fmtDay(d)}`;
+}
+
+function league() {
+  const l = leagues.find((x) => x.id === state.league), d = state.day;
+  $('#tabs').innerHTML = leagues.map((x) => `<button class="tab" type="button" data-l="${x.id}" aria-pressed="${x.id === l.id}">${x.he}</button>`).join('');
+  const rows = l.tls.map((tl) => {
+    const v = at(tl.t, d), qOk = !l.quality || tl.q >= l.quality;
+    return { ...tl, v, qOk, in: v >= 1 && qOk };
+  }).sort((a, b) => b.in - a.in || b.v - a.v);
+  const entrants = rows.filter((r) => r.in);
+  // Stamps: the place (30 / 10 / 3), +10 above 100%, the league's bonuses.
+  rows.forEach((r) => {
+    r.place = r.in ? entrants.indexOf(r) + 1 : null;
+    r.tags = [];
+    r.stamps = 0;
+    if (r.in) { r.stamps += 10; r.tags.push(['+10 מעל 100%', 'plus']); }
+    if (r.place && r.place <= 3) { r.stamps += PLACES[r.place - 1]; r.tags.push([`מקום ${r.place}: ${PLACES[r.place - 1]}`, 'plus']); }
+    if (l.leadBonus && r.leads >= 20) { r.stamps += 5; r.tags.push(['20+ לידים: 5', 'plus']); }
+    if (l.topBonus && r.place === 1) { r.stamps += l.topBonus; r.tags.push([`הגבוה מכולם: ${l.topBonus}`, 'plus']); }
+    if (l.quality) r.tags.push([`סקר 24: ${tl_q(r)}`, r.qOk ? '' : 'warn']);
+  });
+  const podium = [1, 0, 2].map((i) => {
+    const r = entrants[i], cls = `p${i + 1}`;
+    return r ? `<div class="step ${cls}"><span class="who">${r.role}</span><span class="pct ltr">${pct(r.v)}</span>
+      <div class="block-p"><b>${i + 1}</b><small>${PLACES[i]} חותמות</small></div>${i < l.prizes ? '<span class="prize">🏆 פרס</span>' : '<span class="prize">&nbsp;</span>'}</div>`
+      : `<div class="step ${cls} empty"><span class="who muted">פנוי</span><span class="pct">&nbsp;</span><div class="block-p"><b>${i + 1}</b><small>מחכה למי שיגיע ל-100%</small></div><span class="prize">&nbsp;</span></div>`;
+  }).join('');
+  let lineDone = false;
+  const body = rows.map((r) => {
+    const line = !r.in && !lineDone ? ((lineDone = true), `<tr class="line"><td colspan="5"><div>הכניסה לליגה: <span class="ltr">100%</span> מהיעד המשוקלל${l.quality ? ` וציון סקר 24 של ${l.quality}` : ''}</div></td></tr>`) : '';
+    return `${line}<tr class="${r.in ? '' : 'out'}"><td>${r.place ?? '—'}</td><td><b>${r.role}</b><br><span class="muted small">${r.team}</span></td>
+      <td><span class="mini"><i style="width:${Math.min(100, r.v / 1.3 * 100)}%"></i><span class="m100"></span></span><span class="ltr">${pct(r.v)}</span></td>
+      <td class="hide-s"><div class="tags">${r.tags.map(([t, c]) => `<span class="tag ${c}">${t}</span>`).join('') || '<span class="muted small">—</span>'}</div></td>
+      <td><b class="ltr">${r.stamps}</b></td></tr>`;
+  }).join('');
+  $('#league').innerHTML = `
+    <div class="rules">${l.rules.map((x) => `<span>${x}</span>`).join('')}<span>${l.prizes === 1 ? 'פרס אחד' : `${l.prizes} פרסים`}</span></div>
+    <div class="podium">${podium}</div>
+    <div class="scroll"><table class="rank"><thead><tr><th>מקום</th><th>מנהל/ת צוות</th><th>עמידה ביעד</th><th class="hide-s">חותמות מ…</th><th>חותמות</th></tr></thead><tbody>${body}</tbody></table></div>
+    ${l.open ? `<p class="open">${l.open}</p>` : ''}`;
+}
+const tl_q = (r) => r.q.toFixed(1);
+
+$('#tabs').onclick = (e) => { const b = e.target.closest('[data-l]'); if (b) { state.league = b.dataset.l; league(); } };
+$('#day').oninput = (e) => { state.day = Number(e.target.value); render(); };
+let timer = null;
+$('#play').onclick = () => {
+  if (timer) { clearInterval(timer); timer = null; $('#play').textContent = '▶ ניגון'; return; }
+  if (state.day >= DAYS) state.day = 1;
+  $('#play').textContent = '❚❚ עצירה';
+  timer = setInterval(() => { state.day = Math.min(DAYS, state.day + 1); $('#day').value = state.day; render(); if (state.day >= DAYS) $('#play').click(); }, 220);
+};
+const q = new URLSearchParams(location.search);
+if (q.get('day')) { state.day = Math.max(1, Math.min(DAYS, Number(q.get('day')) || 45)); $('#day').value = state.day; }
+if (q.get('league') && LEAGUES.some((l) => l.id === q.get('league'))) state.league = q.get('league');
+render();
+</script>
+</body>
+</html>

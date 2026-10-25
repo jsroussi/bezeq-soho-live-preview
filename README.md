@@ -1,3 +1,3 @@
-# SOHO animated design preview
+# SOHO animated design previews
 
-21 interactive designs with clearly labeled synthetic demo data. Generated website assets only; no private repository history, employee files or administrator updater. Source repository remains private.
+21 integrated interactive designs plus original standalone/reference demos. Manual city controls cover all nine destinations, using labeled synthetic snapshots only. No private repository history, employee files or administrator updater.

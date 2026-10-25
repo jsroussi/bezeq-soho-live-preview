@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>המסלול ל-110%</title>
+<!-- Concept (from the ChatGPT brainstorm, idea #10): "The 110% route", for everyone on the site rather than only the
+     managers. Each department's weighted result as a runway: 100% is take-off, 110% is cruising altitude and the
+     takanon's department prize. Where it stands, where the pace leads, what a day needs from here, and the visitor's
+     own team's share. The division's condition (every prize depends on it) on top. Demo data. -->
+<style>
+@font-face { font-family: Simpler; font-weight: 400; src: url("../../../platform/public/fonts/Simpler-Regular.otf"); }
+@font-face { font-family: Simpler; font-weight: 700; src: url("../../../platform/public/fonts/Simpler-Bold.otf"); }
+@font-face { font-family: Simpler; font-weight: 900; src: url("../../../platform/public/fonts/Simpler-Black.otf"); }
+:root {
+  --navy: #20294d; --navy-2: #2e3152; --accent: #33b5e0; --on-navy: #c9cbd6;
+  --bg: #ebeced; --card: #fff; --ink: #20294d; --muted: #6b6e80; --line: #d9dae0; --field: #f4f4f7;
+  --gold: #C9A227; --good: #1f8a5b; --warn: #c27c0e; --bad: #c0362c;
+  --r: 16px; --pill: 999px; --font: Simpler, "Heebo", "Arial Hebrew", Arial, sans-serif;
+  --shadow: 0 1px 2px rgb(32 41 77 / .06), 0 12px 30px -16px rgb(32 41 77 / .28);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12162b; --card: #1c2242; --ink: #eef0f6; --muted: #a3a7bd; --line: #363c63; --field: #232a50; --good: #4fd19a; --warn: #f0b44c; --bad: #ff7a70; color-scheme: dark; } }
+:root[data-theme="dark"] { --bg: #12162b; --card: #1c2242; --ink: #eef0f6; --muted: #a3a7bd; --line: #363c63; --field: #232a50; --good: #4fd19a; --warn: #f0b44c; --bad: #ff7a70; color-scheme: dark; }
+* { box-sizing: border-box; }
+html { background: var(--bg); color: var(--ink); }
+body { margin: 0; font: 400 16px/1.5 var(--font); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+h1, h2, h3, h4, p { margin: 0; }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 16px; }
+.ltr { direction: ltr; unicode-bidi: isolate; display: inline-block; }
+.muted { color: var(--muted); } .small { font-size: 14px; }
+header { background: linear-gradient(135deg, var(--navy-2), var(--navy)); color: #fff; padding-block: 26px 30px; }
+.brand { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; font-size: 14px; }
+.brand b { font-size: 20px; font-weight: 900; } .brand span { color: var(--accent); font-weight: 700; }
+.demo { margin-inline-start: auto; background: rgb(255 255 255 / .12); padding: 2px 10px; border-radius: var(--pill); color: var(--on-navy) !important; font-weight: 400 !important; }
+h1 { font-weight: 900; font-size: clamp(34px, 6vw, 60px); line-height: 1.02; letter-spacing: -0.02em; margin-top: 14px; }
+.lede { color: var(--on-navy); max-width: 66ch; margin-top: 10px; }
+.controls { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; padding-block: 18px; }
+.day { display: flex; align-items: center; gap: 10px; flex: 1 1 320px; }
+.day input { flex: 1; accent-color: var(--accent); }
+.day b { min-width: 150px; }
+.play { border: 0; background: var(--accent); color: #0b2230; font-weight: 700; border-radius: var(--pill); padding: 7px 16px; cursor: pointer; }
+.seg { display: inline-flex; flex-wrap: wrap; gap: 4px; background: var(--card); border: 1px solid var(--line); border-radius: var(--pill); padding: 3px; }
+.seg button { border: 0; background: none; border-radius: var(--pill); padding: 5px 12px; cursor: pointer; font-size: 14px; }
+.seg button[aria-pressed="true"] { background: var(--navy); color: #fff; }
+section.block { padding-bottom: 34px; display: grid; gap: 14px; }
+.block-head h2 { font-size: 26px; font-weight: 900; }
+.block-head p { color: var(--muted); max-width: 72ch; }
+.card { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 18px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.chip { justify-self: start; display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: var(--pill); font-size: 13px; font-weight: 700; width: fit-content; }
+.chip.ok { background: color-mix(in srgb, var(--good) 15%, transparent); color: var(--good); }
+.chip.no { background: var(--field); color: var(--muted); }
+.chip.warn { background: color-mix(in srgb, var(--warn) 15%, transparent); color: var(--warn); }
+.open { font-size: 13px; color: var(--muted); border-inline-start: 3px solid var(--warn); padding-inline-start: 10px; }
+.how { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; color: var(--muted); }
+.how b { color: var(--ink); }
+footer { padding: 4px 0 40px; color: var(--muted); font-size: 13px; }
+.division { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 18px; align-items: center; margin-top: 22px; background: rgb(255 255 255 / .07); border-radius: var(--r); padding: 14px 18px; }
+.division b { font-size: 28px; font-weight: 900; }
+.dtrack { position: relative; height: 10px; border-radius: var(--pill); background: rgb(255 255 255 / .14); }
+.dtrack i { position: absolute; inset: 0 0 0 auto; border-radius: inherit; background: var(--accent); max-width: 100%; transition: width .4s; }
+.dtrack u { position: absolute; top: -5px; bottom: -5px; width: 2px; background: #fff; }
+.division p { grid-column: 1 / -1; font-size: 14px; color: var(--on-navy); }
+.depts { display: grid; gap: 16px; }
+.dept { display: grid; gap: 14px; }
+.dept.mine { outline: 3px solid var(--accent); outline-offset: -3px; }
+.dhead { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 16px; }
+.dhead h3 { font-size: 20px; font-weight: 900; }
+.dhead .now { font-size: 34px; font-weight: 900; line-height: 1; }
+/* The runway: ground to 100% (take-off), climb to 110% (cruise), the plane at today's result */
+.runway { position: relative; height: 74px; margin: 6px 0 22px; }
+.runway .ground { position: absolute; bottom: 14px; inset-inline: 0; height: 12px; border-radius: 6px; background: repeating-linear-gradient(90deg, var(--field) 0 22px, color-mix(in srgb, var(--muted) 30%, var(--field)) 22px 26px); }
+.runway .done { position: absolute; bottom: 14px; inset-inline-start: 0; height: 12px; border-radius: 6px; background: var(--accent); transition: width .5s cubic-bezier(.2,.7,.2,1); }
+.runway .proj { position: absolute; bottom: 19px; height: 2px; border-top: 2px dashed var(--accent); opacity: .7; }
+.runway .mark { position: absolute; bottom: 6px; top: 6px; width: 2px; background: var(--ink); opacity: .55; }
+.runway .mark.cruise { background: var(--gold); width: 4px; opacity: 1; border-radius: 2px; }
+.runway .lbl { position: absolute; top: -2px; transform: translateX(50%); font-size: 12px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+.runway .lbl.cruise { color: var(--gold); }
+.runway .lbl.low { top: auto; bottom: -8px; }
+.runway .plane { position: absolute; width: 30px; height: 30px; margin-inline-start: -15px; color: var(--navy); transition: inset-inline-start .5s cubic-bezier(.2,.7,.2,1), bottom .5s; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .runway .plane { color: #fff; } }
+.runway .scale { position: absolute; bottom: -24px; inset-inline: 0; display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); gap: 10px; }
+.fact { background: var(--field); border-radius: 12px; padding: 10px 12px; }
+.fact small { display: block; color: var(--muted); font-size: 12px; font-weight: 700; }
+.fact b { font-size: 20px; font-weight: 900; }
+.teams { display: grid; gap: 6px; }
+.team { display: grid; grid-template-columns: minmax(0, 160px) minmax(0, 1fr) 64px; gap: 10px; align-items: center; font-size: 14px; }
+.team .bar { height: 8px; border-radius: var(--pill); background: var(--field); position: relative; overflow: hidden; }
+.team .bar i { position: absolute; inset: 0 0 0 auto; background: var(--navy); opacity: .75; border-radius: inherit; transition: width .4s; }
+.team.me b, .team.me span:first-child { color: var(--accent); font-weight: 900; }
+.team.me .bar i { background: var(--accent); opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .runway .done, .runway .plane, .team .bar i, .dtrack i { transition: none; } }
+</style>
+</head>
+<body>
+<!-- Every concept is a demo (23.10.2026): a label only, the page itself is unchanged. -->
+<div class="demo-badge" role="note" dir="rtl" style="position:fixed;top:12px;left:12px;z-index:2147483647;pointer-events:none;background:#F5C342;color:#11152B;font:800 13px/1 Simpler,'Arial Hebrew',Arial,sans-serif;padding:6px 12px;border-radius:999px;box-shadow:0 2px 8px rgb(0 0 0 / .25)">דמו</div>
+
+<header><div class="wrap">
+  <div class="brand"><b>בזק</b><span>60 יום מסביב לעולם</span><span class="demo">קונספט · נתוני דמו</span></div>
+  <h1>המסלול ל-110%</h1>
+  <p class="lede">כל מחלקה על מסלול המראה: ב-<span class="ltr">100%</span> מהיעד המשוקלל היא ממריאה, וב-<span class="ltr">110%</span> היא בגובה שיוט וזוכה בפרס המחלקתי של התקנון. כולם רואים את המחלקה שלהם, כמה חסר ואת החלק של הצוות שלהם.</p>
+  <div class="division" id="division"></div>
+</div></header>
+
+<div class="wrap">
+  <div class="controls">
+    <div class="day"><button class="play" id="play" type="button">▶ ניגון</button><input type="range" id="day" min="1" max="45" value="24" aria-label="היום בתחרות"><b id="dayLabel"></b></div>
+    <div class="seg" id="who" role="group" aria-label="מי נכנס"></div>
+  </div>
+  <section class="block depts" id="depts"></section>
+  <section class="block">
+    <div class="card">
+      <h2 style="font-size:22px;font-weight:900">מה כל מספר אומר</h2>
+      <ol class="how">
+        <li><b>עד היום:</b> הביצוע המשוקלל מול היעד המשוקלל עד היום (לפי ימי העבודה שעברו), כמו בליגת המנהלים. המשקלים מהתקנון: סוהו ביזנט 45% · IPC 35% · אינטרנט 20%, פרסום מדריך 60% · ריסלר 40%, חשמל הסכמים חתומים.</li>
+        <li><b>בקצב הזה:</b> אם כל יום עד הסוף ייראה כמו הממוצע עד עכשיו. הקו המקווקו על המסלול.</li>
+        <li><b>ליום:</b> כמה אחוזים מהיעד היומי המחלקה צריכה בכל אחד מימי העבודה שנותרו כדי להגיע ל-100% ול-110%.</li>
+        <li><b>הצוות שלך:</b> כמה מהתוצאה של המחלקה הגיע מהצוות שלך, לפי חלקו ביעד. אין כאן שמות של נציגים.</li>
+      </ol>
+      <p class="open">הפרס המחלקתי ב-110% כתוב בתקנון. מה שעוד פתוח: היעדים עצמם במספרים (שאלה 17), ואיך עובד כלל ה-70% אם האגף לא מגיע ליעד.</p>
+    </div>
+  </section>
+  <footer>קונספט מתוך סיעור המוחות עם ChatGPT (רעיון 10). תקנון טיוטה 2: יעדים משוקללים למחלקות, פרס מחלקתי ב-110%, יעד האגף כתנאי לפרסים. הצוותים לפי תפקיד והמספרים הם דמו.</footer>
+</div>
+
+<script src="../_shared/admin-weeks.js"></script>
+<script>
+const DAYS = 45, START = ['2026-11-01', '2026-11-08', '2026-11-15', '2026-11-22', '2026-11-29', '2026-12-06', '2026-12-13', '2026-12-20', '2026-12-27'];
+const CITIES = ['פריז', 'מילאנו', 'מרקש', 'לאס וגאס', 'קנקון', 'טוקיו', 'אתונה', 'ניו דלהי', 'ירושלים'];
+// The admin page's weeks table (../_shared/admin-weeks.js): the order, names and dates follow it.
+if (window.ADMIN_WEEKS) { START.splice(0, START.length, ...window.ADMIN_WEEKS.weeks.map((w) => w.start)); CITIES.splice(0, CITIES.length, ...window.ADMIN_WEEKS.weeks.map((w) => w.he)); }
+const dateOf = (k) => { const d = new Date(`${START[Math.floor((k - 1) / 5)]}T12:00:00`); d.setDate(d.getDate() + ((k - 1) % 5)); return d; };
+const fmt = (k) => dateOf(k).toLocaleDateString('he-IL', { day: 'numeric', month: 'long' });
+let seed = 110;
+const rnd = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+// Each team: share of its department's target, and how its month goes (daily attainment around `lvl`, drifting by `late`).
+const DEPTS = [
+  { he: 'מוקד סוהו', w: 'ביזנט 45% · IPC 35% · אינטרנט 20%', teams: ['מכירות סוהו', 'שטח סוהו', 'שירות סוהו 1', 'סוהו ווטסאפ'] },
+  { he: 'מוקד 144 חיפה', w: 'מדריך 60% · ריסלר 40%', teams: ['מכירות B144 חיפה 1', 'מכירות B144 חיפה 2', 'מענה 144'] },
+  { he: 'פרסום דיגיטלי ת"א', w: 'מדריך 60% · ריסלר 40%', teams: ['העלאת ערך', 'שימור ת"א'] },
+  { he: 'מוקד חשמל', w: 'הסכמים חתומים', teams: ['חשמל 1', 'חשמל 2', 'שירות חשמל'] },
+].map((d, i) => {
+  const lvl = [0.98, 0.9, 1.05, 0.86][i], teams = d.teams.map((he) => ({ he, share: 0.6 + rnd(), lvl: lvl + (rnd() - 0.5) * 0.3, late: rnd() * 2 - 1 }));
+  const sum = teams.reduce((s, t) => s + t.share, 0); teams.forEach((t) => (t.share /= sum));
+  for (const t of teams) { t.days = [0]; for (let k = 1; k <= DAYS; k++) t.days.push(Math.max(0, t.lvl * (1 + 0.3 * t.late * (k / DAYS - 0.5)) * (0.55 + rnd() * 0.9) * ((k - 1) % 5 === 3 ? 1.45 : 1))); }
+  return { ...d, teams };
+});
+// Weighted attainment to date: average daily attainment, team by team, by each team's share of the target.
+const teamTo = (t, k) => t.days.slice(1, k + 1).reduce((s, v) => s + v, 0) / k;
+const deptTo = (d, k) => d.teams.reduce((s, t) => s + t.share * teamTo(t, k), 0);
+
+const $ = (s) => document.querySelector(s);
+const pct = (x) => `${Math.round(x * 100)}%`;
+const state = { day: 24, me: [0, 0] };
+const VISITORS = [['נציג/ה במכירות סוהו', 0, 0], ['נציג/ה ב-B144 חיפה', 1, 1], ['נציג/ה בחשמל', 3, 0]];
+const PLANE = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 15.5v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V8.5l-8 5v2l8-2.5V18l-2 1.5V21l3.5-1 3.5 1v-1.5L13 18v-5z" transform="rotate(-90 12 12)"/></svg>';
+
+function runway(v, proj) {
+  // The runway shows 60%–125%: below 60% the plane waits at the start.
+  const at = (x) => `${Math.max(0, Math.min(100, ((x - 0.6) / 0.65) * 100))}%`;
+  // Below 100% the plane rolls on the ground; between 100% and 110% it climbs; above 110% it cruises.
+  const lift = v < 1 ? 0 : Math.min(1, (v - 1) / 0.1) * 30;
+  return `<div class="runway" aria-hidden="true">
+    <span class="lbl" style="inset-inline-start:${at(1)}">המראה · 100%</span><span class="lbl cruise low" style="inset-inline-start:${at(1.1)}">שיוט · 110% · פרס</span>
+    <i class="ground"></i><i class="done" style="width:${at(Math.min(v, 1))}"></i>
+    <i class="proj" style="inset-inline-start:${at(Math.min(v, proj))};width:calc(${at(Math.max(v, proj))} - ${at(Math.min(v, proj))})"></i>
+    <i class="mark" style="inset-inline-start:${at(1)}"></i><i class="mark cruise" style="inset-inline-start:${at(1.1)}"></i>
+    <span class="plane" style="inset-inline-start:${at(v)};bottom:${22 + lift}px">${PLANE}</span>
+    <span class="scale"><span>60%</span><span>125%</span></span></div>`;
+}
+
+function render() {
+  const k = state.day, left = DAYS - k;
+  $('#dayLabel').textContent = `יום ${k} מתוך ${DAYS} · ${fmt(k)} · ${CITIES[Math.floor((k - 1) / 5)]}`;
+  const div = DEPTS.reduce((s, d) => s + deptTo(d, k), 0) / DEPTS.length;
+  $('#division').innerHTML = `<b class="ltr">${pct(div)}</b><div class="dtrack"><i style="width:${Math.min(100, div / 1.25 * 100)}%"></i><u style="right:${100 / 1.25}%"></u></div>
+    <p>${div >= 1 ? '✓ האגף מעל היעד המשוקלל: התנאי לפרסים מתקיים.' : `האגף ב-${pct(div)} מהיעד המשוקלל. כל הפרסים בתחרות תלויים בו.`}</p>`;
+  $('#depts').innerHTML = DEPTS.map((d, i) => {
+    const v = deptTo(d, k);
+    // The pace: the department's average over the last ten working days, carried to the end.
+    const recent = d.teams.reduce((s, t) => s + t.share * t.days.slice(Math.max(1, k - 9), k + 1).reduce((a, x) => a + x, 0) / Math.min(10, k), 0);
+    const proj = (v * k + recent * left) / DAYS;
+    const need = (goal) => left ? Math.max(0, (goal * DAYS - v * k) / left) : 0;
+    const mine = state.me[0] === i, myTeam = mine ? d.teams[state.me[1]] : null;
+    const chip = v >= 1.1 ? '<span class="chip ok">🏆 בגובה שיוט: בדרך לפרס המחלקתי</span>' : v >= 1 ? `<span class="chip warn">המריאה · עוד <span class="ltr">${pct(1.1 - v)}</span> לפרס</span>` : `<span class="chip no">על המסלול · עוד <span class="ltr">${pct(1 - v)}</span> להמראה</span>`;
+    return `<article class="card dept${mine ? ' mine' : ''}">
+      <div class="dhead"><div><h3>${d.he}${mine ? ' · המחלקה שלך' : ''}</h3><span class="muted small">${d.w}</span></div><span class="now ltr">${pct(v)}</span></div>
+      ${runway(v, proj)}
+      ${chip}
+      <div class="facts">
+        <div class="fact"><small>בקצב הזה בסוף התחרות</small><b class="ltr">${pct(proj)}</b></div>
+        <div class="fact"><small>ל-100% צריך מכל יום</small><b class="ltr">${left ? pct(need(1)) : '—'}</b> <span class="muted small">מהיעד היומי</span></div>
+        <div class="fact"><small>ל-110% צריך מכל יום</small><b class="ltr">${left ? pct(need(1.1)) : '—'}</b> <span class="muted small">מהיעד היומי</span></div>
+        <div class="fact"><small>ימי עבודה נותרו</small><b class="ltr">${left}</b></div>
+      </div>
+      ${mine ? `<div class="teams"><p class="small muted">החלק של כל צוות בתוצאה (לפי חלקו ביעד)</p>${d.teams.map((t, j) => { const c = t.share * teamTo(t, k); return `<div class="team${j === state.me[1] ? ' me' : ''}"><span>${t.he}${j === state.me[1] ? ' · הצוות שלך' : ''}</span><span class="bar"><i style="width:${Math.min(100, (c / 0.6) * 100)}%"></i></span><b class="ltr">+${Math.round(c * 100)}</b></div>`; }).join('')}
+        <p class="small">${myTeam.he} מוסיף <b class="ltr">${Math.round(myTeam.share * teamTo(myTeam, k) * 100)}</b> נקודות אחוז מתוך <b class="ltr">${pct(v)}</b> של המחלקה.</p></div>` : ''}
+    </article>`;
+  }).join('');
+}
+
+$('#who').innerHTML = VISITORS.map(([he, d, t], i) => `<button data-d="${d}" data-t="${t}" aria-pressed="${i === 0}">${he}</button>`).join('');
+$('#who').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; $('#who').querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', x === b)); state.me = [Number(b.dataset.d), Number(b.dataset.t)]; render(); });
+$('#day').addEventListener('input', (e) => { state.day = Number(e.target.value); render(); });
+let timer = null;
+$('#play').addEventListener('click', () => {
+  if (timer) { clearInterval(timer); timer = null; $('#play').textContent = '▶ ניגון'; return; }
+  if (state.day >= DAYS) state.day = 1;
+  $('#play').textContent = '❚❚ עצירה';
+  timer = setInterval(() => { state.day = Math.min(DAYS, state.day + 1); $('#day').value = state.day; render(); if (state.day >= DAYS) $('#play').click(); }, 220);
+});
+const q = new URLSearchParams(location.search);
+if (q.get('day')) { state.day = Math.max(1, Math.min(DAYS, Number(q.get('day')) || 24)); $('#day').value = state.day; }
+render();
+</script>
+</body>
+</html>
