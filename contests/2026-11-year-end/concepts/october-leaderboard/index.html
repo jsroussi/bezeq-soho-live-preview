@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta name="robots" content="noindex, nofollow, noarchive"><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><meta name="robots" content="noindex, nofollow, noarchive"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <!-- Every concept is a demo (23.10.2026): a label only, the page itself is unchanged. -->
 <div class="demo-badge" role="note" dir="rtl" style="position:fixed;top:12px;left:12px;z-index:2147483647;pointer-events:none;background:#F5C342;color:#11152B;font:800 13px/1 Simpler,'Arial Hebrew',Arial,sans-serif;padding:6px 12px;border-radius:999px;box-shadow:0 2px 8px rgb(0 0 0 / .25)">דמו</div>
 
@@ -15,24 +15,26 @@
 @font-face{font-family:"Simpler";src:url("../../../platform/public/fonts/Simpler-Bold.otf") format("opentype");font-weight:700;font-display:swap}
 @font-face{font-family:"Simpler";src:url("../../../platform/public/fonts/Simpler-Black.otf") format("opentype");font-weight:900;font-display:swap}
 :root{
-  --bg:#F2F5FA; --surface:#FFFFFF; --surface-2:#F7F9FC; --line:#DDE3EC; --ink:#08192A; --ink-2:#4A5B70;
-  --primary:#0059DE; --primary-ink:#FFFFFF; --primary-soft:#E3ECFC;
-  --band:#08192A; --band-ink:#FFFFFF; --band-ink-2:#A9B8CC; --lime:#CFF200; --lime-ink:#08192A;
+  /* Bezeq colours (contests/platform/brand/bezeq-tokens.css), inline so the page opens on its own. */
+  --bz-blue:#33B5E0; --bz-blue-deep:#007AA3; --bz-blue-soft:#E5F4FA; --bz-navy:#20294D; --bz-navy-2:#2E3152; --bz-navy-deep:#12162B; --bz-muted:#6B6E80; --bz-line:#C9CBD6; --bz-bg:#EBECED; --bz-white:#FFFFFF;
+  --bg:#F2F5FA; --surface:#FFFFFF; --surface-2:#F7F9FC; --line:#DDE3EC; --ink:var(--bz-navy); --ink-2:#4A5B70;
+  --primary:var(--bz-blue-deep); --primary-ink:#FFFFFF; --primary-soft:var(--bz-blue-soft);
+  --band:var(--bz-navy); --band-ink:#FFFFFF; --band-ink-2:var(--bz-line); --accent:var(--bz-blue); --accent-ink:var(--bz-navy);
   --good:#0F8A5F; --good-soft:#DDF4EA; --bad:#D22F3C; --bad-soft:#FBE3E5; --pend:#5A6B80; --pend-soft:#E8ECF2;
   --track:#E6EBF2;
   --font:"Simpler","Assistant",system-ui,"Segoe UI",Arial,sans-serif;
   --r-sm:6px; --r-md:10px; --r-lg:16px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#06111D; --surface:#0E1E30; --surface-2:#12253A; --line:#203750; --ink:#E9F0F8; --ink-2:#9BB0C7;
-  --primary:#4D8DFF; --primary-ink:#06111D; --primary-soft:#14305A;
-  --band:#0B1B2D; --band-ink:#FFFFFF; --band-ink-2:#93A8C0; --lime:#CFF200; --lime-ink:#08192A;
+  --bg:var(--bz-navy-deep); --surface:#1A2040; --surface-2:var(--bz-navy); --line:var(--bz-navy-2); --ink:#EEF0F5; --ink-2:var(--bz-line);
+  --primary:var(--bz-blue); --primary-ink:var(--bz-navy-deep); --primary-soft:#123A4A;
+  --band:var(--bz-navy-deep); --band-ink:#FFFFFF; --band-ink-2:var(--bz-line); --accent:var(--bz-blue); --accent-ink:var(--bz-navy-deep);
   --good:#3FD6A0; --good-soft:#0F3A2E; --bad:#FF6B76; --bad-soft:#41161C; --pend:#9BB0C7; --pend-soft:#1A2D44;
   --track:#1A2E45; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#06111D; --surface:#0E1E30; --surface-2:#12253A; --line:#203750; --ink:#E9F0F8; --ink-2:#9BB0C7;
-  --primary:#4D8DFF; --primary-ink:#06111D; --primary-soft:#14305A;
-  --band:#0B1B2D; --band-ink:#FFFFFF; --band-ink-2:#93A8C0; --lime:#CFF200; --lime-ink:#08192A;
+  --bg:var(--bz-navy-deep); --surface:#1A2040; --surface-2:var(--bz-navy); --line:var(--bz-navy-2); --ink:#EEF0F5; --ink-2:var(--bz-line);
+  --primary:var(--bz-blue); --primary-ink:var(--bz-navy-deep); --primary-soft:#123A4A;
+  --band:var(--bz-navy-deep); --band-ink:#FFFFFF; --band-ink-2:var(--bz-line); --accent:var(--bz-blue); --accent-ink:var(--bz-navy-deep);
   --good:#3FD6A0; --good-soft:#0F3A2E; --bad:#FF6B76; --bad-soft:#41161C; --pend:#9BB0C7; --pend-soft:#1A2D44;
   --track:#1A2E45; color-scheme:dark}
 *{box-sizing:border-box}
@@ -45,18 +47,18 @@ header.band{background:var(--band);color:var(--band-ink);padding-block:22px 18px
 .brand{font-weight:700;font-size:13px;letter-spacing:.02em;color:var(--band-ink-2)}
 .brand b{color:var(--band-ink)}
 h1{font-weight:900;font-size:clamp(28px,5vw,44px);line-height:1.05;margin:4px 0 6px;letter-spacing:-.01em;text-wrap:balance}
-h1 .hl{color:var(--lime)}
+h1 .hl{color:var(--accent)}
 .sub{color:var(--band-ink-2);font-size:14px}
-.demo{display:inline-flex;align-items:center;gap:6px;background:var(--lime);color:var(--lime-ink);font-weight:700;font-size:12px;padding:3px 10px;border-radius:999px;margin-inline-start:8px;vertical-align:middle}
+.demo{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:12px;padding:3px 10px;border-radius:999px;margin-inline-start:8px;vertical-align:middle}
 .asof{display:grid;gap:6px;min-width:min(100%,340px)}
 .asof label{font-size:12px;color:var(--band-ink-2);font-weight:700;letter-spacing:.03em}
 .asof-row{display:flex;gap:12px;align-items:center}
-.asof input[type=range]{flex:1;accent-color:var(--lime);min-width:0}
+.asof input[type=range]{flex:1;accent-color:var(--accent);min-width:0}
 .asof output{font-weight:700;font-size:18px;min-width:5.5ch;text-align:center}
 .days{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;font-size:13px;color:var(--band-ink-2)}
 .days b{color:var(--band-ink);font-size:16px}
 .daybar{height:6px;background:rgba(255,255,255,.12);border-radius:99px;margin-top:10px;overflow:hidden;position:relative}
-.daybar span{position:absolute;inset-block:0;right:0;background:var(--lime);border-radius:99px}
+.daybar span{position:absolute;inset-block:0;right:0;background:var(--accent);border-radius:99px}
 .daybar i{position:absolute;inset-block:-2px;width:2px;background:var(--band-ink-2)}
 
 nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
@@ -87,7 +89,7 @@ h3{font-size:15px;font-weight:700;margin:0}
 .pill.good{background:var(--good-soft);color:var(--good)}
 .pill.bad{background:var(--bad-soft);color:var(--bad)}
 .pill.pend{background:var(--pend-soft);color:var(--pend)}
-.pill.win{background:var(--lime);color:var(--lime-ink)}
+.pill.win{background:var(--accent);color:var(--accent-ink)}
 .pill.blue{background:var(--primary-soft);color:var(--primary)}
 
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
@@ -110,7 +112,7 @@ h3{font-size:15px;font-weight:700;margin:0}
 .pool .t{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
 .pool .t b{font-size:15px}
 .pool .names{font-size:13px;line-height:1.7}
-.pool.top .count{color:var(--lime)}
+.pool.top .count{color:var(--accent)}
 .count{font-weight:900;font-size:22px}
 
 .tablebox{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);overflow-x:auto}
@@ -156,7 +158,7 @@ pre.code{background:var(--surface-2);border:1px solid var(--line);border-radius:
   <div class="wrap">
     <div class="band-top">
       <div>
-        <div class="brand"><b>בזק energy</b> · אגף סוהו חשמל ושירותי דיגיטל</div>
+        <div class="brand"><b>בזק</b> · אגף סוהו חשמל ושירותי דיגיטל</div>
         <h1>אוקטובר <span class="hl">הגדול</span> 2026</h1>
         <div class="sub">תחרות מכירות · <span class="num">01.10–31.10.2026</span> · <span class="num">20.7</span> ימי עבודה<span class="demo" id="srcBadge">נתוני דמו</span></div>
       </div>
