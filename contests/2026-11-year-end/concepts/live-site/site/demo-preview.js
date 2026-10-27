@@ -9,7 +9,41 @@
   const day = ix.dates.filter((d) => d <= want).pop() || ix.dates[0];
   window.PREVIEW = true; // keep the chosen day stable; do not poll data.js
   window.SITE_SYNC = false; // only this snapshot, never another tab's admin data
-  document.write('<script src="demo-days/day-' + day + '.js"><\/script>');
+  // The real data is encrypted (AES-256-GCM, key from the password by PBKDF2). Ask once, keep it in this browser.
+  const KEY = 'soho-preview-pw';
+  const store = { get: () => { try { return localStorage.getItem(KEY); } catch { return null; } }, set: (v) => { try { localStorage.setItem(KEY, v); } catch {} }, del: () => { try { localStorage.removeItem(KEY); } catch {} } };
+  const b64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+  async function unlock(pw) {
+    const meta = await (await fetch('demo-days/key.json', { cache: 'no-store' })).json();
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveKey']);
+    const key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: b64(meta.salt), iterations: meta.iter, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+    const blob = b64((await (await fetch('demo-days/day-' + day + '.enc', { cache: 'no-store' })).text()).trim());
+    const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: blob.slice(0, 12) }, key, blob.slice(12));
+    return new TextDecoder().decode(plain);
+  }
+  const load = (src) => new Promise((ok, bad) => { const s = document.createElement('script'); s.src = src; s.async = false; s.onload = ok; s.onerror = bad; document.body.append(s); });
+  async function start(text) {
+    const s = document.createElement('script'); s.textContent = text; document.head.append(s);
+    for (const src of window.PREVIEW_SCRIPTS || []) await load(src);
+  }
+  function gate(error) {
+    const g = document.createElement('div'); g.dir = 'rtl'; g.id = 'preview-gate';
+    g.style.cssText = 'position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;background:#20294D;color:#fff;font:600 16px Arial;padding:16px';
+    g.innerHTML = '<form style="display:grid;gap:12px;width:min(340px,100%);text-align:center"><b style="font-size:22px">60 יום מסביב לעולם</b><span style="font-weight:400;opacity:.85">תצוגה מקדימה פנימית · נדרשת סיסמה</span><input type="password" autocomplete="current-password" aria-label="סיסמה" style="font:inherit;padding:12px;border-radius:10px;border:0;color:#20294D;text-align:center"><button style="font:inherit;padding:12px;border-radius:10px;border:0;background:#fff;color:#20294D;cursor:pointer">כניסה</button><small role="alert" style="min-height:1.2em;color:#ffb3b3;font-weight:400"></small></form>';
+    const f = g.querySelector('form'), input = g.querySelector('input'), msg = g.querySelector('small');
+    if (error) msg.textContent = error;
+    f.addEventListener('submit', async (e) => {
+      e.preventDefault(); msg.textContent = 'פותח…';
+      try { const text = await unlock(input.value); store.set(input.value); g.remove(); await start(text); }
+      catch { msg.textContent = 'הסיסמה שגויה'; input.select(); }
+    });
+    document.body.append(g); input.focus();
+  }
+  addEventListener('DOMContentLoaded', async () => {
+    const saved = store.get();
+    if (saved) { try { await start(await unlock(saved)); return; } catch { store.del(); } }
+    gate();
+  });
   addEventListener('DOMContentLoaded', () => {
     const bar = document.createElement('div');
     bar.dir = 'rtl';
