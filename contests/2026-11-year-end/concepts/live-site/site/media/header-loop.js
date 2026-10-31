@@ -1,1 +1,1 @@
-window.HEADER_LOOP = {"transparent":true,"sources":[{"src":"header-loop-alpha.webm","type":"video/webm"}],"safari":"header-loop-alpha.webp","poster":"header-loop.png","badge":"#070F1F","credit":"הלולאה בכותרת: מרקם כדור הארץ מדוגמאות three.js, על בסיס צילומי NASA","base":"media/"};
+window.HEADER_LOOP = {"transparent":true,"once":"header-loop-once.webp","sources":[],"poster":"header-loop-globe.png","badge":"#070F1F","credit":"הלולאה בכותרת: מרקם כדור הארץ מדוגמאות three.js, על בסיס צילומי NASA","base":"media/"};
