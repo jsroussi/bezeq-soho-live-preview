@@ -1,0 +1,7 @@
+{
+  "_note": "FN-1 section 6: the owner's fonts for the 4 scripts Simpler cannot draw. null = the interim (the shipped one-word face, then a named system stack; site/src/fonts.css). To swap: drop the subset WOFF2 files here and fill { \"family\", \"files\": { \"400\": file, \"900\": file }, \"licence\" } (README.md). No CSS or JS change.",
+  "el": null,
+  "ar": null,
+  "ja": null,
+  "hi": null
+}
