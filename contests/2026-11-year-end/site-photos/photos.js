@@ -267,6 +267,58 @@ window.PHOTOS = {
    "hi": "cu_NHJLOTrt|UWRQZdirry}`z~zsdmpgo}ycIRhcdlkhpoyzx`hccl_ztfYi^_ki`l_^hffsigr`_^[egwi__iyeb]mzmglk|^hnnguypy{wbjk|jlanPNeiif_ai~g[\\^w"
   }
  },
+ "images/milan-peak-phone.jpg": {
+  "focus": "50% 40%",
+  "title": "מילאנו · ערב יום השיא · טלפון",
+  "alt": "גלריה ויטוריו אמנואלה, מילאנו בערב",
+  "creator": "Nano Banana Pro (owner)",
+  "license": "AI-generated for the contest",
+  "ai": true,
+  "grid": {
+   "n": 12,
+   "lo": "0000100010000000110000000000100000000020000002111000000000110601100011300001111100000901110111610:01100110200002000030000001001040003:6<=45;B395",
+   "hi": "JJFIHHJJGHCCMEIEEFFFEKFR^\\XOMLSMR[[^Y\\XMMEFENSWTMNNMABA>KRRjMYPoC==I\\QRQMQSOGPWMJQQQfQI^^YQrqwow}vl~_tkz"
+  }
+ },
+ "images/milan-peak.jpg": {
+  "focus": "50% 50%",
+  "title": "מילאנו · ערב יום השיא",
+  "alt": "גלריה ויטוריו אמנואלה, מילאנו בערב",
+  "creator": "Nano Banana Pro (owner)",
+  "license": "AI-generated for the contest",
+  "ai": true,
+  "grid": {
+   "n": 12,
+   "lo": "000001000000100001000001000000000001000110001000001110011100002001010101310001000010100001131101010000000001010000000000000000000000266346823453",
+   "hi": "EIJJJFFEBKITKLQPFGFBSVAUJLP`_JGW`GDTWLPu\\LP\\wEEKLBRNVGL]TI?QWVSNNFK]ZWLS[ZWydf\\zuqLWdTKMNRHPOPI_QVq~s_gn`Iy}"
+  }
+ },
+ "images/milan-phone.jpg": {
+  "focus": "50% 40%",
+  "title": "מילאנו · טלפון",
+  "alt": "גלריה ויטוריו אמנואלה, מילאנו",
+  "creator": "Nano Banana Pro (owner)",
+  "license": "AI-generated for the contest",
+  "ai": true,
+  "grid": {
+   "n": 12,
+   "lo": "1222515421112324315441330010203100001111110022144211331111:<1518755771<21000;:@821320:122>?861;20601210810200001211120000003001020003549B>BE=4:3",
+   "hi": "dd{tnuijcv}imi|ypnufvchig~}|{lims~dcsvua|stzkph|c"
+  }
+ },
+ "images/milan.jpg": {
+  "focus": "50% 50%",
+  "title": "מילאנו · יום",
+  "alt": "גלריה ויטוריו אמנואלה, מילאנו",
+  "creator": "Nano Banana Pro (owner)",
+  "license": "AI-generated for the contest",
+  "ai": true,
+  "grid": {
+   "n": 12,
+   "lo": "11113511001220012511001411110010000301121110311111301121121001321552212143200131212212200261200321100000000111000110000100000000000057865:<676;;",
+   "hi": "~wqlps}xujzzq{by~~ggx}rhi{rm|bbxwwzx^yzwpsnmvkj{s{"
+  }
+ },
  "images/new-delhi-peak-phone.jpg": {
   "focus": "50% 50%",
   "title": "ניו דלהי · ערב יום השיא · טלפון",
