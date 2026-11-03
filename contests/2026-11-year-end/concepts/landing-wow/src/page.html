@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<script>
+const TEASER = 'התחרות ממריאה בקרוב. הקישור יגיע אליכם עם העדכון הראשון.';   // the one line to edit
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="theme-color" content="#00204D">
+<title>מסביב לעולם ב-60 יום</title>
+<!-- LW-1 (SPEC-LW1): the landing page as a departure board ("לוח המראות"). One file, inline CSS/JS/SVG, no external
+     request, no data but the public dates: the nine stops come from contest.json peakDays through
+     scripts/build-landing-wow.mjs (edit src/page.html, then rebuild). The teaser is the one constant to edit: TEASER, above. -->
+<style>
+/*TOKENS*/
+:root { --ease-out: cubic-bezier(0.23, 1, 0.32, 1); }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; min-height: 100vh; min-height: 100dvh; background: var(--bz-navy-deep); color: var(--bz-white);
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  padding: max(24px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+main { width: 100%; max-width: 720px; margin: 0 auto; display: grid; justify-items: center; gap: 14px; text-align: center; }
+.mark { width: 72px; height: auto; }
+.brand { margin: 0; font-size: 16px; letter-spacing: .12em; direction: ltr; }
+h1 { margin: 0; font-size: clamp(28px, 8vw, 40px); line-height: 1.2; }
+.dates { margin: 0; font-size: 20px; font-weight: 700; }
+#teaser { margin: 0; font-size: 18px; }
+bdi { unicode-bidi: isolate; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* the board: its rows are in the file (no layout shift); only the statuses and the countdown are written by the script */
+.board { position: relative; width: 100%; margin-top: 10px; padding: 16px 12px 12px; background: var(--bz-navy); border-radius: 16px; text-align: start; }
+.board h2 { margin: 0 0 10px; font-size: 18px; letter-spacing: .02em; }
+.route { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.route path { fill: none; stroke: var(--bz-blue); stroke-width: 1.5; stroke-dasharray: 5 7; opacity: .7; }
+.plane { position: absolute; top: 0; left: 0; width: 30px; height: 30px; pointer-events: none; will-change: transform; }
+.head, .row { display: grid; grid-template-columns: minmax(0, 1fr) 4.6em 8.2em 30px; align-items: center; gap: 8px; }
+.head { padding: 0 8px 6px; font-size: 16px; color: var(--bz-line); border-bottom: 1px solid var(--bz-navy-2); }
+.rows { list-style: none; margin: 0; padding: 0; }
+.row { min-height: 56px; padding: 6px 8px; border-bottom: 1px solid var(--bz-navy-2); }
+.row:last-child { border-bottom: 0; }
+.dest { min-width: 0; }
+.flaps { display: flex; flex-wrap: wrap; gap: 3px 9px; perspective: 400px; }
+.w { display: inline-flex; flex-wrap: nowrap; gap: 3px; }   /* a city wraps between its words only */
+.f { position: relative; display: inline-grid; place-items: center; flex: none; width: 1.3em; height: 1.6em;
+  background: var(--bz-navy-deep); border-radius: 4px; font-size: clamp(14px, 4.6vw, 18px);   /* the tiles shrink with a narrow or zoomed screen */ font-weight: 700; line-height: 1; }
+.f.sp { width: .5em; background: none; }
+.f::after { content: ""; position: absolute; inset-inline: 0; top: 50%; height: 1px; background: var(--bz-navy); }
+.f.sp::after { display: none; }
+.country { display: block; font-size: 16px; color: var(--bz-line); }
+.when { font-size: 16px; font-variant-numeric: tabular-nums; }
+.st { justify-self: start; display: inline-block; min-width: 6.6em; padding: 2px 10px; white-space: nowrap; border-radius: 999px; font-size: 16px; font-weight: 700; text-align: center;
+  border: 1px solid var(--bz-line); color: var(--bz-white); }
+.row[data-state="next"], .row[data-state="today"] { background: var(--bz-blue); color: var(--bz-navy-deep); border-radius: 10px; }
+.row[data-state="today"] { background: var(--bz-white); }
+.row[data-state="next"] .country, .row[data-state="today"] .country { color: var(--bz-navy-deep); }
+.row[data-state="next"] .st, .row[data-state="today"] .st { background: var(--bz-navy-deep); color: var(--bz-white); border-color: var(--bz-navy-deep); }
+.row[data-state="next"] .f, .row[data-state="today"] .f { background: var(--bz-blue-soft); color: var(--bz-navy-deep); }
+.row[data-state="next"] .f::after, .row[data-state="today"] .f::after { background: var(--bz-blue); }
+.row[data-state="past"] .st { border-color: transparent; color: var(--bz-line); }
+.dock { width: 30px; height: 30px; }
+.count .nw { display: inline-block; white-space: nowrap; }
+.count .sep { display: none; } /* stacked in two lines, the separator is not drawn (it stays in the text for copy and tests) */
+.count { margin: 2px 0 0; padding: 10px 16px; border-radius: 12px; background: var(--bz-navy); border: 1px solid var(--bz-blue);
+  font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; min-height: calc(3em + 20px); display: grid; place-items: center; }
+/* the countdown first: the most useful line, under the teaser and above the board; two lines' height kept (no shift) */
+
+/* the split-flap entrance: each tile turns down into place, row after row (delays set per tile by the build) */
+@keyframes flap { from { transform: rotateX(-90deg); opacity: 0; } to { transform: none; opacity: 1; } }
+.f, .when, .st { animation: flap 300ms var(--ease-out) backwards; animation-delay: var(--d, 0ms); transform-origin: 50% 0; }
+@media (prefers-reduced-motion: reduce) { .f, .when, .st { animation: none; } }
+/* phones: two lines per row, the city's tiles across the row, then the date and the status; the dock keeps its column */
+@media (max-width: 560px) {
+  .head { display: none; }
+  .row { grid-template-columns: minmax(0, 1fr) auto 28px; grid-template-areas: "dest dest dock" "when st dock"; row-gap: 4px; padding-block: 8px; }
+  .dest { grid-area: dest; } .when { grid-area: when; } .st { grid-area: st; justify-self: end; } .dock { grid-area: dock; }
+  .board { padding-inline: 10px; }
+}
+/* the same two-line rows whenever the BOARD itself is narrow (a zoomed page, a narrow window), not only a narrow viewport */
+.board { container: board / inline-size; }
+@container board (max-width: 540px) {
+  .head { display: none; }
+  .row { grid-template-columns: minmax(0, 1fr) auto 28px; grid-template-areas: "dest dest dock" "when st dock"; row-gap: 4px; padding-block: 8px; }
+  .dest { grid-area: dest; } .when { grid-area: when; } .st { grid-area: st; justify-self: end; } .dock { grid-area: dock; }
+}
+</style>
+</head>
+<body>
+<main>
+<!--LOGO-->
+<p class="brand">BEZEQ AIRLINES</p>
+<h1>מסביב לעולם ב-60 יום</h1>
+<p class="dates"><bdi dir="ltr">1.11–31.12.2026</bdi></p>
+<p id="teaser"></p>
+<p class="count" id="count" role="timer" aria-live="off"></p>
+<section class="board" aria-labelledby="board-h">
+  <h2 id="board-h">לוח המראות · ימי השיא</h2>
+  <div class="head" aria-hidden="true"><span>יעד</span><span>יום שיא</span><span>סטטוס</span><span></span></div>
+  <ol class="rows">
+<!--ROWS-->
+  </ol>
+  <svg class="route" aria-hidden="true" focusable="false"><path id="route" d=""/></svg>
+  <svg class="plane" id="plane" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="#FFFFFF" stroke="#00204D" stroke-width=".8" d="M21 15.5v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V8.5l-8 5v2l8-2.5V18l-2 1.5V21l3.5-1 3.5 1v-1.5L13 18v-5z"/></svg>
+</section>
+</main>
+<script>
+document.getElementById('teaser').textContent = TEASER;
+const STOPS = /*STOPS*/;
+// The visitor's clock, read in Israel's time zone: the date (YYYY-MM-DD) and the epoch of a given Israeli wall time.
+const IL = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jerusalem', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
+const parts = (t) => Object.fromEntries(IL.formatToParts(t).filter((p) => p.type !== 'literal').map((p) => [p.type, Number(p.value)]));
+const ilDate = (t) => { const p = parts(t); return `${p.year}-${String(p.month).padStart(2, '0')}-${String(p.day).padStart(2, '0')}`; };
+function ilEpoch(date, hh) {
+  const [y, m, d] = date.split('-').map(Number), want = Date.UTC(y, m - 1, d, hh);
+  let t = want - 2 * 36e5;
+  for (let i = 0; i < 3; i++) { const p = parts(t); t += want - Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second); }
+  return t;
+}
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const rows = [...document.querySelectorAll('.row')];
+// Each row's status from the date: past "המריא", today "היום!", the next one "ההמראה הבאה", the rest "בקרוב".
+function states(now) {
+  const today = ilDate(now), next = STOPS.findIndex((s) => s.date > today);
+  return STOPS.map((s, i) => (s.date < today ? 'past' : s.date === today ? 'today' : i === next ? 'next' : 'soon'));
+}
+const LABEL = { past: 'המריא', today: 'היום!', next: 'ההמראה הבאה', soon: 'בקרוב' };
+// The countdown: to the next peak day's 08:00 in Israel, rolling on once it starts; before 1.11, the take-off date; after
+// the last peak day, the end.
+function countText(now) {
+  const today = ilDate(now);
+  if (today < '2026-11-01') return 'ההמראה ב-⁦1.11⁩';
+  const i = STOPS.findIndex((s) => ilEpoch(s.date, 8) > now);
+  // after the last peak day the contest still runs to 31.12; it has ended from 1.1.2027
+  if (i < 0) return today > '2026-12-31' ? 'התחרות הסתיימה. תודה!' : today > STOPS.at(-1).date ? [`יום השיא האחרון היה: ${STOPS.at(-1).city} · `, 'התחרות נמשכת עד \u206631.12\u2069']
+    : `יום השיא האחרון: ${STOPS.at(-1).city} · היום!`;
+  let s = Math.floor((ilEpoch(STOPS[i].date, 8) - now) / 1000);
+  const d = Math.floor(s / 86400); s %= 86400;
+  const hh = String(Math.floor(s / 3600)).padStart(2, '0'), mm = String(Math.floor(s / 60) % 60).padStart(2, '0'), ss = String(s % 60).padStart(2, '0');
+  const days = d === 0 ? '' : d === 1 ? 'יום אחד ו־' : `${d} ימים ו־`;
+  return [`${i === 0 ? 'יום השיא הראשון' : 'יום השיא הבא'}: ${STOPS[i].city} · `, `עוד ${days}\u2066${reduce ? `${hh}:${mm}` : `${hh}:${mm}:${ss}`}\u2069`];
+}
+function render() {
+  const now = Date.now();
+  states(now).forEach((st, i) => { rows[i].dataset.state = st; rows[i].querySelector('.st').textContent = LABEL[st]; });
+  // the "עוד …" part wraps as one piece (never "ו־" alone at a line's end)
+  const [a, b = ''] = [countText(now)].flat(), c = document.getElementById('count');
+  const span = (className, textContent) => Object.assign(document.createElement('span'), { className, textContent });
+  if (c.textContent !== a + b) c.replaceChildren(...(b ? [span('', a.replace(/ · $/, '')), span('sep', ' · '), span('nw', b)] : [a]));
+}
+// The plane: one crossing along a dashed route from the board's top corner to the dock beside the next stop's row (or
+// today's, or the last); transform keyframes only; then it stays parked (no animation left running).
+function target() { const s = states(Date.now()); const i = [s.indexOf('next'), s.indexOf('today')].find((x) => x >= 0) ?? STOPS.length - 1; return rows[i].querySelector('.dock'); }
+function path() {
+  const board = document.querySelector('.board').getBoundingClientRect(), dock = target().getBoundingClientRect();
+  const x0 = board.width - 24, y0 = -6, x1 = dock.left - board.left + dock.width / 2, y1 = dock.top - board.top + dock.height / 2;
+  // along the top edge, then down the dock column to the row (a cubic: no line across the board's text)
+  const c1 = { x: x1 + (x0 - x1) * 0.15, y: y0 - 28 }, c2 = { x: x1, y: y0 + 12 };
+  document.getElementById('route').setAttribute('d', `M${x0} ${y0} C${c1.x} ${c1.y} ${c2.x} ${c2.y} ${x1} ${y1}`);
+  return { p0: { x: x0, y: y0 }, c1, c2, p3: { x: x1, y: y1 } };
+}
+const at = (p, t) => { const a = 1 - t, b = (k) => a * a * a * p.p0[k] + 3 * a * a * t * p.c1[k] + 3 * a * t * t * p.c2[k] + t * t * t * p.p3[k],
+  d = (k) => 3 * a * a * (p.c1[k] - p.p0[k]) + 6 * a * t * (p.c2[k] - p.c1[k]) + 3 * t * t * (p.p3[k] - p.c2[k]);
+  return { x: b('x'), y: b('y'), dx: d('x'), dy: d('y') }; };
+const pose = (q) => `translate(${(q.x - 15).toFixed(1)}px, ${(q.y - 15).toFixed(1)}px) rotate(${(Math.atan2(q.dy, q.dx) * 180 / Math.PI + 90).toFixed(1)}deg)`;
+const plane = document.getElementById('plane');
+function park() { const p = path(); plane.style.transform = pose(at(p, 1)); }
+function fly() {
+  const p = path();
+  if (reduce || !plane.animate) { park(); return; }
+  const frames = Array.from({ length: 17 }, (_, k) => ({ transform: pose(at(p, k / 16)) }));
+  const a = plane.animate(frames, { duration: 2200, delay: 1200, easing: 'cubic-bezier(0.77, 0, 0.175, 1)', fill: 'both' });
+  a.onfinish = () => { plane.style.transform = frames.at(-1).transform; a.cancel(); };
+}
+render(); fly();
+// a resize or a turned phone moves the rows: the route and the plane are placed again (a flight in progress lands at once)
+let queued = 0;
+const replace = () => { cancelAnimationFrame(queued); queued = requestAnimationFrame(() => { plane.getAnimations().forEach((a) => a.cancel()); park(); }); };
+addEventListener('resize', replace); addEventListener('orientationchange', replace);
+// the countdown: every second, or once a minute under reduced motion, on the boundary
+(function tick() { render(); const step = reduce ? 60000 : 1000; setTimeout(tick, step - (Date.now() % step) + 5); })();
+</script>
+</body>
+</html>

@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="robots" content="noindex, nofollow, noarchive">
+<title>60 יום מסביב לעולם: טיזר וידאו</title>
+<!-- Colours: the Bezeq tokens only, read from the one token file (no colour is written in this page). The pass is the
+     site's own (boarding-pass.js passCard + boarding-pass.css), through a small adapter below. -->
+<link rel="stylesheet" href="../../../../platform/brand/bezeq-tokens.css">
+<link rel="stylesheet" href="../../../../platform/site/src/boarding-pass.css">
+<style>
+  @font-face { font-family: "Simpler"; src: url("../../../../platform/public/fonts/Simpler-Regular.otf") format("opentype"); font-weight: 400; }
+  @font-face { font-family: "Simpler"; src: url("../../../../platform/public/fonts/Simpler-Bold.otf") format("opentype"); font-weight: 700; }
+  @font-face { font-family: "Simpler"; src: url("../../../../platform/public/fonts/Simpler-Black.otf") format("opentype"); font-weight: 900; }
+  :root { --text: "Simpler", Arial, sans-serif; }
+  html, body { margin: 0; background: var(--bz-navy); overflow: hidden; font-family: var(--text); }
+  canvas { position: absolute; top: 0; left: 0; display: block; }
+  #stage { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
+  #pass { position: absolute; top: 0; left: 0; transform-origin: 0 0; opacity: 0; container-type: inline-size; }
+  /* on the video's navy ground the plain-navy pass keeps its edge (its own rule colour), and the notches are the ground */
+  #pass .bz-pass { outline: 2px solid var(--rule); outline-offset: -2px; box-shadow: none; }
+  #pass .bz-stub::before, #pass .bz-stub::after { background: var(--bz-navy); }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="stage"><div id="pass"></div></div>
+<canvas id="top"></canvas>
+<script type="module">
+// Every frame is a pure function of t (seconds). render.mjs serves this page from the repository, hands it the contest
+// data (contest.json, reduced to what the teaser shows: render.mjs teaserData) and calls window.renderFrame(t).
+// One musical grid drives picture and sound (music.mjs uses the same BPM and bar map).
+import * as THREE from '../../teaser-sphere-globe/vendor/three/three.module.js';
+import { AIRLINER } from '../../../../platform/site/src/icons.js';
+import { passCard, TAGLINE } from '../../../../platform/site/src/boarding-pass.js';
+
+const BPM = 120, BEAT = 60 / BPM, BAR = 4 * BEAT;          // 2 s per bar, 12 bars = 24 s
+const T = (bar, beat = 0) => bar * BAR + beat * BEAT;
+window.DURATION = T(12);
+
+const D = await (await fetch('/__teaser/data.json')).json();   // { name, start, stops: [{ he, country, ll, start, end }], home, prizesTeaser, boardingPass }
+const Q = new URLSearchParams(location.search);
+const SCALE = Number(Q.get('scale') || 1);
+const WIDE = Q.get('ar') === '16x9';                        // ?ar=16x9 -> desktop / screen version
+const W = WIDE ? 1920 : 1080, H = WIDE ? 1080 : 1920;
+window.SIZE = [W, H];
+// 9:16 keeps the top 250 px and the bottom 300 px clear in every shot (content between y 250 and 1620).
+// Every position that differs between the two formats lives here; the shots read only from L.
+const L = WIDE ? {
+  open: { cx: 560, cy: 540, R: 380 }, back: { cx: W / 2, cy: 600, R: 520, a: 0.32 },
+  card: { x: W / 2, logoY: 200, logoH: 300, nameY: 640, nameSize: 96, dateY: 744, dateSize: 60 },
+  n60: [1380, 330, 300], title: { x: 1380, y: 600, size: 104 }, tag1: [1380, 730, 52], tag2: [1380, 805],
+  st: { hx: W - 150, halign: 'right', h1y: 400, h2y: 520, hsize: 104, gw: 260, gap: 26, x0: 150, y0: 127, city: [48, 32], country: 28 },
+  pz: { hy: 170, hsize: 100, tw: 470, th: 230, gx: 40, gy: 40, y0: 300, cols: 3, ly: 880, lsize: 52 },
+  ps: { px: 840, py: 200, pw: 1000, css: 600, sx: 1560 },
+  end: { cx: W / 2, cy: 470, sw: 376, logoH: 300, lineY: 712, lineSize: 44, ring: [200, 340] },
+} : {
+  open: { cx: W / 2, cy: 640, R: 340 }, back: { cx: W / 2, cy: 935, R: 500, a: 0.32 },
+  card: { x: W / 2, logoY: 470, logoH: 390, nameY: 1010, nameSize: 104, dateY: 1124, dateSize: 64 },
+  n60: [W / 2, 1110, 260], title: { x: W / 2, y: 1300, size: 104 }, tag1: [W / 2, 1420, 52], tag2: [W / 2, 1495],
+  st: { hx: W / 2, halign: 'center', h1y: 345, h2y: 465, hsize: 110, gw: 280, gap: 30, x0: (W - (3 * 280 + 2 * 30)) / 2, y0: 570, city: [54, 40], country: 30 },
+  pz: { hy: 360, hsize: 104, tw: 440, th: 230, gx: 40, gy: 40, y0: 480, cols: 2, ly: 1370, lsize: 54 },
+  ps: { px: 132, py: 270, pw: 816, css: 480, sx: W - 300 },
+  end: { cx: W / 2, cy: 880, sw: 670, logoH: 370, lineY: 1272, lineSize: 54, ring: [360, 600] },
+};
+const cv = document.getElementById('c'), top = document.getElementById('top');
+for (const c of [cv, top]) { c.width = W * SCALE; c.height = H * SCALE; c.style.width = `${W * SCALE}px`; }
+document.getElementById('stage').style.transform = `scale(${SCALE})`;
+const base = cv.getContext('2d'), over = top.getContext('2d');
+let ctx = base;
+
+// The Bezeq tokens, as bezeq-tokens.css defines them.
+const tok = (n) => getComputedStyle(document.documentElement).getPropertyValue(`--bz-${n}`).trim();
+const C = { navy: tok('navy'), navy2: tok('navy-2'), deep: tok('navy-deep'), blueDeep: tok('blue-deep'), sky: tok('blue'), soft: tok('blue-soft'), white: tok('white'), line: tok('line') };
+const alpha = (hex, a) => `rgba(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(',')},${a})`;
+const FONT = '"Simpler", "Arial Hebrew", Arial, sans-serif';
+
+// ---------- the contest's data (no date is typed here) ----------
+const dm = (iso) => { const [, m, d] = iso.split('-').map(Number); return `${d}.${m}`; };
+const WEEKS = D.stops.map((x) => [dm(x.start), dm(x.end)]);
+const START = `${dm(D.start)}.${D.start.slice(0, 4)}`;     // the contest's first day, d.m.yyyy
+
+// ---------- motion primitives ----------
+function spring(t, t0, zeta = 0.42, w = 17) {
+  const s = t - t0; if (s <= 0) return 0;
+  if (zeta >= 1) return 1 - Math.exp(-w * s) * (1 + w * s);
+  const wd = w * Math.sqrt(1 - zeta * zeta);
+  return 1 - Math.exp(-zeta * w * s) * (Math.cos(wd * s) + (zeta * w / wd) * Math.sin(wd * s));
+}
+const POP = [0.42, 17], SLIDE = [0.7, 12], LAND = [0.35, 10], SOFT = [1, 14];
+const sp = (t, t0, p) => spring(t, t0, p[0], p[1]);
+const clamp01 = x => Math.max(0, Math.min(1, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const smooth = x => { x = clamp01(x); return x * x * (3 - 2 * x); };
+// fast exit before a cut: 1 -> 0 over ~0.25 s, no overshoot
+const exitK = (t, tCut) => 1 - spring(t, tCut - 0.28, 1, 24);
+
+function text(str, x, y, { size = 60, weight = 700, color = C.white, align = 'center', dir = 'rtl', alpha = 1 } = {}) {
+  ctx.save();
+  ctx.globalAlpha *= alpha;
+  ctx.font = `${weight} ${size}px ${FONT}`;
+  ctx.direction = dir; ctx.textAlign = align; ctx.textBaseline = 'middle';
+  ctx.fillStyle = color; ctx.fillText(str, x, y);
+  ctx.restore();
+}
+function rrect(x, y, w, h, r) {
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+// draw fn() with transform around (cx, cy): scale s, alpha a, translate dx/dy, rotate rot
+function group(cx, cy, { s = 1, a = 1, dx = 0, dy = 0, rot = 0 }, fn) {
+  if (a <= 0.001) return;
+  ctx.save(); ctx.globalAlpha *= clamp01(a);
+  ctx.translate(cx + dx, cy + dy); ctx.rotate(rot); ctx.scale(s, s); ctx.translate(-cx, -cy);
+  fn(); ctx.restore();
+}
+
+// ---------- the official Bezeq logo: white (fill swap only), its viewBox cropped to its own bbox ----------
+const LOGO_BOX = [338, 374, 254, 434];
+const logoSvg = (await (await fetch('../../../../platform/brand/official/bezeq-logo-hebrew.svg')).text())
+  .replace(/<\?xml[^>]*>\s*/, '').replace(/fill="rgb\([^"]*\)"/g, `fill="${C.white}"`)
+  .replace(/width="[^"]*" height="[^"]*" viewBox="[^"]*"/, `width="${LOGO_BOX[2] * 4}" height="${LOGO_BOX[3] * 4}" viewBox="${LOGO_BOX.join(' ')}"`);
+const LOGO = new Image(); LOGO.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(logoSvg);
+await LOGO.decode();
+function logo(x, y, h) { ctx.drawImage(LOGO, x - h * LOGO_BOX[2] / LOGO_BOX[3] / 2, y, h * LOGO_BOX[2] / LOGO_BOX[3], h); }
+// where the logo sits at full size, [x, y, w, h], frame 0 and the sign-off (the QA measures its letters in the pixels there)
+window.logoBoxes = () => [[L.card.x, L.card.logoY], [L.end.cx, L.end.cy - L.end.logoH / 2]].map(([x, y], i) => { const h = i ? L.end.logoH : L.card.logoH; return [x - h * LOGO_BOX[2] / LOGO_BOX[3] / 2, y, h * LOGO_BOX[2] / LOGO_BOX[3], h]; });
+
+// The title card: the logo, the contest's name, its first day. Frame 0 (the WhatsApp thumbnail).
+function titleCard(c, k, out = 1) {
+  group(c.x, c.logoY + c.logoH / 2, { s: lerp(0.6, 1, k), a: Math.min(1, k * 3) * out }, () => logo(c.x, c.logoY, c.logoH));
+  group(c.x, c.nameY, { a: clamp01(k * 2) * out, dy: 24 * (1 - k) }, () => text(D.name, c.x, c.nameY, { size: c.nameSize, weight: 900 }));
+  group(c.x, c.dateY, { a: clamp01(k * 2) * out, dy: 24 * (1 - k) }, () => text(START, c.x, c.dateY, { size: c.dateSize, weight: 700, color: C.sky, dir: 'ltr' }));
+}
+
+// ---------- the Earth (T1's textures and three.js, by relative path) and the plane's great circle ----------
+THREE.ColorManagement.enabled = false;                     // token colours reach the shader unchanged
+const glc = document.createElement('canvas');
+const renderer = new THREE.WebGLRenderer({ canvas: glc, antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(SCALE); renderer.setSize(W, H, false); renderer.setClearColor(0x000000, 0);
+const scene = new THREE.Scene();
+const cam = new THREE.OrthographicCamera(0, W, H, 0, -5000, 5000); cam.position.set(0, 0, 1000); cam.lookAt(0, 0, 0);
+const loader = new THREE.TextureLoader();
+const tex = (url) => new Promise((ok, no) => loader.load(url, (x) => { x.anisotropy = renderer.capabilities.getMaxAnisotropy(); ok(x); }, undefined, no));
+const [dayTex, nightTex] = await Promise.all([tex('../../teaser-sphere-globe/textures/earth-day-4k.jpg'), tex('../../teaser-sphere-globe/textures/earth-night-4k.jpg')]);
+const col = (h) => new THREE.Color(h);
+const earth = new THREE.Mesh(new THREE.SphereGeometry(1, 160, 112), new THREE.ShaderMaterial({
+  transparent: true,
+  uniforms: { day: { value: dayTex }, night: { value: nightTex }, deep: { value: col(C.deep) }, blue: { value: col(C.blueDeep) }, navy2: { value: col(C.navy2) },
+    sky: { value: col(C.sky) }, white: { value: col(C.white) }, fade: { value: 1 } },
+  vertexShader: `varying vec2 vUv; varying vec3 vN;
+    void main() { vUv = uv; vN = normalize(mat3(modelMatrix) * normal); gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0); }`,
+  fragmentShader: `uniform sampler2D day; uniform sampler2D night; uniform vec3 deep; uniform vec3 blue; uniform vec3 navy2; uniform vec3 sky; uniform vec3 white; uniform float fade;
+    varying vec2 vUv; varying vec3 vN;
+    void main() {
+      vec3 d = texture2D(day, vUv).rgb, n = texture2D(night, vUv).rgb;
+      float water = smoothstep(0.02, 0.10, d.b - d.r);                       // the oceans read bluer than the land
+      float relief = smoothstep(0.08, 0.60, dot(d, vec3(0.30, 0.59, 0.11)));
+      vec3 land = mix(navy2, mix(blue, sky, 0.30), relief);
+      vec3 c = mix(land, deep, water);
+      vec3 N = normalize(vN);
+      c *= 0.55 + 0.55 * max(dot(N, normalize(vec3(-0.45, 0.55, 0.70))), 0.0);   // soft light from the upper left
+      float L = dot(n, vec3(0.30, 0.59, 0.11));
+      c += mix(sky, white, smoothstep(0.4, 0.95, L)) * smoothstep(0.15, 0.9, L) * 0.9;   // city lights
+      c = mix(c, sky, pow(1.0 - max(N.z, 0.0), 3.0) * 0.55);                 // the rim
+      gl_FragColor = vec4(c, fade);
+    }`,
+}));
+earth.matrixAutoUpdate = false; scene.add(earth);
+
+const RAD = Math.PI / 180;
+// The journey: TLV (boardingPass.home) -> the nine stops in contest.json order, from their `ll`. Each leg is a great circle.
+const ORIGIN = [34.8854, 32.0055];                         // Ben Gurion airport (TLV), lon/lat
+const vll = ([lo, la]) => new THREE.Vector3(Math.cos(la * RAD) * Math.cos(lo * RAD), Math.sin(la * RAD), -Math.cos(la * RAD) * Math.sin(lo * RAD));
+const O = vll(ORIGIN);
+const WAY = [O, ...D.stops.map((x) => vll(x.ll))];
+const PATH = [], AT = [0];                                  // one point per degree along the legs; AT[i] = where stop i is reached
+for (let i = 1; i < WAY.length; i++) {
+  const a = WAY[i - 1], b = WAY[i], w = a.angleTo(b), n = Math.max(1, Math.ceil(w / RAD));
+  for (let k = i === 1 ? 0 : 1; k <= n; k++) PATH.push(a.clone().multiplyScalar(Math.sin((1 - k / n) * w) / Math.sin(w)).addScaledVector(b, Math.sin(k / n * w) / Math.sin(w)));
+  AT.push(PATH.length - 1);
+}
+const pathAt = (u) => { const i = Math.min(PATH.length - 2, Math.floor(u)), k = u - i; return PATH[i].clone().lerp(PATH[i + 1], k).normalize(); };
+// the plane's progress along the path (path points): still at TLV under the title card, the nine legs in ~6 s
+const FLY = [0.6, 6.6];
+const flown = (t) => (PATH.length - 1) * smooth((t - FLY[0]) / (FLY[1] - FLY[0]));
+window.routePath = (t) => PATH.slice(0, Math.floor(flown(t)) + 1).map((p) => [Math.atan2(-p.z, p.x) / RAD, Math.asin(p.y) / RAD]);
+
+// the globe's placement: model -> screen, north up, the view following the plane a little behind it (as T1 does)
+const M = new THREE.Matrix4(), tmp = new THREE.Vector3();
+function placeGlobe(t, g) {
+  const u = flown(t), z = new THREE.Vector3();
+  for (const lag of [0, 6, 12, 18, 24]) z.add(pathAt(Math.max(0, u - lag)));
+  z.normalize();
+  const y = new THREE.Vector3(0, 1, 0).addScaledVector(z, -z.y).normalize();                 // north up
+  const x = new THREE.Vector3().crossVectors(y, z);
+  const basis = new THREE.Matrix4().makeBasis(x, y, z).transpose();
+  M.makeTranslation(g.cx, H - g.cy, 0).multiply(new THREE.Matrix4().makeScale(g.R, g.R, g.R)).multiply(basis);
+  earth.matrix.copy(M); earth.matrixWorld.copy(M);
+}
+// a model point -> [screen x, screen y, facing (1 at the centre of the disc, 0 on the rim, < 0 behind)]
+const project = (p, g) => { tmp.copy(p).applyMatrix4(M); return [tmp.x, H - tmp.y, (tmp.z) / g.R]; };
+
+function globe(t, g) {
+  if (g.a <= 0.001) return;
+  placeGlobe(t, g);
+  earth.material.uniforms.fade.value = g.a;
+  renderer.render(scene, cam);
+  ctx.save();
+  const halo = ctx.createRadialGradient(g.cx, g.cy, g.R * 0.97, g.cx, g.cy, g.R * 1.07);       // the atmosphere, kept tight
+  halo.addColorStop(0, alpha(C.sky, 0.32 * g.a)); halo.addColorStop(1, alpha(C.sky, 0));
+  ctx.fillStyle = halo; ctx.beginPath(); ctx.arc(g.cx, g.cy, g.R * 1.07, 0, Math.PI * 2); ctx.fill();
+  ctx.drawImage(glc, 0, 0, W, H);
+  ctx.restore();
+}
+
+// the route drawn as the plane flies it, a dot on each stop it has reached, and the plane itself (the site's airliner,
+// nose along the route)
+const PLANE = new Path2D(AIRLINER), PLANE_PX = 66, DOT = 8;
+const flightK = (t) => 1 - smooth((t - 7.1) / 0.5);       // the route and the plane leave before the globe settles
+function trail(t, g) {
+  const u = flown(t), pts = [];
+  for (let i = 0; i <= Math.floor(u); i++) pts.push(project(PATH[i].clone().multiplyScalar(1.004), g));
+  if (u > 0) pts.push(project(pathAt(u).multiplyScalar(1.004), g));
+  return pts;
+}
+// the route as drawn (visible part), for the "60" measurement: its points and the widest mark on it (a stop's dot)
+window.routeStroke = (t) => {
+  if (flightK(t) <= 0 || t >= T(4)) return { width: 0, pts: [] };
+  const g = globeState(t); placeGlobe(t, g);
+  return { width: 2 * DOT + 3, pts: trail(t, g).filter((p) => p[2] > 0).map((p) => p.slice(0, 2)) };
+};
+function plane(t, g) {
+  const K = g.a * flightK(t);
+  if (K <= 0) return;
+  const pts = trail(t, g);
+  ctx.save(); ctx.lineCap = 'round'; ctx.lineWidth = 5;
+  for (let i = 1; i < pts.length; i++) {
+    const [x0, y0, f0] = pts[i - 1], [x1, y1, f1] = pts[i];
+    if (f0 <= 0 || f1 <= 0) continue;
+    ctx.strokeStyle = alpha(C.sky, 0.85 * smooth(f1 * 6) * K);
+    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+  }
+  ctx.restore();
+  const u = flown(t);
+  AT.slice(1).forEach((at, i) => {                          // the stops reached so far
+    const [x, y, f] = project(PATH[at].clone().multiplyScalar(1.004), g), k = clamp01((u - at) / 4);
+    if (f <= 0 || u < at) return;
+    ctx.save(); ctx.globalAlpha *= K * smooth(f * 6);
+    ctx.fillStyle = C.sky; ctx.beginPath(); ctx.arc(x, y, DOT * (0.6 + 0.4 * k), 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = C.white; ctx.lineWidth = 3; ctx.stroke(); ctx.restore();
+  });
+  const [x, y, f] = project(pathAt(u).multiplyScalar(1.02), g), [x2, y2] = project(pathAt(Math.min(PATH.length - 1.001, u + 0.5)).multiplyScalar(1.02), g);
+  if (f <= 0) return;
+  ctx.save(); ctx.globalAlpha *= smooth(f * 6) * K;
+  ctx.translate(x, y); ctx.rotate(Math.atan2(y2 - y, x2 - x) + Math.PI / 2);   // the icon's nose points up
+  const s = PLANE_PX / 24 * (0.75 + 0.25 * f); ctx.scale(s, s); ctx.translate(-12, -12);
+  ctx.shadowColor = alpha(C.deep, 0.6); ctx.shadowBlur = 6;
+  ctx.fillStyle = C.white; ctx.fill(PLANE);
+  ctx.restore();
+}
+// the origin: a dot on TLV and its label (boardingPass.home and its city name)
+function origin(t, g, a) {
+  const [x, y, f] = project(O.clone().multiplyScalar(1.003), g);
+  if (f <= 0 || a <= 0.001) return;
+  ctx.save(); ctx.globalAlpha *= a * smooth(f * 6);
+  ctx.fillStyle = C.sky; ctx.beginPath(); ctx.arc(x, y, 9, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = C.white; ctx.lineWidth = 3; ctx.stroke();
+  ctx.font = `700 40px ${FONT}`; ctx.direction = 'rtl';
+  const label = `${D.home.he} · ${D.home.code}`, w = ctx.measureText(label).width + 40, lx = x - 26 - w, ly = y - 26;   // on the dot's inline-start side
+  ctx.fillStyle = alpha(C.deep, 0.85); rrect(lx, ly - 30, w, 60, 30); ctx.fill();
+  ctx.restore();
+  ctx.save(); ctx.globalAlpha *= a * smooth(f * 6);
+  text(label, lx + w / 2, ly + 2, { size: 40, weight: 700 });
+  ctx.restore();
+}
+
+// the globe: big for the opening, then a dimmed backdrop inside the safe area
+function globeState(t) {
+  const g = smooth((t - 0.45) / 0.6), s = sp(t, T(4) - 0.3, SLIDE), A = L.open, B = L.back;
+  return { cx: lerp(A.cx, B.cx, s), cy: lerp(A.cy, B.cy, s), R: lerp(A.R, B.R, s) * lerp(0.92, 1, g), a: g * lerp(1, B.a, clamp01(s)) * (1 - smooth((t - T(10)) / 0.4)) };
+}
+
+// ---------- shots ----------
+// Shot 1 (bars 0-4): the title card (frame 0), the plane takes off from TLV, "60" lands, title and tagline.
+function shotOpen(t, g) {
+  const out = exitK(t, T(4));
+  titleCard(L.card, 1, 1 - smooth((t - 0.35) / 0.45));
+  origin(t, g, smooth((t - 0.5) / 0.4) * (1 - smooth((t - 1.5) / 0.4)));   // the origin's label, until the plane is away
+  plane(t, g);
+
+  const k60 = sp(t, T(1), LAND);
+  const [nx, ny, nsize] = L.n60;
+  group(nx, ny, { s: lerp(1.4, 1, k60) * (1 + 0.012 * Math.sin(t * 2.2)), a: Math.min(1, k60 * 3) * out, dy: -40 * (1 - out) }, () =>
+    text('60', nx, ny, { size: nsize, weight: 900, color: C.sky, dir: 'ltr' }));
+
+  // one line: "יום מסביב" on the right, "לעולם" on the left
+  const k1 = sp(t, T(2), POP), k2 = sp(t, T(2, 1), POP), TL = L.title;
+  ctx.font = `900 ${TL.size}px ${FONT}`;
+  const a = ctx.measureText('יום מסביב').width, b = ctx.measureText('לעולם').width, half = (a + TL.size * 0.3 + b) / 2;
+  const w1 = TL.x + half - a / 2, w2 = TL.x - half + b / 2;
+  group(w1, TL.y, { s: lerp(0.86, 1, k1), a: Math.min(1, k1 * 2) * out, dy: 50 * (1 - k1) }, () =>
+    text('יום מסביב', w1, TL.y, { size: TL.size, weight: 900 }));
+  group(w2, TL.y, { s: lerp(0.86, 1, k2), a: Math.min(1, k2 * 2) * out, dy: 50 * (1 - k2) }, () =>
+    text('לעולם', w2, TL.y, { size: TL.size, weight: 900 }));
+
+  const l1 = sp(t, T(3), SLIDE), l2 = sp(t, T(3, 2), SLIDE), [t1x, t1y, tsize] = L.tag1, [t2x, t2y] = L.tag2;
+  group(t1x, t1y, { a: l1 * out, dy: 30 * (1 - l1) }, () =>
+    text('כל שבוע מדינה אחרת.', t1x, t1y, { size: tsize, weight: 400, color: alpha(C.white, 0.86) }));
+  group(t2x, t2y, { a: l2 * out, dy: 30 * (1 - l2) }, () =>
+    text('כל שבוע הפנינג אחר.', t2x, t2y, { size: tsize, weight: 700, color: C.sky }));
+}
+window.n60Box = (t) => {                                   // the "60" as drawn: its ink box, with the landing scale
+  if (t < T(1) || t >= T(4)) return null;
+  const [nx, ny, nsize] = L.n60, k = sp(t, T(1), LAND), s = lerp(1.4, 1, k) * (1 + 0.012 * Math.sin(t * 2.2)), dy = -40 * (1 - exitK(t, T(4)));
+  ctx.font = `900 ${nsize}px ${FONT}`; ctx.direction = 'ltr'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const m = ctx.measureText('60');
+  return [nx - m.actualBoundingBoxLeft * s, ny + dy - m.actualBoundingBoxAscent * s, nx + m.actualBoundingBoxRight * s, ny + dy + m.actualBoundingBoxDescent * s];
+};
+
+// Shot 2 (bars 4-7): passport, the 9 weeks' stamps: each week's city (and its country when it fits) and dates, from
+// contest.json's stops. The city never drops below its minimum size (L.st.city: [largest, smallest]).
+function fitSize(str, maxW, [big, small], weight) {
+  for (let z = big; z > small; z -= 2) { ctx.font = `${weight} ${z}px ${FONT}`; if (ctx.measureText(str).width <= maxW) return z; }
+  return small;
+}
+const tileK = (t, i) => sp(t, T(4, 2) + i * BEAT / 2, POP);   // one per eighth note, on music.mjs's 9 ticks, week 1 -> 9
+window.tileK = tileK;
+window.tileRects = () => Array.from({ length: 9 }, (_, i) => { const S = L.st, col = i % 3, row = Math.floor(i / 3); return [S.x0 + (2 - col) * (S.gw + S.gap), S.y0 + row * (S.gw + S.gap), S.gw, S.gw]; });
+function stamp(i, x, y, w, h, t, glint) {
+  ctx.fillStyle = i === 0 ? C.blueDeep : C.navy2; rrect(x, y, w, h, 26); ctx.fill();
+  ctx.save(); ctx.strokeStyle = alpha(C.white, 0.16); ctx.lineWidth = 3; ctx.setLineDash([10, 9]);
+  rrect(x + 12, y + 12, w - 24, h - 24, 18); ctx.stroke(); ctx.restore();
+  text('שבוע ' + (i + 1), x + w - 34, y + 50, { size: 34, weight: 700, color: C.sky, align: 'right' });
+  const S = L.st, stop = D.stops[i], room = w - 48, pulse = 1 + 0.06 * glint;
+  const cz = fitSize(stop.he, room, S.city, 900);
+  ctx.font = `400 ${S.country}px ${FONT}`;
+  const withCountry = stop.country && stop.country !== stop.he && ctx.measureText(stop.country).width <= room;
+  const cy = y + h / 2 + (withCountry ? -12 : 4);
+  group(x + w / 2, cy, { s: pulse }, () => {
+    text(stop.he, x + w / 2, cy, { size: cz, weight: 900 });
+    if (withCountry) text(stop.country, x + w / 2, cy + cz * 0.5 + S.country * 0.75, { size: S.country, weight: 400, color: C.sky });
+  });
+  text(WEEKS[i][0] + '–' + WEEKS[i][1], x + 34, y + h - 44, { size: 28, weight: 400, color: alpha(C.white, 0.7), align: 'left', dir: 'ltr' });
+}
+function shotStamps(t) {
+  const out = exitK(t, T(7));
+  const h1 = sp(t, T(4), POP);
+  const S = L.st;
+  group(S.hx, S.h1y, { a: Math.min(1, h1 * 2) * out, dy: 40 * (1 - h1) }, () => {
+    text('9 שבועות.', S.hx, S.h1y, { size: S.hsize, weight: 900, align: S.halign });
+  });
+  const h2 = sp(t, T(4, 1), POP);
+  group(S.hx, S.h2y, { a: Math.min(1, h2 * 2) * out, dy: 40 * (1 - h2) }, () =>
+    text('9 יעדים.', S.hx, S.h2y, { size: S.hsize, weight: 900, color: C.sky, align: S.halign }));
+
+  const gw = S.gw, gh = S.gw, gap = S.gap, x0 = S.x0, y0 = S.y0;
+  const gcx = x0 + (3 * gw + 2 * gap) / 2, gcy = y0 + (3 * gh + 2 * gap) / 2;
+  for (let i = 0; i < 9; i++) {
+    const col = i % 3, row = Math.floor(i / 3);
+    const x = x0 + (2 - col) * (gw + gap), y = y0 + row * (gh + gap);          // RTL: week 1 top-right
+    const k = tileK(t, i);
+    const glint = t > T(6) ? Math.max(0, Math.sin((t - T(6)) * 4 - i * 0.7)) : 0;      // glint travels across the stamps
+    const push = 1 + 0.035 * clamp01((t - T(5)) / (T(7) - T(5)));                        // slow push-in
+    const float = 7 * Math.sin(t * 2.2 + i * 0.9);
+    group(x + gw / 2, y + gh / 2, { s: lerp(1.5, 1, k) * (1 - 0.06 * (1 - out)) * push, a: Math.min(1, k * 4) * out, dx: (x + gw / 2 - gcx) * (push - 1), dy: (y + gh / 2 - gcy) * (push - 1) + float * k, rot: (1 - k) * (i % 2 ? 0.2 : -0.2) }, () =>
+      stamp(i, x, y, gw, gh, t, glint));
+  }
+}
+
+// Shot 3 (bars 7-9): sealed luggage tags. Prizes are hidden until approved: "?" only, and contest.json's prizes.teaser.
+function tag(i, x, y, w, h) {
+  ctx.fillStyle = C.white; rrect(x, y, w, h, 28); ctx.fill();
+  ctx.fillStyle = i % 2 ? C.blueDeep : C.sky; rrect(x + w - 22, y + 26, 10, h - 52, 5); ctx.fill();   // colour strip, inline-start
+  ctx.fillStyle = C.navy; ctx.beginPath(); ctx.arc(x + 56, y + h / 2, 16, 0, Math.PI * 2); ctx.fill();  // tag hole
+  ctx.strokeStyle = C.line; ctx.lineWidth = 6; ctx.stroke();
+  text('?', x + w / 2 + 10, y + h / 2 + 6, { size: 130, weight: 900, color: C.blueDeep, dir: 'ltr' });
+}
+function shotPrizes(t) {
+  const out = exitK(t, T(9));
+  const h = sp(t, T(7), POP);
+  const P = L.pz;
+  group(W / 2, P.hy, { a: Math.min(1, h * 2) * out, dy: 40 * (1 - h) + 8 * Math.sin(t * 2.6), s: 1 + 0.02 * Math.sin(t * 2.6 + 1) }, () =>
+    text('מה נכנס למזוודה?', W / 2, P.hy, { size: P.hsize, weight: 900 }));
+
+  const tw = P.tw, th = P.th, rowW = P.cols * tw + (P.cols - 1) * P.gx;
+  for (let i = 0; i < 6; i++) {
+    const t0 = T(7, 2) + i * BEAT;
+    const k = sp(t, t0, SLIDE);
+    const swing = (1 - sp(t, t0, [0.25, 9])) * (i % 2 ? 0.12 : -0.12) + 0.006 * Math.sin(t * 2.4 + i);   // pendulum settle + breath
+    const col = i % P.cols, row = Math.floor(i / P.cols);
+    const x = (W + rowW) / 2 - tw - col * (tw + P.gx), y = P.y0 + row * (th + P.gy);   // RTL: first tag on the right
+    group(x + 56, y + th / 2, { a: Math.min(1, k * 2.5) * out, dx: (1 - k) * 700, rot: swing }, () => tag(i, x, y, tw, th));
+  }
+  const s = sp(t, T(8), SLIDE);
+  group(W / 2, P.ly, { a: s * out, dy: 20 * (1 - s) }, () =>
+    text(D.prizesTeaser, W / 2, P.ly, { size: P.lsize, weight: 700, color: C.sky }));
+}
+
+// Shot 4 (bar 9): the site's BEZEQ AIRLINES pass (plain navy, its TAGLINE and the first day), the take-off stamp.
+// The adapter: passCard with no class (the plain-navy pass), the passenger placeholder, TLV -> "?", the contest's first
+// day; no flight, gate, seat or class are shown.
+const passEl = document.getElementById('pass');
+{
+  const card = passCard({ features: { names: 'none' }, boardingPass: D.boardingPass, stops: [] }, { key: 'teaser', stampCard: { class: null } });
+  card.setAttribute('aria-label', 'כרטיס עלייה למטוס');
+  // 8b-P markup: the TO city and code "?", the passenger and the first day only, no class tab, no stub grid
+  const to = card.querySelectorAll('.bz-route .bz-ap')[1];
+  to.querySelector('.bz-city').textContent = '?'; to.querySelector('.bz-code').textContent = '?';
+  const fields = [...card.querySelectorAll('.bz-facts .bz-f')];
+  fields.forEach((f, i) => { if (i === 2) f.querySelector('.bz-v').textContent = START; else if (i > 0) f.remove(); });
+  card.querySelector('.bz-tab')?.remove(); card.querySelector('.bz-stub .bz-grid')?.remove();
+  if (card.querySelector('.bz-air span').textContent !== TAGLINE[0]) throw new Error('the pass tagline is not TAGLINE');
+  passEl.append(card);
+  passEl.lang = 'he';
+}
+const PS = L.ps, PK = PS.pw / PS.css;
+passEl.style.width = `${PS.css}px`; passEl.style.left = `${PS.px}px`; passEl.style.top = `${PS.py}px`;
+const passH = () => passEl.offsetHeight * PK;
+// a spring's first arrival at 1 (s after its start): the stamp's first full contact falls on the clap
+const arrival = ([z, w]) => { const wd = w * Math.sqrt(1 - z * z); return (Math.PI - Math.atan(wd / (z * w))) / wd; };
+const STAMP_HIT = T(9, 3), STAMP_T0 = STAMP_HIT - arrival(LAND) - 1e-6;   // in contact on the clap's own frame
+window.stampScale = (t) => lerp(2.4, 1, sp(t, STAMP_T0, LAND));
+function shotPass(t) {
+  const out = exitK(t, T(10));
+  const k = sp(t, T(9), SLIDE), ph = passH();
+  passEl.style.opacity = (Math.min(1, k * 2) * out).toFixed(3);
+  passEl.style.transform = `translateY(${(Math.max(0, 1 - k) * 500 + 10 * Math.sin(t * 2.4)).toFixed(2)}px) scale(${(PK * (1 + 0.018 * Math.sin(t * 1.8))).toFixed(4)})`;
+
+  ctx = over;
+  // the "יוצאים לדרך" stamp slams onto the pass's lower corner
+  const sk = sp(t, STAMP_T0, LAND), sx = PS.sx, sy = PS.py + ph - 40 + 10 * Math.sin(t * 2.4);
+  group(sx, sy, { s: lerp(2.4, 1, sk), a: Math.min(1, sk * 3) * 0.95 * out, rot: -0.18 }, () => {
+    ctx.save(); ctx.strokeStyle = C.sky; ctx.lineWidth = 10;
+    ctx.fillStyle = alpha(C.deep, 0.94); rrect(sx - 190, sy - 80, 380, 160, 22); ctx.fill(); ctx.stroke();
+    text('יוצאים לדרך', sx, sy, { size: 72, weight: 900, color: C.white });
+    ctx.restore();
+  });
+  ctx = base;
+}
+
+// The sign-off (bars 10-12, on the music's hits): the official logo (20.0 s whoosh, held to 21.0 s), it shrinks to a
+// point while the SOHO shield's four pieces fly in; they snap on the boom (22.0 s); the division line is in by 22.5 s;
+// a sky-blue pulse ring on the chime (23.0 s). The pieces are T3's split of the owner's shield (no copy, no redraw).
+const DIVISION_LINE = 'אגף סוהו • חשמל • שירותי דיגיטל';   // T3's divisionLine (test/teaser-60-days.test.js keeps them equal)
+const SHIELD_DIR = '../../terminal-60-cinematic/assets/shield/';
+const PIECES = [['soho', -1, -1], ['digital', 1, -1], ['energy', -1, 1], ['h144', 1, 1]];   // the four pieces and where they fly from
+const img = async (src) => { const i = new Image(); i.src = src; await i.decode(); return i; };
+const SHIELD = Object.fromEntries(await Promise.all([...PIECES.map((p) => p[0]), 'base'].map(async (n) => [n, await img(`${SHIELD_DIR}${n}.png`)])));
+const LOGO_IN = T(10), SHRINK = T(10, 2), SNAP = T(11), LINE_IN = T(11, 1), RING = T(11, 2);
+const easeIn = (x) => { x = clamp01(x); return x * x * x; };
+// the state of the sign-off at t (the QA reads it frame by frame); the logo already shows on the whoosh's own frame
+window.signoff = (t) => ({
+  logoA: t < LOGO_IN ? 0 : smooth((t - LOGO_IN) / 0.12 + 0.25), logoS: 1 - easeIn((t - SHRINK) / 0.5),
+  fly: t >= SNAP ? 0 : 1 - easeIn((t - SHRINK) / (SNAP - SHRINK)), piecesA: smooth((t - SHRINK) / 0.3),
+  snap: t >= SNAP ? 1 + 0.045 * Math.exp(-(t - SNAP) * 9) * Math.cos((t - SNAP) * 30) : 1,
+  baseA: smooth((t - SNAP) / 0.1), lineK: smooth((t - SNAP) / (LINE_IN - SNAP)), ringK: t < RING ? -1 : clamp01((t - RING) / 0.8),
+});
+function shotEnd(t) {
+  const E = L.end, st = window.signoff(t), sh = E.sw * 762 / 800, x0 = E.cx - E.sw / 2, y0 = E.cy - sh / 2;
+  if (st.logoS > 0 && st.logoA > 0) group(E.cx, E.cy, { s: st.logoS, a: st.logoA }, () => logo(E.cx, E.cy - E.logoH / 2, E.logoH));
+  group(E.cx, E.cy, { s: st.snap }, () => {
+    if (st.baseA > 0) { ctx.save(); ctx.globalAlpha *= st.baseA; ctx.drawImage(SHIELD.base, x0, y0, E.sw, sh); ctx.restore(); }
+    for (const [n, dx, dy] of PIECES) {
+      if (st.piecesA <= 0) break;
+      group(E.cx, E.cy, { a: st.piecesA, dx: dx * W * 0.55 * st.fly, dy: dy * E.sw * 0.3 * st.fly, rot: dx * dy * 0.35 * st.fly }, () => ctx.drawImage(SHIELD[n], x0, y0, E.sw, sh));
+    }
+  });
+  if (st.ringK >= 0 && st.ringK < 1) {                                  // the ring under the division line
+    ctx.save(); ctx.strokeStyle = alpha(C.sky, 0.85 * (1 - st.ringK)); ctx.lineWidth = 6;
+    ctx.beginPath(); ctx.arc(E.cx, E.cy, lerp(E.ring[0], E.ring[1], 1 - (1 - st.ringK) ** 2), 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+  }
+  group(E.cx, E.lineY, { a: st.lineK, dy: 24 * (1 - st.lineK) }, () => text(DIVISION_LINE, E.cx, E.lineY, { size: E.lineSize, weight: 700 }));
+}
+
+window.renderFrame = function (t) {
+  for (const c of [base, over]) { c.setTransform(SCALE, 0, 0, SCALE, 0, 0); c.clearRect(0, 0, W, H); }
+  ctx = base;
+  ctx.fillStyle = C.navy; ctx.fillRect(0, 0, W, H);
+  const g = globeState(t);
+  globe(t, g);
+  passEl.style.opacity = '0';
+  // the top layer holds the stamp, from its first frame on. Hidden while it would be empty: an
+  // emptied canvas can keep showing its last picture in the capture (seen in Chromium), a hidden one cannot.
+  top.style.visibility = t > STAMP_T0 && t < T(10) ? 'visible' : 'hidden';
+  if (t < T(4)) shotOpen(t, g);
+  else if (t < T(7)) shotStamps(t);
+  else if (t < T(9)) shotPrizes(t);
+  else if (t < T(10)) shotPass(t);
+  else shotEnd(t);
+};
+window.globeState = globeState;
+window.endLayout = () => ({ ...L.end, sh: L.end.sw * 762 / 800, W, H });
+
+await Promise.all([document.fonts.load(`900 100px "Simpler"`, 'אב 60'), document.fonts.load(`400 50px "Simpler"`, 'אב'), document.fonts.load(`700 50px "Simpler"`, 'אב')]);
+window.fontsOk = document.fonts.check('900 100px Simpler', 'אב') && document.fonts.check('700 50px Simpler', 'אב') && document.fonts.check('400 50px Simpler', 'אב');
+window.renderFrame(0);
+window.ready = true;
+</script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+/* The teaser's HTML overlay: every Hebrew word is real browser text (bidi and shaping), composited over the WebGL
+   globe in the capture. Simpler from contests/platform; Bezeq token colours (brand/bezeq-tokens.css). */
+@font-face { font-family: 'Simpler'; src: url('/contests/platform/public/fonts/Simpler-Regular.otf') format('opentype'); font-weight: 400; }
+@font-face { font-family: 'Simpler'; src: url('/contests/platform/public/fonts/Simpler-Bold.otf') format('opentype'); font-weight: 700; }
+:root {
+  --bz-blue: #51C6F1;
+  --bz-blue-deep: #00316B;
+  --bz-navy: #16254F;
+  --bz-navy-deep: #00204D;
+  --bz-white: #FFFFFF;
+  --u: 1px; /* set per cut from the shorter side (1080 px = 1) */
+  --c: 1px; /* the chips' unit: --u, × 1.6 in the 9:16 cuts */
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #000814; }
+body { font-family: 'Simpler', sans-serif; color: var(--bz-white); -webkit-font-smoothing: antialiased; }
+body { position: fixed; inset: 0; }
+#gl, #ges, #overlay { position: absolute; inset: 0; width: 100%; height: 100%; }
+#overlay { overflow: hidden; contain: strict; }
+#ges { object-fit: cover; opacity: 0; }
+#leaders { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+#leaders line { stroke-width: calc(2 * var(--u)); }
+
+.chip {
+  position: absolute; left: 0; top: 0; white-space: nowrap; will-change: transform;
+  display: flex; align-items: center; gap: calc(10 * var(--c));
+  padding: calc(8 * var(--c)) calc(16 * var(--c)); border-radius: calc(999 * var(--c));
+  background: color-mix(in srgb, var(--bz-navy) 92%, transparent); border: calc(1.5 * var(--c)) solid rgba(81, 198, 241, 0.55);
+  font-size: calc(30 * var(--c)); font-weight: 700; line-height: 1;
+  box-shadow: 0 calc(6 * var(--c)) calc(24 * var(--c)) rgba(0, 8, 20, 0.55);
+}
+.chip .dot { width: calc(14 * var(--c)); height: calc(14 * var(--c)); border-radius: 50%; flex: none; }
+.chip .code { color: var(--bz-blue); font-weight: 400; letter-spacing: 0.06em; }
+.chip svg { width: calc(44 * var(--c)); height: calc(10 * var(--c)); flex: none; }
+
+#title { position: absolute; opacity: 0; text-align: right; }
+#title-name { font-weight: 700; line-height: 1.02; letter-spacing: -0.01em; text-shadow: 0 calc(4 * var(--u)) calc(40 * var(--u)) rgba(0, 8, 20, 0.9); }
+#title-name span { display: block; }
+#title-dates { font-weight: 400; color: var(--bz-white); margin-top: calc(22 * var(--u)); letter-spacing: 0.02em; }
+#title-mark { font-weight: 700; color: var(--bz-white); margin-top: calc(18 * var(--u)); line-height: 1; letter-spacing: 0.02em; }
+#title::before { /* a navy vignette behind the words so they keep ≥4.5:1 wherever the globe is */
+  content: ''; position: absolute; inset: calc(-120 * var(--u)) calc(-160 * var(--u)); z-index: -1;
+  background: radial-gradient(closest-side, rgba(0, 32, 77, 0.78), rgba(0, 32, 77, 0.5) 60%, rgba(0, 32, 77, 0)); }
+
+#credit {
+  position: absolute; left: calc(28 * var(--u)); bottom: calc(24 * var(--u)); opacity: 0; direction: ltr;
+  font-family: Arial, 'Simpler', sans-serif; font-size: calc(20 * var(--u)); color: var(--bz-white);
+  text-shadow: 0 0 calc(6 * var(--u)) rgba(0, 0, 0, 0.9);
+}

@@ -1,0 +1,73 @@
+{
+  "_comment": "Single source of edit timing (frames at 30 fps), read by the compositions and by scripts/make-audio.py. hero = the title (heroTitle frames) then the animated sign-off (signOff frames, overlapping the title by 8).",
+  "fps": 30,
+  "bpm": 120,
+  "main": {
+    "duration": 1800,
+    "signal": [
+      0,
+      120
+    ],
+    "origin": [
+      120,
+      258
+    ],
+    "board": [
+      258,
+      396
+    ],
+    "pass": [
+      396,
+      576
+    ],
+    "passStamp": 524,
+    "cities": [
+      576,
+      1332
+    ],
+    "cityLen": 84,
+    "transition": 16,
+    "competition": [
+      1332,
+      1472
+    ],
+    "globe": [
+      1472,
+      1538
+    ],
+    "hero": [
+      1538,
+      1800
+    ],
+    "heroTitle": 120,
+    "signOff": 150
+  },
+  "short": {
+    "duration": 450,
+    "signal": [
+      0,
+      26
+    ],
+    "board": [
+      26,
+      71
+    ],
+    "pass": [
+      71,
+      131
+    ],
+    "passStamp": 114,
+    "cities": [
+      131,
+      248
+    ],
+    "cityLen": 13,
+    "transition": 8,
+    "hero": [
+      248,
+      450
+    ],
+    "heroTitle": 60,
+    "signOff": 150
+  }
+}

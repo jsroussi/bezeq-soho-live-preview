@@ -1,0 +1,196 @@
+{
+  "date": "2026-10-27",
+  "determinism": [
+    {
+      "frame": 90,
+      "t": 3,
+      "run1": "0955ff4b1570d88e087971d94ebf7dbf81d050c0c8b82a8635b9bf7ef917f791",
+      "run2": "0955ff4b1570d88e087971d94ebf7dbf81d050c0c8b82a8635b9bf7ef917f791",
+      "runVsRun": 0,
+      "fullRender": "02a7ed682180748be4b83b3c0c33df70e4b50be944d9b6e15bce914edd8b25b9",
+      "runVsFull": 0.008438946759259259,
+      "pass": true
+    },
+    {
+      "frame": 420,
+      "t": 14,
+      "run1": "fa6893968e5464492d176f5c7d9b5c30214fda312055a9880b3132de7ffb8281",
+      "run2": "fa6893968e5464492d176f5c7d9b5c30214fda312055a9880b3132de7ffb8281",
+      "runVsRun": 0,
+      "fullRender": "e2165f063bc45bb021e2225f58f651afce78d517d805053b78a8f0a1a5aa156a",
+      "runVsFull": 0.0030676118827160496,
+      "pass": true
+    },
+    {
+      "frame": 900,
+      "t": 30,
+      "run1": "683ff79ed3b99f777df55d4d85530f4f9a8e118318dce78c8b59b7e2cef29445",
+      "run2": "683ff79ed3b99f777df55d4d85530f4f9a8e118318dce78c8b59b7e2cef29445",
+      "runVsRun": 0,
+      "fullRender": "4b6d60a024fc94ea4a56809d3972c3bc6ebf927a508edafacce150b008dc29bd",
+      "runVsFull": 0.0032532793209876544,
+      "pass": true
+    }
+  ],
+  "renderEnv": {
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+    "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "vendor": "Google Inc. (Google)",
+    "three": "186",
+    "fontsOk": true,
+    "chromium": "153.0.8010.12",
+    "blockedRequests": [],
+    "chromiumArgs": [
+      "--use-angle=swiftshader",
+      "--use-gl=angle",
+      "--enable-unsafe-swiftshader",
+      "--ignore-gpu-blocklist",
+      "--force-color-profile=srgb",
+      "--disable-lcd-text",
+      "--font-render-hinting=none",
+      "--disable-background-timer-throttling"
+    ],
+    "node": "v22.22.0",
+    "ffmpeg": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers"
+  },
+  "cuts": {
+    "master": {
+      "file": "out/teaser-sphere-globe-16x9.mp4",
+      "bytes": 15078655,
+      "duration": 32,
+      "video": "h264 1920x1080 30/1 yuv420p",
+      "audio": "aac 48000 Hz 2 ch",
+      "lufs": -15.9,
+      "truePeak": -2,
+      "loudnessOk": true,
+      "endCard": {
+        "markCapPx": 48.6,
+        "titleBottom": 768,
+        "ok": true
+      },
+      "firstFrameLuma": 33.4027,
+      "firstFrameNotBlack": true
+    },
+    "vertical": {
+      "file": "out/teaser-sphere-globe-9x16.mp4",
+      "bytes": 9334563,
+      "duration": 20,
+      "video": "h264 1080x1920 30/1 yuv420p",
+      "audio": "aac 48000 Hz 2 ch",
+      "lufs": -16,
+      "truePeak": -3,
+      "loudnessOk": true,
+      "endCard": {
+        "markCapPx": 64.8,
+        "titleBottom": 1550,
+        "ok": true
+      },
+      "firstFrameLuma": 31.3368,
+      "firstFrameNotBlack": true
+    },
+    "whatsapp": {
+      "file": "out/teaser-sphere-globe-whatsapp-15s.mp4",
+      "bytes": 4311713,
+      "duration": 15,
+      "video": "h264 1080x1920 30/1 yuv420p",
+      "audio": "aac 48000 Hz 2 ch",
+      "lufs": -16,
+      "truePeak": -2.9,
+      "loudnessOk": true,
+      "endCard": {
+        "markCapPx": 64.8,
+        "titleBottom": 1550,
+        "ok": true
+      },
+      "firstFrameLuma": 31.3419,
+      "firstFrameNotBlack": true
+    }
+  },
+  "order": {
+    "homes": [
+      {
+        "city": "חולון",
+        "at": 0.6
+      },
+      {
+        "city": "תל אביב",
+        "at": 0.95
+      },
+      {
+        "city": "חיפה",
+        "at": 1.3
+      },
+      {
+        "city": "אשדוד",
+        "at": 1.65
+      }
+    ],
+    "stops": [
+      {
+        "week": 1,
+        "country": "צרפת",
+        "city": "פריז",
+        "iata": "CDG",
+        "arrives": 8.5
+      },
+      {
+        "week": 2,
+        "country": "איטליה",
+        "city": "ונציה",
+        "iata": "VCE",
+        "arrives": 10.22
+      },
+      {
+        "week": 3,
+        "country": "מרוקו",
+        "city": "מרקש",
+        "iata": "RAK",
+        "arrives": 11.94
+      },
+      {
+        "week": 4,
+        "country": "ארה״ב",
+        "city": "לאס וגאס",
+        "iata": "LAS",
+        "arrives": 13.66
+      },
+      {
+        "week": 5,
+        "country": "מקסיקו",
+        "city": "קנקון",
+        "iata": "CUN",
+        "arrives": 15.38
+      },
+      {
+        "week": 6,
+        "country": "יפן",
+        "city": "טוקיו",
+        "iata": "HND",
+        "arrives": 17.1
+      },
+      {
+        "week": 7,
+        "country": "יוון",
+        "city": "אתונה",
+        "iata": "ATH",
+        "arrives": 18.82
+      },
+      {
+        "week": 8,
+        "country": "הודו",
+        "city": "ניו דלהי",
+        "iata": "DEL",
+        "arrives": 20.54
+      },
+      {
+        "week": 9,
+        "country": "ישראל",
+        "city": "ירושלים",
+        "iata": "JLM",
+        "arrives": 22.26
+      }
+    ],
+    "inOrder": true
+  }
+}
