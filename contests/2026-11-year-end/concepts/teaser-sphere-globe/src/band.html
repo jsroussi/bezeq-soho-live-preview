@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="robots" content="noindex, nofollow, noarchive">
+<title>רצועת הטיזר</title>
+<!-- The ticker band's strip as real HTML (Simpler, browser bidi). scripts/render.mjs screenshots #band with a
+     transparent ground; the globe page wraps it round the band in white over navy. -->
+<style>
+@font-face { font-family: 'Simpler'; src: url('/contests/platform/public/fonts/Simpler-Bold.otf') format('opentype'); font-weight: 700; }
+html, body { margin: 0; background: transparent; }
+#band { display: inline-flex; padding-inline: 2px !important; align-items: center; height: 120px; padding: 0; white-space: nowrap;
+  font: 700 66px/1 'Simpler', sans-serif; color: #FFFFFF; }
+#band span { padding: 0 54px; }
+#band svg { width: 26px; height: 26px; flex: none; }
+</style>
+</head>
+<body>
+<div id="band"></div>
+<script type="module">
+const D = await (await fetch('/__teaser/data.json?cut=master')).json();
+const bdi = (s) => s.replace(/[0-9][0-9.–\-]*/g, (m) => `<bdi dir="ltr">${m}</bdi>`);
+const star = '<svg viewBox="0 0 26 26"><path d="M13 1 L16 10 L25 13 L16 16 L13 25 L10 16 L1 13 L10 10 Z" fill="#51C6F1"/></svg>';
+document.getElementById('band').innerHTML = D.band.map((f) => `<span>${bdi(f)}</span>${star}`).join('');
+await document.fonts.load('700 66px Simpler', 'בזק');
+window.bandOk = document.fonts.check('700 66px Simpler', 'בזק');
+window.bandReady = true;
+</script>
+</body>
+</html>

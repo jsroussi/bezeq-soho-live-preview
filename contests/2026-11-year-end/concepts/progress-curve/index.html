@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="he" dir="rtl">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8"><meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>עקומת ההתקדמות</title>
 <!-- Concept (from the ChatGPT brainstorm, idea #7): "My progress curve". The visitor's stamps day by day, built from the
@@ -121,7 +121,7 @@ footer { padding: 4px 0 40px; color: var(--muted); font-size: 13px; }
 <script>
 // ---------- Demo data: 45 working days (Sun–Thu, 1.11–31.12), nine weeks of five days, the peak on each Wednesday.
 // 21 SOHO sales reps in three teams; stamps by the takanon's SOHO table (ביזנט 3, IPC 3, internet / fiber 2), threshold 350.
-const STOPS = [['פריז', '2026-11-01'], ['מילאנו', '2026-11-08'], ['מרקש', '2026-11-15'], ['לאס וגאס', '2026-11-22'], ['קנקון', '2026-11-29'], ['טוקיו', '2026-12-06'], ['אתונה', '2026-12-13'], ['ניו דלהי', '2026-12-20'], ['ירושלים', '2026-12-27']];
+const STOPS = [['פריז', '2026-11-01'], ['ונציה', '2026-11-08'], ['מרקש', '2026-11-15'], ['לאס וגאס', '2026-11-22'], ['קנקון', '2026-11-29'], ['טוקיו', '2026-12-06'], ['אתונה', '2026-12-13'], ['ניו דלהי', '2026-12-20'], ['ירושלים', '2026-12-27']];
 // The admin page's weeks table (../_shared/admin-weeks.js): the order, names and dates follow it.
 if (window.ADMIN_WEEKS) STOPS.splice(0, STOPS.length, ...window.ADMIN_WEEKS.weeks.map((w) => [w.he, w.start]));
 const DAYS = 45, THRESHOLD = 350;

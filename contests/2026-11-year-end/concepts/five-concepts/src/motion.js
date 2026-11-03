@@ -7,7 +7,7 @@ export const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matc
 const STYLES = {
   // Paris at blue hour: slow, a little float.
   drift: (els) => gsap.from(els, { opacity: 0, y: 22, duration: 1.4, ease: 'sine.out', stagger: 0.14 }),
-  // Milan: a runway, crisp slides from the side, no float.
+  // Venice: a glide, crisp slides from the side like a boat along a canal, no float.
   runway: (els) => gsap.from(els, { opacity: 0, x: -64, duration: 0.55, ease: 'expo.out', stagger: 0.08 }),
   // Marrakech at noon: a shadow line sweeps across and leaves the element behind it.
   sweep: (els) => gsap.from(els, { clipPath: 'inset(0 0 0 100%)', duration: 0.9, ease: 'power3.inOut', stagger: 0.1 }),

@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="he" dir="rtl">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8"><meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>60 יום מסביב לעולם · תשעה ימי שיא</title>
 <style>
@@ -295,7 +295,7 @@ footer a { color: inherit; }
   addEventListener('hashchange', pick); pick();
 
   const A = WEEKS.map((w) => w.city);
-  const B = ['ירושלים', 'פריז', 'קנקון', 'לאס וגאס', 'מילאנו', 'מרקש', 'טוקיו', 'שנגחאי', 'ג׳איפור'];
+  const B = ['ירושלים', 'פריז', 'קנקון', 'לאס וגאס', 'ונציה', 'מרקש', 'טוקיו', 'שנגחאי', 'ג׳איפור'];
   const route = (list) => list.map((c, i) => `<li class="${c === 'ירושלים' ? 'home' : ''}"><span class="num">${i + 1}</span> · ${esc(c)}</li>`).join('');
   $('#routeA').innerHTML = route(A); $('#routeB').innerHTML = route(B);
 

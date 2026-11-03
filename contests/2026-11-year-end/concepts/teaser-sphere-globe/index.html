@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>טיזר גלובוס הלילה · 60 יום מסביב לעולם</title>
+<style>
+@font-face { font-family: 'Simpler'; src: url('../../../platform/public/fonts/Simpler-Regular.otf') format('opentype'); font-weight: 400; }
+@font-face { font-family: 'Simpler'; src: url('../../../platform/public/fonts/Simpler-Bold.otf') format('opentype'); font-weight: 700; }
+:root { --bz-blue: #51C6F1; --bz-navy: #16254F; --bz-navy-deep: #00204D; --bz-line: #C9CBD6; --bz-white: #FFFFFF; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bz-navy-deep); color: var(--bz-white); font: 400 17px/1.6 'Simpler', sans-serif; }
+main { max-width: 1180px; margin: 0 auto; padding: 32px 16px 64px; }
+.badge { display: inline-block; background: var(--bz-blue); color: var(--bz-navy); font-weight: 700; border-radius: 6px; padding: 0 10px; margin-inline-start: 8px; font-size: 15px; }
+h1 { font-size: 34px; margin: 0 0 6px; }
+h2 { font-size: 22px; margin: 36px 0 10px; }
+p, li { color: var(--bz-line); max-width: 75ch; }
+img { width: 100%; height: auto; display: block; border-radius: 10px; border: 1px solid rgba(81, 198, 241, 0.3); }
+.row { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; align-items: start; }
+@media (max-width: 760px) { .row { grid-template-columns: 1fr; } }
+code, bdi.ltr { font-family: ui-monospace, monospace; font-size: 15px; color: var(--bz-white); }
+a { color: var(--bz-blue); }
+</style>
+</head>
+<body>
+<main>
+  <h1>טיזר גלובוס הלילה<span class="badge">דמו</span></h1>
+  <p>כדור הארץ בלילה עם אורות הערים, ארבע קשתות מחולון, תל אביב, חיפה ואשדוד שטסות לפי הסדר דרך תשעת היעדים, כל יעד נדלק עם שם המדינה וקוד שדה התעופה, ורצועת מסר שעוטפת את הגלובוס. בסוף חוזרים לישראל: "60 יום מסביב לעולם", <bdi dir="ltr">1.11–31.12.2026</bdi> ו"בזק".</p>
+  <p>שלוש גרסאות: <bdi dir="ltr">16:9</bdi> של 32 שניות, <bdi dir="ltr">9:16</bdi> של 20 שניות (קומפוזיציה נפרדת, לא חיתוך), וגרסת וואטסאפ של 15 שניות. קובצי הווידאו לא נשמרים במאגר; נבנים מחדש בפקודה אחת (ראו <code>README.md</code>).</p>
+
+  <h2>פוסטר</h2>
+  <div class="row">
+    <img src="qa/poster-master.jpg" alt="פוסטר 16:9: הגלובוס בלילה והכותרת 60 יום מסביב לעולם">
+    <img src="qa/poster-vertical.jpg" alt="פוסטר 9:16">
+  </div>
+
+  <h2>דף מגע · תמונה כל 2 שניות</h2>
+  <img src="qa/contact-sheet-master.jpg" alt="דף מגע של גרסת 16:9">
+  <h2>9:16 · 20 שניות</h2>
+  <img src="qa/contact-sheet-vertical.jpg" alt="דף מגע של גרסת 9:16">
+  <h2>וואטסאפ · 15 שניות</h2>
+  <img src="qa/contact-sheet-whatsapp.jpg" alt="דף מגע של גרסת הוואטסאפ">
+
+  <h2>איך בונים</h2>
+  <p dir="ltr" style="text-align:left"><code>node scripts/render.mjs all &amp;&amp; node scripts/qa.mjs</code></p>
+  <p>הפתיחה מ-Google Earth Studio נכנסת לתיקייה <code>opening/</code> ומתחברת לגלובוס לבד; ההסבר ב-<code>README.md</code>.</p>
+</main>
+</body>
+</html>

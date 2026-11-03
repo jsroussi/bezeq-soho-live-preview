@@ -1,0 +1,44 @@
+{
+ "source": "contests/2026-11-year-end/concepts/teaser-60-days/video/assets/soho-logo.png (owner-approved, 28.10)",
+ "size": [
+  800,
+  762
+ ],
+ "pieces": {
+  "soho": {
+   "kind": "light",
+   "size_px": 99261,
+   "centroid": [
+    236.8,
+    199.4
+   ]
+  },
+  "h144": {
+   "kind": "light",
+   "size_px": 98866,
+   "centroid": [
+    535.1,
+    478.3
+   ]
+  },
+  "digital": {
+   "kind": "dark",
+   "size_px": 73464,
+   "centroid": [
+    589.8,
+    184.2
+   ]
+  },
+  "energy": {
+   "kind": "dark",
+   "size_px": 73656,
+   "centroid": [
+    247.3,
+    499.5
+   ]
+  }
+ },
+ "fidelity_max_channel_diff_off_seams": 0,
+ "fidelity_pass_le_3": true,
+ "seam_band_share": 0.0863
+}

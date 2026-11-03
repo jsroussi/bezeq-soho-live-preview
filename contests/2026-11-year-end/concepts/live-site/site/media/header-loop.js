@@ -1,0 +1,1 @@
+window.HEADER_LOOP = {"transparent":true,"once":"header-loop-once.webp","sources":[],"poster":"header-loop-globe.png","badge":"#070F1F","credit":"הלולאה בכותרת: מרקם כדור הארץ מדוגמאות three.js, על בסיס צילומי NASA","base":"media/"};

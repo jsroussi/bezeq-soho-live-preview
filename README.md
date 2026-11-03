@@ -1,3 +1,3 @@
 # SOHO animated design previews
 
-Two equal main choices: Mission and Horizon. The other41 original live/reference designs remain in Archive; their direct links are unchanged. UNFOLD is a separate experimental prototype link. Manual city controls cover all nine destinations, using October results replayed over November-December (real names; ID numbers are never published). No private repository history, employee files or administrator updater.
+7 main comparison cards: תחנות, משלחת, גלריית יעדים, מסע, UNFOLD · העולם נפתח, מעל האופק, חדר הבקרה BZQ-60. The other 45 original live/reference designs remain in Archive. Manual city controls cover all 9 destinations, using labeled synthetic snapshots only. No private repository history, employee files, saved administrator state or administrator tool.

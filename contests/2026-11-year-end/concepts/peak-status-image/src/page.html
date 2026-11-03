@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>תמונת מצב ליום שיא</title>
+<!-- PD-3 (SPEC-PD3): the peak-day status image maker. One offline file: no network, nothing leaves the device. Built by
+     contests/platform/scripts/build-peak-status-image.mjs from src/; edit src/, then rebuild. -->
+<style>
+/*FONTS*/
+:root { --navy:#11152B; --navy-2:#1B2140; --navy-3:#2A3158; --ink:#FFFFFF; --muted:#C9CCDA; --green:#7BC043; --sky:#A9DBFF; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--navy); color: var(--ink); font: 16px/1.45 Simpler, system-ui, Arial, sans-serif; }
+main { max-width: 1100px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; }
+h1 { margin: 0; font-size: 22px; }
+.card { background: var(--navy-2); border-radius: 14px; padding: 14px; display: grid; gap: 10px; min-width: 0; }
+label { display: grid; gap: 4px; font-size: 14px; color: var(--muted); }
+/* accessibility-audit: the field borders are 4.2:1 on the card (WCAG 1.4.11 asks 3:1) */
+input, select, button { font: inherit; color: var(--ink); background: var(--navy); border: 1px solid #7A82AE; border-radius: 8px; padding: 8px 10px; min-width: 0; }
+input:focus-visible, select:focus-visible, button:focus-visible { outline: 3px solid var(--sky); outline-offset: 1px; }
+button { cursor: pointer; background: var(--navy-3); -webkit-user-select: none; user-select: none; }   /* mobile-native: a long press does not select the label */
+button, input, select { touch-action: manipulation; }   /* mobile-native: no double-tap-zoom delay on taps */
+button.main { background: var(--green); color: #0E1A06; border-color: var(--green); font-weight: 700; }
+.row2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.block { border: 1px solid var(--navy-3); border-radius: 12px; padding: 10px; display: grid; gap: 8px; }
+.bhead { display: flex; gap: 8px; flex-wrap: wrap; align-items: end; }
+.bhead input { flex: 1 1 160px; }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; }
+th, td { padding: 4px; text-align: center; }
+thead th { background: var(--navy); font-size: 13px; color: var(--muted); }
+td.team input { background: #22305A; color: var(--sky); font-weight: 700; }
+td input { width: 76px; text-align: center; }
+td.team input { width: 140px; text-align: right; }
+.pct { min-width: 48px; display: inline-block; font-weight: 700; }
+.pct.ok { color: #0E1A06; background: var(--green); border-radius: 6px; padding: 2px 6px; }
+.mhead { display: flex; gap: 4px; align-items: center; justify-content: center; }
+.mhead input { width: 150px; }
+.x { padding: 4px 8px; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; }
+canvas { width: 100%; height: auto; border-radius: 12px; display: block; }
+.muted { color: var(--muted); font-size: 14px; margin: 0; }
+#walink[hidden] { display: none; }
+a { color: var(--sky); }
+</style>
+</head>
+<body>
+<main>
+<h1>תמונת מצב ליום שיא</h1>
+<section class="card" aria-label="פרטים">
+  <div class="row2">
+    <label>כותרת<input id="title"></label>
+    <label>נכון ל־ (תאריך)<input id="date" type="date"></label>
+    <label>שעה<input id="time" type="time"></label>
+  </div>
+  <label>שורת טקסט חופשי<input id="note"></label>
+  <div class="row2">
+    <label>תמונת רקע<select id="stop"></select></label>
+    <label>או קובץ / גלריה / מצלמה<input id="file" type="file" accept="image/*" capture="environment"></label>
+    <label>הכהיית הרקע <span id="darkv"></span><input id="dark" type="range" min="0.86" max="0.95" step="0.01"></label>
+  </div>
+</section>
+<section class="card" aria-label="טבלאות"><div id="blocks"></div><div class="actions"><button id="addBlock">+ טבלה</button></div>
+  <p class="muted">אפשר להדביק מאקסל (כמה שורות ועמודות) לתוך תא יעד או ביצוע. עד 3 מדדים בטבלה. האחוז מחושב לבד; בלי יעד הוא ריק.</p></section>
+<section class="card" aria-label="תמונה">
+  <canvas id="out" role="img" aria-label="תצוגה מקדימה של התמונה"></canvas>
+  <div class="actions">
+    <button class="main" id="png">הורדת תמונה (PNG)</button>
+    <button id="share">שליחה בוואטסאפ</button>
+    <a id="walink" hidden target="_blank" rel="noopener">פתיחת וואטסאפ עם הטקסט</a>
+    <button id="clear">ניקוי</button>
+  </div>
+  <p class="muted">הכול נשאר במכשיר: אין חיבור לרשת, והטיוטה נשמרת רק בדפדפן הזה.</p>
+</section>
+</main>
+<script>/*STOPS*/</script>
+<script>/*APP*/</script>
+</body>
+</html>

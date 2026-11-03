@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="robots" content="noindex, nofollow, noarchive"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>דף הבית של הניהול · דוגמה</title>
+<style>
+@font-face{font-family:"Simpler";src:url("../../../platform/public/fonts/Simpler-Regular.otf");font-weight:400}
+@font-face{font-family:"Simpler";src:url("../../../platform/public/fonts/Simpler-Bold.otf");font-weight:700}
+@font-face{font-family:"Simpler";src:url("../../../platform/public/fonts/Simpler-Black.otf");font-weight:900}
+:root{--navy:#11152B;--navy2:#1c2242;--bg:#EBECED;--card:#fff;--ink:#11152B;--muted:#585b70;--line:#d4d6de;--blue:#00316B;--good:#16704a;--warn:#8a5a00;--bad:#b3261e;--r:16px;--pill:999px;--font:"Simpler","Arial Hebrew",Arial,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.5 var(--font)}
+.demo{background:#F5C342;color:#11152B;font-weight:900;text-align:center;padding:6px 12px;font-size:14px}
+header{background:var(--navy);color:#fff;padding:22px 32px 20px}
+header h1{margin:0;font:900 28px/1.2 var(--font)}header p{margin:6px 0 0;color:#d6d9e8;font-size:16px}
+main{max-width:1280px;margin:0 auto;padding:28px 32px 48px}
+h2{font:900 22px/1.3 var(--font);margin:0 0 4px}.sub{color:var(--muted);margin:0 0 18px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media (max-width:1180px){.grid{grid-template-columns:repeat(2,1fr)}main{padding:24px 24px 40px}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;display:flex;flex-direction:column;gap:10px;min-height:208px;box-shadow:0 1px 2px rgb(32 41 77/.06),0 10px 28px -14px rgb(32 41 77/.22)}
+.top{display:flex;align-items:center;gap:12px}.n{flex:none;width:38px;height:38px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:900}
+.card h3{margin:0;font:900 22px/1.2 var(--font)}.card p{margin:0;color:var(--muted)}
+.status{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;border-radius:var(--pill);padding:3px 12px;font-weight:700;font-size:15px;border:1.5px solid currentColor}
+.ok{color:var(--good)}.miss{color:var(--warn)}.bad{color:var(--bad)}
+.go{margin-top:auto;display:flex;align-items:center;gap:14px}
+.btn{font:700 17px var(--font);background:var(--navy);color:#fff;border:0;border-radius:var(--pill);padding:10px 22px;min-height:44px;cursor:pointer}
+.btn.blue{background:var(--blue)}
+.what{background:none;border:0;color:var(--blue);font:700 15px var(--font);text-decoration:underline;cursor:pointer;min-height:44px}
+.help{display:none;background:#f3f4f8;border-radius:10px;padding:10px 12px;font-size:15px}.card.open .help{display:block}
+.btn:focus-visible,.what:focus-visible,summary:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+details{margin-top:28px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 22px}
+summary{font:900 20px var(--font);cursor:pointer;min-height:44px;display:flex;align-items:center}
+details ul{columns:2;margin:10px 0 0;padding-inline-start:20px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+th,td{padding:9px 14px;text-align:start;border-bottom:1px solid var(--line);font-size:16px}th{background:#f3f4f8;font-weight:900}
+td.old{color:var(--muted);text-decoration:line-through;text-decoration-color:#9a9db0}
+.note{margin-top:28px;color:var(--muted);font-size:15px}
+</style></head><body>
+<div class="demo">דוגמה בלבד · נתוני הדגמה סינתטיים · הניהול לא משתנה</div>
+<header><h1>ניהול התחרות</h1><p>מה צריך לעשות היום? בחרו משימה. כל מה שהיה קיים עדיין כאן, תחת "מתקדם".</p></header>
+<main>
+<h2>המשימות</h2><p class="sub">כל כרטיס מראה בקצרה איפה אתם עומדים. הנתונים מתעדכנים לבד.</p>
+<div class="grid">
+<section class="card"><div class="top"><span class="n">1</span><h3>טעינת נתונים</h3></div><p>מעלים את קבצי המכירות והעובדים של השבוע.</p><span class="status ok">✓ נטען ב-30.10, 14:20</span><div class="help">קובץ אחד עם כל הגיליונות, או כל קובץ בנפרד. מה שנטען קודם מוחלף רק באותו סוג קובץ.</div><div class="go"><button class="btn">פתיחה</button><button class="what" aria-expanded="false">מה זה?</button></div></section>
+<section class="card"><div class="top"><span class="n">2</span><h3>בדיקה</h3></div><p>רואים מה האתר יציג, ומה דורש תשומת לב לפני פרסום.</p><span class="status miss">⚠ 3 אזהרות · 2 שמות לשיוך</span><div class="help">אזהרה לא עוצרת את הפרסום, היא מבקשת מבט. שם שלא זוהה מחכה לבחירה שלכם.</div><div class="go"><button class="btn">פתיחה</button><button class="what" aria-expanded="false">מה זה?</button></div></section>
+<section class="card"><div class="top"><span class="n">3</span><h3>פרסום</h3></div><p>שומרים את האתר, מעדכנים את התיקייה, או מכינים תיקיית העלאה ל-Cloudflare.</p><span class="status ok">✓ הפרסום האחרון: 30.10, 14:35</span><div class="help">הקובץ index.html הוא האתר כולו. תיקיית העלאה היא כל מה שצריך לגרור לאתר האחסון.</div><div class="go"><button class="btn blue">הכנת תיקיית העלאה ל-Cloudflare</button><button class="what" aria-expanded="false">מה זה?</button></div></section>
+<section class="card"><div class="top"><span class="n">4</span><h3>תרחישים (מה אם)</h3></div><p>בודקים מה יקרה אם יעד או נתון ישתנה, בלי לשנות כלום באמת.</p><span class="status ok">✓ אין תרחיש פתוח</span><div class="help">תרחיש הוא עותק לעיון. הוא לא נשמר ולא מתפרסם.</div><div class="go"><button class="btn">פתיחה</button><button class="what" aria-expanded="false">מה זה?</button></div></section>
+<section class="card"><div class="top"><span class="n">5</span><h3>יום שיא</h3></div><p>קובעים את ימי השיא של כל שבוע: תאריך, שם וטקסט.</p><span class="status miss">⚠ שבועות 3 ו-4 בלי יום שיא</span><div class="help">יום שיא נחשף באתר רק כשמגיע השבוע שלו, אלא אם בחרתם לחשוף מראש.</div><div class="go"><button class="btn">פתיחה</button><button class="what" aria-expanded="false">מה זה?</button></div></section>
+<section class="card"><div class="top"><span class="n">6</span><h3>יעדים וחוקים</h3></div><p>עורכים את התקנון ואת היעדים של נובמבר ודצמבר.</p><span class="status bad">חסר: 14 יעדים</span><div class="help">יעד שלא הוזן מוצג באתר כ"טרם נקבע". לא מנחשים ולא ממלאים לבד.</div><div class="go"><button class="btn">פתיחה</button><button class="what" aria-expanded="false">מה זה?</button></div></section>
+</div>
+<details><summary>מתקדם · כל האזורים הקיימים</summary><ul><li>רשימת העובדים</li><li>קבצי התוצאות</li><li>מי מופיע באתר</li><li>השבועות וימי השיא</li><li>שמירת האתר ועדכון התיקייה</li><li>האתר, בזמן אמת</li><li>גיבוי</li><li>שיוך שמות ידני</li><li>העברת מכירות</li><li>יומן שינויים</li></ul></details>
+<h2 style="margin-top:32px">מילים פשוטות · כך זה ייראה</h2><p class="sub">דוגמאות לתרגום מילים טכניות. הרשימה המלאה תהיה במילון קצר.</p>
+<table><thead><tr><th>היה</th><th>יהיה</th><th>מה זה?</th></tr></thead><tbody>
+<tr><td class="old">snapshot</td><td>עותק שמור</td><td>תמונת מצב של האתר ברגע השמירה, לחזרה אחורה.</td></tr>
+<tr><td class="old">KV</td><td>אחסון הנתונים באתר</td><td>המקום שבו האתר שומר את הנתונים שהוא מציג.</td></tr>
+<tr><td class="old">hash</td><td>טביעת אצבע של הקובץ</td><td>מספר שמראה אם קובץ השתנה.</td></tr>
+<tr><td class="old">pepper</td><td>מפתח הצפנה</td><td>סוד שנשמר רק אצלכם ומגן על מי שמופיע באתר.</td></tr>
+<tr><td class="old">token</td><td>קוד גישה</td><td>קוד זמני שמאשר שזה אתם.</td></tr></tbody></table>
+<p class="note">דוגמה בלבד: הנתונים והסטטוסים כאן הומצאו. הכרטיסים רק יקשרו לאזורים הקיימים, בלי לשנות נתונים, אחסון או הצפנה.</p>
+</main>
+<script>document.querySelectorAll('.what').forEach(b=>b.addEventListener('click',()=>{const c=b.closest('.card');const o=c.classList.toggle('open');b.setAttribute('aria-expanded',o)}))</script>
+</body></html>

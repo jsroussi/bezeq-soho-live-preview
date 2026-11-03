@@ -1,0 +1,541 @@
+{
+  "checks": {
+    "frames-9x16": {
+      "ok": true,
+      "frames": 720
+    },
+    "safe-9x16": {
+      "ok": true,
+      "rule": "content only in rows 250–1619",
+      "perShot": {
+        "open": {
+          "top": 283,
+          "bottom": 1536
+        },
+        "weeks": {
+          "top": 283,
+          "bottom": 1544
+        },
+        "tags": {
+          "top": 295,
+          "bottom": 1439
+        },
+        "pass": {
+          "top": 266,
+          "bottom": 1449
+        },
+        "sign-off": {
+          "top": 279,
+          "bottom": 1480
+        }
+      },
+      "badFrames": []
+    },
+    "frames-16x9": {
+      "ok": true,
+      "frames": 720
+    },
+    "logo-cap-9x16": {
+      "ok": true,
+      "frame0Px": 70,
+      "signoffPx": [
+        67,
+        67,
+        67
+      ],
+      "signoffAt": [
+        20.15,
+        20.5,
+        20.95
+      ],
+      "need": 64
+    },
+    "signoff-events-9x16": {
+      "ok": true,
+      "stampContact": {
+        "frame": 585,
+        "want": [
+          555,
+          585
+        ],
+        "ok": true
+      },
+      "logoAppears": {
+        "frame": 600,
+        "want": [
+          600
+        ],
+        "ok": true
+      },
+      "logoFull": {
+        "from": 603,
+        "to": 630,
+        "seconds": 0.933,
+        "need": 0.8,
+        "ok": true
+      },
+      "logoGone": {
+        "frame": 645,
+        "ok": true
+      },
+      "snap": {
+        "frame": 660,
+        "want": [
+          660
+        ],
+        "ok": true
+      },
+      "lineIn": {
+        "frame": 675,
+        "want": [
+          675
+        ],
+        "ok": true
+      },
+      "ring": {
+        "frame": 690,
+        "want": [
+          690
+        ],
+        "ok": true
+      }
+    },
+    "shield-9x16": {
+      "ok": true,
+      "maxWidth": 670,
+      "heightShare": 0.3323,
+      "holds": [
+        {
+          "t": 22.6,
+          "width": 670,
+          "height": 640,
+          "dx": 0,
+          "clipped": false
+        },
+        {
+          "t": 22.9,
+          "width": 670,
+          "height": 638,
+          "dx": 0,
+          "clipped": false
+        },
+        {
+          "t": 23.9,
+          "width": 670,
+          "height": 638,
+          "dx": 0,
+          "clipped": false
+        }
+      ]
+    },
+    "sixty-vs-route-9x16": {
+      "ok": true,
+      "minGapPx": 223.1,
+      "at": 3.566666666666667
+    },
+    "route-visits-stops": {
+      "ok": true,
+      "visits": [
+        {
+          "stop": 1,
+          "offDeg": 0,
+          "at": 30,
+          "ok": true
+        },
+        {
+          "stop": 2,
+          "offDeg": 0,
+          "at": 38,
+          "ok": true
+        },
+        {
+          "stop": 3,
+          "offDeg": 0,
+          "at": 59,
+          "ok": true
+        },
+        {
+          "stop": 4,
+          "offDeg": 0,
+          "at": 143,
+          "ok": true
+        },
+        {
+          "stop": 5,
+          "offDeg": 0,
+          "at": 172,
+          "ok": true
+        },
+        {
+          "stop": 6,
+          "offDeg": 0,
+          "at": 281,
+          "ok": true
+        },
+        {
+          "stop": 7,
+          "offDeg": 0,
+          "at": 367,
+          "ok": true
+        },
+        {
+          "stop": 8,
+          "offDeg": 0,
+          "at": 413,
+          "ok": true
+        },
+        {
+          "stop": 9,
+          "offDeg": 0,
+          "at": 450,
+          "ok": true
+        }
+      ]
+    },
+    "tile-cities-9x16": {
+      "ok": true,
+      "inkPx": [
+        31,
+        30,
+        38,
+        41,
+        37,
+        39,
+        32,
+        42,
+        41
+      ],
+      "need": 28,
+      "at": 13.5
+    },
+    "tile-ticks-9x16": {
+      "ok": true,
+      "firstFrames": [
+        271,
+        278,
+        286,
+        293,
+        301,
+        308,
+        316,
+        323,
+        331
+      ],
+      "tickFrames": [
+        270,
+        277.5,
+        285,
+        292.5,
+        300,
+        307.5,
+        315,
+        322.5,
+        330
+      ]
+    },
+    "deterministic-9x16": {
+      "ok": true,
+      "times": [
+        0,
+        1.5,
+        12,
+        20.5,
+        22.5,
+        23.9
+      ],
+      "run1": [
+        "a8b4c82bbf9e6b5540f46148a5aa1e0f831c944e52edbaeea7c4d03607700fe9",
+        "c42c0c241dac29ac4d2e80698452f3e580a347444817e390301beaaa827c8c28",
+        "25c7592c77d1c5c61341243380030a4e7b19e3d4891e0fb4f7d4cfdea1e54420",
+        "6fb847eff6f981bdbd832a3d6f722ec5645a8569ffdfce52e05b93658e192631",
+        "c2e967d45d2e61567c4e59d2cedee5b27f87ed82583c9767ef44260dd6a12957",
+        "496a7df608d976f304eb471b9241e57ff8e93d97d540109bff257174d1fe284d"
+      ],
+      "run2": [
+        "a8b4c82bbf9e6b5540f46148a5aa1e0f831c944e52edbaeea7c4d03607700fe9",
+        "c42c0c241dac29ac4d2e80698452f3e580a347444817e390301beaaa827c8c28",
+        "25c7592c77d1c5c61341243380030a4e7b19e3d4891e0fb4f7d4cfdea1e54420",
+        "6fb847eff6f981bdbd832a3d6f722ec5645a8569ffdfce52e05b93658e192631",
+        "c2e967d45d2e61567c4e59d2cedee5b27f87ed82583c9767ef44260dd6a12957",
+        "496a7df608d976f304eb471b9241e57ff8e93d97d540109bff257174d1fe284d"
+      ],
+      "fullRender": [
+        "a8b4c82bbf9e6b5540f46148a5aa1e0f831c944e52edbaeea7c4d03607700fe9",
+        "c42c0c241dac29ac4d2e80698452f3e580a347444817e390301beaaa827c8c28",
+        "25c7592c77d1c5c61341243380030a4e7b19e3d4891e0fb4f7d4cfdea1e54420",
+        "6fb847eff6f981bdbd832a3d6f722ec5645a8569ffdfce52e05b93658e192631",
+        "c2e967d45d2e61567c4e59d2cedee5b27f87ed82583c9767ef44260dd6a12957",
+        "496a7df608d976f304eb471b9241e57ff8e93d97d540109bff257174d1fe284d"
+      ]
+    },
+    "logo-cap-16x9": {
+      "ok": true,
+      "frame0Px": 54,
+      "signoffPx": [
+        54,
+        54,
+        54
+      ],
+      "signoffAt": [
+        20.15,
+        20.5,
+        20.95
+      ],
+      "need": 48
+    },
+    "signoff-events-16x9": {
+      "ok": true,
+      "stampContact": {
+        "frame": 585,
+        "want": [
+          555,
+          585
+        ],
+        "ok": true
+      },
+      "logoAppears": {
+        "frame": 600,
+        "want": [
+          600
+        ],
+        "ok": true
+      },
+      "logoFull": {
+        "from": 603,
+        "to": 630,
+        "seconds": 0.933,
+        "need": 0.8,
+        "ok": true
+      },
+      "logoGone": {
+        "frame": 645,
+        "ok": true
+      },
+      "snap": {
+        "frame": 660,
+        "want": [
+          660
+        ],
+        "ok": true
+      },
+      "lineIn": {
+        "frame": 675,
+        "want": [
+          675
+        ],
+        "ok": true
+      },
+      "ring": {
+        "frame": 690,
+        "want": [
+          690
+        ],
+        "ok": true
+      }
+    },
+    "shield-16x9": {
+      "ok": true,
+      "maxWidth": 377,
+      "heightShare": 0.3315,
+      "holds": [
+        {
+          "t": 22.6,
+          "width": 376,
+          "height": 360,
+          "dx": 0,
+          "clipped": false
+        },
+        {
+          "t": 22.9,
+          "width": 376,
+          "height": 358,
+          "dx": 0,
+          "clipped": false
+        },
+        {
+          "t": 23.9,
+          "width": 376,
+          "height": 358,
+          "dx": 0,
+          "clipped": false
+        }
+      ]
+    },
+    "sixty-vs-route-16x9": {
+      "ok": true,
+      "minGapPx": 275.9,
+      "at": 3.9
+    },
+    "tile-cities-16x9": {
+      "ok": true,
+      "inkPx": [
+        28,
+        27,
+        33,
+        35,
+        33,
+        34,
+        28,
+        37,
+        36
+      ],
+      "need": 22,
+      "at": 13.5
+    },
+    "tile-ticks-16x9": {
+      "ok": true,
+      "firstFrames": [
+        271,
+        278,
+        286,
+        293,
+        301,
+        308,
+        316,
+        323,
+        331
+      ],
+      "tickFrames": [
+        270,
+        277.5,
+        285,
+        292.5,
+        300,
+        307.5,
+        315,
+        322.5,
+        330
+      ]
+    },
+    "deterministic-16x9": {
+      "ok": true,
+      "times": [
+        0,
+        1.5,
+        12,
+        20.5,
+        22.5,
+        23.9
+      ],
+      "run1": [
+        "e24521e84344df6870ddda014c4c8a9315f0cb5b1b745033e228aac4f0b3f21c",
+        "ee625717a6938149b87198fa00afec7fd76c87c502e98dbdc270854d6ae6e5da",
+        "f91d990df7f3cfc087eafd7f762335aa4d4c97db238c8896a90a3954687b827a",
+        "6cce8a889b599b24a38262f6be75a313aa5e12b4a4244b28f6784a1ebad2a2cf",
+        "0e5ce86fae4dd79bd47853993bb77a5d31a156e9539279e64496e24fac38a4e3",
+        "cbc594b23cf33215f1a165e75cb36f3835066e73d1903a2db873ca0325a07591"
+      ],
+      "run2": [
+        "e24521e84344df6870ddda014c4c8a9315f0cb5b1b745033e228aac4f0b3f21c",
+        "ee625717a6938149b87198fa00afec7fd76c87c502e98dbdc270854d6ae6e5da",
+        "f91d990df7f3cfc087eafd7f762335aa4d4c97db238c8896a90a3954687b827a",
+        "6cce8a889b599b24a38262f6be75a313aa5e12b4a4244b28f6784a1ebad2a2cf",
+        "0e5ce86fae4dd79bd47853993bb77a5d31a156e9539279e64496e24fac38a4e3",
+        "cbc594b23cf33215f1a165e75cb36f3835066e73d1903a2db873ca0325a07591"
+      ],
+      "fullRender": [
+        "e24521e84344df6870ddda014c4c8a9315f0cb5b1b745033e228aac4f0b3f21c",
+        "ee625717a6938149b87198fa00afec7fd76c87c502e98dbdc270854d6ae6e5da",
+        "f91d990df7f3cfc087eafd7f762335aa4d4c97db238c8896a90a3954687b827a",
+        "6cce8a889b599b24a38262f6be75a313aa5e12b4a4244b28f6784a1ebad2a2cf",
+        "0e5ce86fae4dd79bd47853993bb77a5d31a156e9539279e64496e24fac38a4e3",
+        "cbc594b23cf33215f1a165e75cb36f3835066e73d1903a2db873ca0325a07591"
+      ]
+    },
+    "mp4-9x16": {
+      "ok": true,
+      "duration": "24.000000",
+      "fps": "30/1",
+      "frames": "720",
+      "size": "1080x1920",
+      "audio": "aac 44100 Hz"
+    },
+    "audio-9x16": {
+      "ok": true,
+      "oldPcmSha256": "03bfdb53a391a4dfabdf23fe57835c83037ea7130d7d310df7dbb13688b36ef9",
+      "newPcmSha256": "03bfdb53a391a4dfabdf23fe57835c83037ea7130d7d310df7dbb13688b36ef9"
+    },
+    "mp4-16x9": {
+      "ok": true,
+      "duration": "24.000000",
+      "fps": "30/1",
+      "frames": "720",
+      "size": "1920x1080",
+      "audio": "aac 44100 Hz"
+    },
+    "audio-16x9": {
+      "ok": true,
+      "oldPcmSha256": "03bfdb53a391a4dfabdf23fe57835c83037ea7130d7d310df7dbb13688b36ef9",
+      "newPcmSha256": "03bfdb53a391a4dfabdf23fe57835c83037ea7130d7d310df7dbb13688b36ef9"
+    },
+    "music.mjs-unchanged": {
+      "ok": true,
+      "against": "eff77cb"
+    },
+    "shield-height-share": {
+      "ok": true,
+      "9x16": 0.3323,
+      "16x9": 0.3315
+    }
+  },
+  "frame0-9x16": {
+    "box": [
+      95,
+      474,
+      985,
+      1141
+    ]
+  },
+  "content-9x16": {
+    "open": {
+      "top": 283,
+      "bottom": 1536
+    },
+    "weeks": {
+      "top": 283,
+      "bottom": 1544
+    },
+    "tags": {
+      "top": 295,
+      "bottom": 1439
+    },
+    "pass": {
+      "top": 266,
+      "bottom": 1449
+    },
+    "sign-off": {
+      "top": 279,
+      "bottom": 1480
+    }
+  },
+  "frame0-16x9": {
+    "box": [
+      549,
+      203,
+      1371,
+      760
+    ]
+  },
+  "content-16x9": {
+    "open": {
+      "top": 75,
+      "bottom": 1079
+    },
+    "weeks": {
+      "top": 48,
+      "bottom": 1079
+    },
+    "tags": {
+      "top": 75,
+      "bottom": 1079
+    },
+    "pass": {
+      "top": 75,
+      "bottom": 1079
+    },
+    "sign-off": {
+      "top": 75,
+      "bottom": 1079
+    }
+  }
+}

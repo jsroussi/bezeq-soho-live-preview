@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TERMINAL 60 · סקירה</title>
+<style>
+  /* Bezeq tokens (platform/brand/bezeq-tokens.css) */
+  :root { --bz-blue: #51C6F1; --bz-blue-deep: #00316B; --bz-navy: #16254F; --bz-navy-2: #0B2A5C; --bz-navy-deep: #00204D; --bz-line: #C9CBD6; --bz-white: #FFFFFF; }
+  @font-face { font-family: Simpler; src: url("../../../../platform/public/fonts/Simpler-Regular.otf"); font-weight: 400; }
+  @font-face { font-family: Simpler; src: url("../../../../platform/public/fonts/Simpler-Bold.otf"); font-weight: 700; }
+  @font-face { font-family: Simpler; src: url("../../../../platform/public/fonts/Simpler-Black.otf"); font-weight: 900; }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bz-navy-deep); color: var(--bz-white); font: 400 16px/1.5 Simpler, "Arial Hebrew", Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+  main { max-width: 1100px; margin: 0 auto; padding: 20px 16px 48px; }
+  h1 { font: 900 clamp(30px, 7vw, 52px)/1.05 Simpler, Arial, sans-serif; margin: 8px 0 4px; letter-spacing: -0.01em; }
+  .mark { color: var(--bz-blue); font-weight: 700; font-size: 22px; letter-spacing: .01em; }
+  .mark small { font-weight: 600; font-size: 12px; opacity: .75; margin-inline-start: 8px; }
+  .sub { color: var(--bz-line); margin: 0 0 18px; }
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0; }
+  .tabs button { font: 700 15px/1 Simpler, Arial, sans-serif; color: var(--bz-white); background: var(--bz-navy); border: 1px solid rgb(201 203 214 / .25); border-radius: 999px; padding: 12px 16px; min-height: 44px; cursor: pointer; }
+  .tabs button[aria-pressed="true"] { background: var(--bz-blue); color: var(--bz-navy-deep); border-color: var(--bz-blue); }
+  .player { background: #000; border-radius: 12px; overflow: hidden; display: grid; place-items: center; }
+  .player video { width: 100%; max-height: 78vh; display: block; background: #000; }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px 16px; color: var(--bz-line); font-size: 14px; margin: 10px 0 0; }
+  .meta a { color: var(--bz-blue); }
+  h2 { font: 700 20px/1.2 Simpler, Arial, sans-serif; margin: 28px 0 10px; }
+  .chapters { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+  .chapters button { text-align: start; font: 400 14px/1.3 Simpler, Arial, sans-serif; color: var(--bz-white); background: var(--bz-navy); border: 0; border-radius: 10px; padding: 10px 12px; min-height: 44px; cursor: pointer; }
+  .chapters b { display: block; color: var(--bz-blue); font-weight: 700; direction: ltr; text-align: end; }
+  .posters { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+  .posters img { width: 100%; border-radius: 8px; display: block; background: var(--bz-navy); }
+  .note { background: var(--bz-navy); border-radius: 12px; padding: 14px 16px; color: var(--bz-line); font-size: 15px; }
+  .note strong { color: var(--bz-white); }
+  ul.links { padding-inline-start: 18px; margin: 0; } ul.links a { color: var(--bz-blue); }
+  bdi { unicode-bidi: isolate; }
+</style>
+</head>
+<body>
+<main>
+  <div class="mark">בזק<small>אגף סוהו • חשמל • שירותי דיגיטל</small></div>
+  <h1>TERMINAL 60 · 60 יום מסביב לעולם</h1>
+  <p class="sub">טיזר קולנועי לתחרות <bdi dir="ltr">1.11–31.12.2026</bdi> · גרסה <bdi dir="ltr" id="ver">1.0</bdi></p>
+
+  <div class="tabs" role="group" aria-label="פורמט">
+    <button data-f="0" aria-pressed="true">ראשי 16:9 · 4K</button>
+    <button data-f="1" aria-pressed="false">טלפון 9:16 · 60 שנ׳</button>
+    <button data-f="2" aria-pressed="false">הכרזה 15 שנ׳ · 9:16</button>
+    <button data-f="3" aria-pressed="false">הכרזה 15 שנ׳ · 16:9</button>
+  </div>
+  <div class="player"><video id="v" controls playsinline preload="none"></video></div>
+  <div class="meta" id="meta"></div>
+
+  <h2>פרקים</h2>
+  <div class="chapters" id="chapters"></div>
+
+  <h2>פוסטרים</h2>
+  <div class="posters" id="posters"></div>
+
+  <h2>הערות לסקירה</h2>
+  <div class="note">
+    <p><strong>קבצי הוידאו אינם נשמרים ב-Git.</strong> הם נוצרים מחדש ב-<bdi dir="ltr">scripts/render-all.sh</bdi> ונשמרים בתיקייה <bdi dir="ltr">renders/</bdi> שליד הדף. אם הסרטון לא נטען, הקובץ עוד לא נמצא בעותק הזה.</p>
+    <p>התמונות הן סט הצילומים v3 של האתר. בירושלים: גשר המיתרים. ממרקש, מלאס וגאס ומתמונת הטלפון של ונציה נחתכו מגדל תפילה, שלט עם כיתוב ומגדל פעמונים. הפרסים מופיעים רק כמשפט הטיזר של התחרות.</p>
+    <p>במאסטר 4K כל הטקסט והגרפיקה בחדות 4K מלאה. הצילומים עצמם מגיעים ממקורות ברוחב 1672–2048 פיקסלים ומוגדלים.</p>
+  </div>
+
+  <h2>קבצים</h2>
+  <ul class="links">
+    <li><a href="../README.md">README וקריטריוני הקבלה</a></li>
+    <li><a href="../docs/qa-report.md">דוח QA</a> · <a href="../docs/qa/">פלט ffprobe, ebur128 וגיליונות פריימים</a></li>
+    <li><a href="../docs/storyboard.md">סטוריבורד</a> · <a href="../docs/transition-map.md">מפת מעברים</a> · <a href="../docs/audio-design.md">סאונד</a></li>
+    <li><a href="../flow-handoff/README.md">חבילת Flow (אופציונלית)</a></li>
+  </ul>
+</main>
+<script>
+const F = [
+  { file: 'terminal-60-master-4k-16x9', spec: '3840×2160 · 30fps · H.264 + AAC', ch: 'main' },
+  { file: 'terminal-60-vertical-1080x1920', spec: '1080×1920 · 30fps · H.264 + AAC', ch: 'main' },
+  { file: 'terminal-60-announcement-15s-vertical', spec: '1080×1920 · 15 שנ׳', ch: 'short' },
+  { file: 'terminal-60-announcement-15s-16x9', spec: '1920×1080 · 15 שנ׳', ch: 'short' },
+];
+const CH = {
+  main: [[0, 'האות'], [4, 'נקודת המוצא · חולון'], [9, 'לוח המראות'], [14, 'כרטיס העלייה והחותמת'], [20, 'פריז'], [23, 'ונציה'], [26, 'מרקש'], [29, 'לאס וגאס'], [32, 'קנקון'], [35, 'טוקיו'], [38, 'אתונה'], [41, 'ניו דלהי'], [44, 'ירושלים'], [47, 'התחרות מאיצה'], [52, 'המסלול על הגלובוס'], [55, 'הכותרת']],
+  short: [[0, 'האות'], [1.2, 'לוח המראות'], [3.2, 'כרטיס וחותמת'], [5.6, 'תשעה יעדים'], [11.6, 'הכותרת']],
+};
+const v = document.getElementById('v');
+const show = (i) => {
+  const f = F[i];
+  document.querySelectorAll('.tabs button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.f == i)));
+  v.poster = `poster-${f.file}.jpg`;
+  v.src = `../renders/${f.file}.mp4`;
+  document.getElementById('meta').innerHTML = `<span><bdi dir="ltr">${f.spec}</bdi></span><a href="../renders/${f.file}.mp4" download>הורדה</a><a href="../docs/qa/contact-${f.file}.jpg">גיליון פריימים</a>`;
+  document.getElementById('chapters').innerHTML = CH[f.ch].map(([t, n]) => `<button data-t="${t}"><b>${String(Math.floor(t / 60)).padStart(2, '0')}:${String(Math.floor(t % 60)).padStart(2, '0')}</b>${n}</button>`).join('');
+};
+document.querySelector('.tabs').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) show(+b.dataset.f); });
+document.getElementById('chapters').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; v.currentTime = +b.dataset.t; v.play().catch(() => {}); });
+document.getElementById('posters').innerHTML = F.map((f, i) => `<button style="all:unset;cursor:pointer" data-i="${i}" aria-label="פוסטר"><img src="poster-${f.file}.jpg" alt="" loading="lazy"></button>`).join('');
+document.getElementById('posters').addEventListener('click', (e) => { const b = e.target.closest('[data-i]'); if (b) { show(+b.dataset.i); scrollTo({ top: 0, behavior: 'smooth' }); } });
+show(0);
+</script>
+</body>
+</html>
