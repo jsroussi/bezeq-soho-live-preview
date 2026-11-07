@@ -1,0 +1,262 @@
+{
+  "createdAt": "2026-11-07T14:40:38.976Z",
+  "synthetic": true,
+  "sourceCommit": "bf3136f01a03678d0715dec782e56d14dd743f28",
+  "privateBaseline": "8cabdb47399b1cc2833d3f0316372195140de4a0",
+  "seed": 20261101,
+  "asOf": "2026-11-05",
+  "sourceScope": "Allowlisted UI/build/test overlay only; unchanged private engine/config/helper dependencies required.",
+  "previewURL": "https://jsroussi.github.io/bezeq-soho-live-preview/contests/2026-11-year-end/concepts/live-site/site/",
+  "publication": {
+    "repository": "jsroussi/bezeq-soho-live-preview",
+    "branch": "gh-pages",
+    "directory": "/",
+    "method": "Preview-only reviewed tree, no deletions; latest deployment commit and Pages status recorded in release PR.",
+    "evidenceURL": "https://github.com/jsroussi/bezeq-soho-live-preview/pull/3"
+  },
+  "checks": {
+    "responsive": {
+      "passed": true,
+      "cases": 281
+    },
+    "refinement": {
+      "passed": true,
+      "cases": 18
+    },
+    "calendar": {
+      "passed": true,
+      "cases": 12
+    },
+    "motion": {
+      "passed": true,
+      "cases": 14
+    },
+    "admin": {
+      "passed": true,
+      "cases": 6
+    }
+  },
+  "repositoryTests": {
+    "total": 310,
+    "passed": 309,
+    "failed": 0,
+    "skipped": 1,
+    "skip": "Managed local Chromium blocks file:// polling; real folder writes passed."
+  },
+  "accessibility": [
+    {
+      "role": "public",
+      "violations": [],
+      "incomplete": [
+        "color-contrast",
+        "link-in-text-block"
+      ]
+    },
+    {
+      "role": "rep",
+      "violations": [],
+      "incomplete": [
+        "aria-prohibited-attr",
+        "color-contrast",
+        "link-in-text-block"
+      ]
+    },
+    {
+      "role": "tl",
+      "violations": [],
+      "incomplete": [
+        "aria-prohibited-attr",
+        "color-contrast",
+        "link-in-text-block"
+      ]
+    },
+    {
+      "role": "dept_manager",
+      "violations": [],
+      "incomplete": [
+        "color-contrast",
+        "link-in-text-block"
+      ]
+    },
+    {
+      "role": "division_manager",
+      "violations": [],
+      "incomplete": [
+        "color-contrast",
+        "link-in-text-block"
+      ]
+    },
+    {
+      "role": "admin",
+      "violations": [],
+      "incomplete": [
+        "color-contrast",
+        "link-in-text-block"
+      ]
+    },
+    {
+      "role": "superadmin",
+      "violations": [],
+      "incomplete": [
+        "aria-prohibited-attr",
+        "color-contrast",
+        "link-in-text-block"
+      ]
+    }
+  ],
+  "initialJavaScriptGzipBytes": 73305,
+  "performance": {
+    "at": "2026-11-07T14:40:12.728Z",
+    "conditions": "Local uncompressed HTTP, cold browser cache, 4x CPU throttling, no network throttling, reduced motion. Lab sample only; not field data.",
+    "samples": [
+      {
+        "width": 390,
+        "lcpMs": 1396,
+        "cls": 0.036667335885565054,
+        "domContentLoadedMs": 328,
+        "resources": [
+          {
+            "path": "Simpler-Regular.otf",
+            "transferSize": 73328,
+            "durationMs": 16
+          },
+          {
+            "path": "airlines.css",
+            "transferSize": 65351,
+            "durationMs": 19
+          },
+          {
+            "path": "airlines-route.js",
+            "transferSize": 453,
+            "durationMs": 23
+          },
+          {
+            "path": "airlines-bootstrap.js",
+            "transferSize": 1053,
+            "durationMs": 3
+          },
+          {
+            "path": "airlines-data.js",
+            "transferSize": 399799,
+            "durationMs": 74
+          },
+          {
+            "path": "favicon.svg",
+            "transferSize": 505,
+            "durationMs": 20
+          },
+          {
+            "path": "airlines.js",
+            "transferSize": 157758,
+            "durationMs": 8
+          },
+          {
+            "path": "airlines-chunk-NHA4QZM3.js",
+            "transferSize": 1100,
+            "durationMs": 3
+          },
+          {
+            "path": "paris-phone.webp",
+            "transferSize": 137278,
+            "durationMs": 7
+          },
+          {
+            "path": "paris.webp",
+            "transferSize": 141626,
+            "durationMs": 11
+          },
+          {
+            "path": "Simpler-Black.otf",
+            "transferSize": 66844,
+            "durationMs": 10
+          },
+          {
+            "path": "Simpler-Bold.otf",
+            "transferSize": 82120,
+            "durationMs": 9
+          }
+        ]
+      },
+      {
+        "width": 1440,
+        "lcpMs": 1484,
+        "cls": 0.0021060492537803284,
+        "domContentLoadedMs": 426,
+        "resources": [
+          {
+            "path": "Simpler-Regular.otf",
+            "transferSize": 73328,
+            "durationMs": 14
+          },
+          {
+            "path": "airlines.css",
+            "transferSize": 65351,
+            "durationMs": 10
+          },
+          {
+            "path": "airlines-route.js",
+            "transferSize": 453,
+            "durationMs": 10
+          },
+          {
+            "path": "airlines-bootstrap.js",
+            "transferSize": 1053,
+            "durationMs": 18
+          },
+          {
+            "path": "airlines-data.js",
+            "transferSize": 399799,
+            "durationMs": 45
+          },
+          {
+            "path": "favicon.svg",
+            "transferSize": 505,
+            "durationMs": 6
+          },
+          {
+            "path": "airlines.js",
+            "transferSize": 157758,
+            "durationMs": 46
+          },
+          {
+            "path": "airlines-chunk-NHA4QZM3.js",
+            "transferSize": 1100,
+            "durationMs": 7
+          },
+          {
+            "path": "paris.webp",
+            "transferSize": 141626,
+            "durationMs": 39
+          },
+          {
+            "path": "Simpler-Black.otf",
+            "transferSize": 66844,
+            "durationMs": 9
+          },
+          {
+            "path": "Simpler-Bold.otf",
+            "transferSize": 82120,
+            "durationMs": 10
+          }
+        ]
+      }
+    ]
+  },
+  "runtimeHashes": {
+    "airlines-bootstrap.js": "a0054ef4b591dfe3facee508c518f247da491492539b8496e73e09e6127bb924",
+    "airlines-chunk-NHA4QZM3.js": "6290d9f63097074876503fa52e1d48e282692f2b211a7dfd95122f7b96163db0",
+    "airlines-data.js": "d2243b8c458d1808730b28272956ad1403b4182fb680b3aeafd3e44be9483ca1",
+    "airlines-excel.js": "8ac6d9e9165f0c52dd76a2229b091014b9e5b9c446f954b4792732c8720da48e",
+    "airlines-route.js": "b82c2e6cfe82d958d7d871f40c66987b72a5a8465a38a2e5cd7f315225aba670",
+    "airlines.css": "107a0dbe852f8aea46186be40fc970e39e5edf18c92459a378dcefd14aef5c2e",
+    "airlines.js": "f5d48ebceefdab991ce088b16fe974af7ab23af04a268a958b974dacf8f344ca",
+    "index.html": "9e6cabc3eb76c1c6ce2d81da1719676e0a4362d9bf1e5e21b4d24b716d16a2eb"
+  },
+  "limitations": [
+    "Automated axe scans include incomplete categories requiring human review; not WCAG certification.",
+    "One managed-Chromium file:// polling test skipped; real folder writes passed.",
+    "Live jsroussi.github.io browser navigation is blocked by managed network policy; no published role-navigation or screenshots claimed.",
+    "Synthetic demo authentication and local publishing must be replaced by approved real adapters before private-app integration.",
+    "Existing campaign artwork is reused; no new documentary photography claim."
+  ]
+}

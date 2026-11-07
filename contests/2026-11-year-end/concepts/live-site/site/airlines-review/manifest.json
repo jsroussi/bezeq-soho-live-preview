@@ -1,0 +1,285 @@
+{
+  "sourceCommit": "bf3136f01a03678d0715dec782e56d14dd743f28",
+  "files": [
+    {
+      "name": "DESIGN-SYSTEM.md",
+      "bytes": 1387,
+      "sha256": "a96232477747c17982d9e4f0ab01fe28b5a740330432763026e4660a3a506838"
+    },
+    {
+      "name": "PUBLIC-AUDIT.md",
+      "bytes": 1549,
+      "sha256": "73bb539c14904e33c238949b039ba8cfb93e140daeeb34f307a0f356703b0410"
+    },
+    {
+      "name": "PUBLIC-HANDOFF.md",
+      "bytes": 11047,
+      "sha256": "7d6742ccd30bf2afd68d0ef111224af2a14649ca4c43ad0b61c3cd1fa8509f5d"
+    },
+    {
+      "name": "PUBLIC-SKILLS.md",
+      "bytes": 4858,
+      "sha256": "cd4b3111cb750e2a3e0fd992fadb42f66436d9952748b7b97ae65e6ab27ba6b3"
+    },
+    {
+      "name": "README.md",
+      "bytes": 946,
+      "sha256": "a0103e109b520f0b89c90bf85799136527390da2d631f4ce4a34d1f3f477457b"
+    },
+    {
+      "name": "evidence/admin-report.json",
+      "bytes": 481,
+      "sha256": "bdb8ed0c284f80e2f4d65b8d55137f97d4de528ba5b753df837c1d7f9d4185ed"
+    },
+    {
+      "name": "evidence/calendar-report.json",
+      "bytes": 1047,
+      "sha256": "723206c61695b315c9652fcea2ac61b27cac64a92b801817af911be554c37418"
+    },
+    {
+      "name": "evidence/motion/arrival-1440.png",
+      "bytes": 1229786,
+      "sha256": "58b2bbd9ce1276642d48e022a5b08a96e80e1547ca44c7287a269fe8db457932"
+    },
+    {
+      "name": "evidence/motion/arrival-1440.webm",
+      "bytes": 2712542,
+      "sha256": "5b4e91d19cb519535de86e08bd7927bfe7d7f2e251f7574d28c6e57842f389bc"
+    },
+    {
+      "name": "evidence/motion/arrival-390.png",
+      "bytes": 360820,
+      "sha256": "73053dde898d5e07114e5badd1c1bf00c6776d3bdace6d547c62fc032b4adfa1"
+    },
+    {
+      "name": "evidence/motion/arrival-390.webm",
+      "bytes": 819015,
+      "sha256": "ab1aca33a59e5712aea34a742e05a38effe578e72d58b7c4807cf55d74e69200"
+    },
+    {
+      "name": "evidence/motion/boarding-1440.png",
+      "bytes": 184519,
+      "sha256": "20623189eaccbd3ce145a6656e5be2fed9a344e476adaea4db1ea1813025529c"
+    },
+    {
+      "name": "evidence/motion/boarding-390.png",
+      "bytes": 150537,
+      "sha256": "6d23b1524a4c557db24df40574e776f019ab5dc85d1fa875efbd546fd9fb8adf"
+    },
+    {
+      "name": "evidence/motion-report.json",
+      "bytes": 1289,
+      "sha256": "7c66ff809afb5928f07b86102318b95480db1785ccbff5c16ac2e0a9784f8454"
+    },
+    {
+      "name": "evidence/performance-report.json",
+      "bytes": 3238,
+      "sha256": "7965c4ac053547b038658506ac6e66077e232b13876783b035b53636c011c099"
+    },
+    {
+      "name": "evidence/refinement-report.json",
+      "bytes": 1922,
+      "sha256": "72c9a5445ef8422e2c5f44fb925c49457e9b4a4de47972f85ee06e53d9a6798e"
+    },
+    {
+      "name": "evidence/repository-tests.json",
+      "bytes": 246,
+      "sha256": "d536c00cedbf17de240e80c9fc9d6abca3ddfe719e534b5cea76b5b160feeef5"
+    },
+    {
+      "name": "evidence/responsive-report.json",
+      "bytes": 23236,
+      "sha256": "85e69ba9f3bcecfa9524ea9563777f5374de30dad1a8fe64debcf9f73d53b326"
+    },
+    {
+      "name": "evidence/screenshots/admin-1440.png",
+      "bytes": 158727,
+      "sha256": "c7cec3eb561e446fbeace2b2bee4d46f819d24eb9a496870104129fb41e4c986"
+    },
+    {
+      "name": "evidence/screenshots/admin-390.png",
+      "bytes": 77842,
+      "sha256": "dd92aa5536c5c63caed9f33a9bbfb633353394b45b7fe90dbed361235d493200"
+    },
+    {
+      "name": "evidence/screenshots/dept_manager-1440.png",
+      "bytes": 148343,
+      "sha256": "2ee1bc361662b643d67447bbff0c1179e69debfb53417c13c9d900d435e2094e"
+    },
+    {
+      "name": "evidence/screenshots/dept_manager-390.png",
+      "bytes": 116204,
+      "sha256": "b7f86688989513fb2dea196d69bec662c67a53159932d8d9b937f8cd89ece01d"
+    },
+    {
+      "name": "evidence/screenshots/division_manager-1440.png",
+      "bytes": 251150,
+      "sha256": "c2c2225ef13f39dd99420ccd01db64d275944a1478b4550d858fece83737b579"
+    },
+    {
+      "name": "evidence/screenshots/division_manager-390.png",
+      "bytes": 211435,
+      "sha256": "117566bd46947e440b0cd5106ed61e6014ceec537adb35b9e3fe8bdfc21adb6e"
+    },
+    {
+      "name": "evidence/screenshots/public-1440.png",
+      "bytes": 2094752,
+      "sha256": "da399a8e2d532ee2caea5475d6abfd85d328c8df04150d2076d4bd056c3ee447"
+    },
+    {
+      "name": "evidence/screenshots/public-320.png",
+      "bytes": 619768,
+      "sha256": "c082885259aa7ad5a0e7b1a26384b6b92b2b1e1eb488e67dfcd38f89da382dd9"
+    },
+    {
+      "name": "evidence/screenshots/public-390.png",
+      "bytes": 722790,
+      "sha256": "1a45452ed965ddf3c7d6a27cf539d3784e4145916d0f7f3e941bfe44aec7c638"
+    },
+    {
+      "name": "evidence/screenshots/rep-1440.png",
+      "bytes": 177325,
+      "sha256": "a30c37276571df81987a8a3b8972aeeb7217bf09f6dcab83daa6ad8502cb78e8"
+    },
+    {
+      "name": "evidence/screenshots/rep-390.png",
+      "bytes": 145200,
+      "sha256": "88bf391f4279f154d179373c2bcff6ad330cdb7b4506d42707c9e266e2bb9497"
+    },
+    {
+      "name": "evidence/screenshots/superadmin-1440.png",
+      "bytes": 146585,
+      "sha256": "eb649f6e1c9e5067cb3536206d0400f1293e2ef61d4d381b86ad7e29f29b6133"
+    },
+    {
+      "name": "evidence/screenshots/superadmin-390.png",
+      "bytes": 102010,
+      "sha256": "09c13e528a4d33c9cc5a797380392fde4ef362cd3b59ce8242449f290b6797af"
+    },
+    {
+      "name": "evidence/screenshots/tl-1440.png",
+      "bytes": 156297,
+      "sha256": "a3fb5604d2bad18a60a3f0b2354fcd3308a48eac2a9a5bc5784bc74ef71da3e1"
+    },
+    {
+      "name": "evidence/screenshots/tl-390.png",
+      "bytes": 120276,
+      "sha256": "ffb79f2536651796d9f5a41ce0872168d1bcff2f18bb9f3264d2e20fb617a428"
+    },
+    {
+      "name": "release.json",
+      "bytes": 7396,
+      "sha256": "b3756296a3d83b5d7b3f5925030605b3e9c0e93c05a765f46c27fa620b766006"
+    },
+    {
+      "name": "source/contests/platform/scripts/build-airlines-preview.mjs",
+      "bytes": 14181,
+      "sha256": "109e9e4366bf0f4270287c06ec118ac3f98dfb95e0ad70c330ac5f97a8c24d44"
+    },
+    {
+      "name": "source/contests/platform/scripts/check-airlines-admin.mjs",
+      "bytes": 9004,
+      "sha256": "6b54cd7cb6fb54d4561421986273582b7ae13c9b5aabcc874eafdbdacbe71ab9"
+    },
+    {
+      "name": "source/contests/platform/scripts/check-airlines-calendar.mjs",
+      "bytes": 3559,
+      "sha256": "8805537cabab5a58b2a984276654c59471b318f7c90bba93df1b15e4598d501b"
+    },
+    {
+      "name": "source/contests/platform/scripts/check-airlines-motion.mjs",
+      "bytes": 6140,
+      "sha256": "07c4eee5dff3317a290cf0ed4a046e0085f69ea845f4ee4325d7aae07f604e34"
+    },
+    {
+      "name": "source/contests/platform/scripts/check-airlines-preview.mjs",
+      "bytes": 9710,
+      "sha256": "03c03df072bf96cec68323ab894b33523c815b68ef0c5e23a4e380e86dd0f172"
+    },
+    {
+      "name": "source/contests/platform/scripts/check-airlines-refinement.mjs",
+      "bytes": 13289,
+      "sha256": "93c93f82eabf85223aa3b6aa33a9bf4c3b9654f1858ab712211062059fa15e44"
+    },
+    {
+      "name": "source/contests/platform/scripts/measure-airlines-performance.mjs",
+      "bytes": 2111,
+      "sha256": "4453bbf7776db2c7b587df72a5006b0625c909b135d61a06ceb445551f8af74e"
+    },
+    {
+      "name": "source/contests/platform/scripts/package-airlines-review.mjs",
+      "bytes": 9672,
+      "sha256": "5afddb5900d57d065e29ba8754250a69ca77cd5706e8d2aceda5fe9e561dcf4a"
+    },
+    {
+      "name": "source/contests/platform/scripts/verify-airlines-live.mjs",
+      "bytes": 1384,
+      "sha256": "87fb327719cae614a807e38a7ef2c4cc21cd23962b660395b0ead6333de793b7"
+    },
+    {
+      "name": "source/contests/platform/site/src/airlines/activity.js",
+      "bytes": 4689,
+      "sha256": "3dd1a5caf4f1efcdc2885c4ac4714cae0dc3783ea4465f28802cc96442167c37"
+    },
+    {
+      "name": "source/contests/platform/site/src/airlines/admin.css",
+      "bytes": 10547,
+      "sha256": "51a61a7eb7c70cba58658aa9f3b407ba8ba5db01beb7760caf02729489e7ddfc"
+    },
+    {
+      "name": "source/contests/platform/site/src/airlines/admin.js",
+      "bytes": 27850,
+      "sha256": "18c4ceb6b216640e93cbc0bb5e52926483509b1cce9e021fda983818b9a85a65"
+    },
+    {
+      "name": "source/contests/platform/site/src/airlines/excel.js",
+      "bytes": 55,
+      "sha256": "8f266b2585c882ddd835786269de55085c514664d1986bd06fa55f71502626b4"
+    },
+    {
+      "name": "source/contests/platform/site/src/airlines/main.js",
+      "bytes": 50032,
+      "sha256": "f1b90822b32658973acdfb91773b061b749aa91676f9a88c91edef66582f6ba0"
+    },
+    {
+      "name": "source/contests/platform/site/src/airlines/model.js",
+      "bytes": 3606,
+      "sha256": "cd21bd30b69a471eee89b63daa24313691a2f6781d2c79d9855958f13844ffb3"
+    },
+    {
+      "name": "source/contests/platform/site/src/airlines/motion.js",
+      "bytes": 6361,
+      "sha256": "8aa32574b99dc8dcc7f4776788ca1e81cb3fb0b81a11ffd486b9058ac84eca7f"
+    },
+    {
+      "name": "source/contests/platform/site/src/airlines/styles.css",
+      "bytes": 54961,
+      "sha256": "089680394b0cae108031ab422967baff493ddd26d969d3760168533b206ea661"
+    },
+    {
+      "name": "source/contests/platform/site/src/airlines/ui.js",
+      "bytes": 3172,
+      "sha256": "da12f73f6625e0fb69e01d43827a06ce8c2cfd181bb3be59caf0d15d730969ce"
+    },
+    {
+      "name": "source/contests/platform/test/airlines-activity.test.js",
+      "bytes": 4330,
+      "sha256": "e2a5a381d615586b3d692a6a1f14b86729bce8d1c9ad105a2e90e2e513832de3"
+    },
+    {
+      "name": "source/contests/platform/test/airlines-data.test.js",
+      "bytes": 2166,
+      "sha256": "eb439d8fbd97d44d325c9b1fb49e2e3763131b514a464e2498e4f8f80020ad34"
+    },
+    {
+      "name": "source/contests/platform/test/airlines-model.test.js",
+      "bytes": 1799,
+      "sha256": "876de838a28b1dbd743ea3e122a0ecb159309778a276b158ecff7127b9460555"
+    },
+    {
+      "name": "source.patch",
+      "bytes": 244544,
+      "sha256": "07280e1214e47ff8647b1ee9be3acd13d2259b14fa5b491725aaef941e4134cd"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+# Refinement audit and corrections
+
+High: initial Excel dependency loaded for every visitor; split into an on-demand retryable module. Mobile participant columns overlapped after quantities were added; seven cells now have explicit grid positions and a geometry regression check. Pale quantity text on the white boarding pass failed contrast; corrected and rescanned.
+
+Medium: quantities were not visible beside stamps; added raw, separately labeled units throughout six roles. Pending ranks exported as numbers; unified pending text. Empty configured units looked like real zero performance; explicit pending state and optional empty-unit filter. Loaded/configured team counts were ambiguous; now separate. Long rankings lacked pagination; added 25-row pages with complete filtered exports. Full browser storage could prevent same-visit recalculation; validated memory state now drives publication. Mobile admin controls crowded the first action; compact progressive disclosure. Known monthly actuals were concealed by missing targets; shown separately. Menu focus and route cleanup refined.
+
+No critical/high issue remains in the verified synthetic runtime. Automated accessibility is not certification. No production business-rule audit or production authorization change is implied. Existing legacy material is preserved separately. Division pages remain relatively long; native file-picker text follows browser locale. Public browser verification is blocked by the environment network policy; deployment evidence is recorded in the release PR.

@@ -1,0 +1,1227 @@
+{
+  "startedAt": "2026-11-07T14:37:19.719Z",
+  "synthetic": true,
+  "checks": [
+    {
+      "id": "motion-no-preference",
+      "passed": true
+    },
+    {
+      "id": "motion-reduce",
+      "passed": true
+    },
+    {
+      "id": "public-320",
+      "passed": true
+    },
+    {
+      "id": "public-routes-320",
+      "passed": true
+    },
+    {
+      "id": "login-errors-keyboard-320",
+      "passed": true
+    },
+    {
+      "id": "public-console-320",
+      "passed": true
+    },
+    {
+      "id": "rep-dashboard-320",
+      "passed": true
+    },
+    {
+      "id": "rep-navigation-320",
+      "passed": true
+    },
+    {
+      "id": "rep-ranking-search-filter-details-320",
+      "passed": true
+    },
+    {
+      "id": "rep-permission-320",
+      "passed": true
+    },
+    {
+      "id": "rep-console-320",
+      "passed": true
+    },
+    {
+      "id": "tl-dashboard-320",
+      "passed": true
+    },
+    {
+      "id": "tl-navigation-320",
+      "passed": true
+    },
+    {
+      "id": "tl-ranking-search-filter-details-320",
+      "passed": true
+    },
+    {
+      "id": "tl-permission-320",
+      "passed": true
+    },
+    {
+      "id": "tl-console-320",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-dashboard-320",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-navigation-320",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-ranking-search-filter-details-320",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-permission-320",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-console-320",
+      "passed": true
+    },
+    {
+      "id": "division_manager-dashboard-320",
+      "passed": true
+    },
+    {
+      "id": "division_manager-navigation-320",
+      "passed": true
+    },
+    {
+      "id": "division_manager-ranking-search-filter-details-320",
+      "passed": true
+    },
+    {
+      "id": "division_manager-permission-320",
+      "passed": true
+    },
+    {
+      "id": "division_manager-console-320",
+      "passed": true
+    },
+    {
+      "id": "admin-dashboard-320",
+      "passed": true
+    },
+    {
+      "id": "admin-navigation-320",
+      "passed": true
+    },
+    {
+      "id": "admin-ranking-search-filter-details-320",
+      "passed": true
+    },
+    {
+      "id": "admin-permission-320",
+      "passed": true
+    },
+    {
+      "id": "admin-console-320",
+      "passed": true
+    },
+    {
+      "id": "superadmin-dashboard-320",
+      "passed": true
+    },
+    {
+      "id": "superadmin-navigation-320",
+      "passed": true
+    },
+    {
+      "id": "superadmin-ranking-search-filter-details-320",
+      "passed": true
+    },
+    {
+      "id": "superadmin-permission-320",
+      "passed": true
+    },
+    {
+      "id": "superadmin-console-320",
+      "passed": true
+    },
+    {
+      "id": "public-360",
+      "passed": true
+    },
+    {
+      "id": "public-routes-360",
+      "passed": true
+    },
+    {
+      "id": "login-errors-keyboard-360",
+      "passed": true
+    },
+    {
+      "id": "public-console-360",
+      "passed": true
+    },
+    {
+      "id": "rep-dashboard-360",
+      "passed": true
+    },
+    {
+      "id": "rep-navigation-360",
+      "passed": true
+    },
+    {
+      "id": "rep-ranking-search-filter-details-360",
+      "passed": true
+    },
+    {
+      "id": "rep-permission-360",
+      "passed": true
+    },
+    {
+      "id": "rep-console-360",
+      "passed": true
+    },
+    {
+      "id": "tl-dashboard-360",
+      "passed": true
+    },
+    {
+      "id": "tl-navigation-360",
+      "passed": true
+    },
+    {
+      "id": "tl-ranking-search-filter-details-360",
+      "passed": true
+    },
+    {
+      "id": "tl-permission-360",
+      "passed": true
+    },
+    {
+      "id": "tl-console-360",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-dashboard-360",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-navigation-360",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-ranking-search-filter-details-360",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-permission-360",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-console-360",
+      "passed": true
+    },
+    {
+      "id": "division_manager-dashboard-360",
+      "passed": true
+    },
+    {
+      "id": "division_manager-navigation-360",
+      "passed": true
+    },
+    {
+      "id": "division_manager-ranking-search-filter-details-360",
+      "passed": true
+    },
+    {
+      "id": "division_manager-permission-360",
+      "passed": true
+    },
+    {
+      "id": "division_manager-console-360",
+      "passed": true
+    },
+    {
+      "id": "admin-dashboard-360",
+      "passed": true
+    },
+    {
+      "id": "admin-navigation-360",
+      "passed": true
+    },
+    {
+      "id": "admin-ranking-search-filter-details-360",
+      "passed": true
+    },
+    {
+      "id": "admin-permission-360",
+      "passed": true
+    },
+    {
+      "id": "admin-console-360",
+      "passed": true
+    },
+    {
+      "id": "superadmin-dashboard-360",
+      "passed": true
+    },
+    {
+      "id": "superadmin-navigation-360",
+      "passed": true
+    },
+    {
+      "id": "superadmin-ranking-search-filter-details-360",
+      "passed": true
+    },
+    {
+      "id": "superadmin-permission-360",
+      "passed": true
+    },
+    {
+      "id": "superadmin-console-360",
+      "passed": true
+    },
+    {
+      "id": "public-390",
+      "passed": true
+    },
+    {
+      "id": "public-routes-390",
+      "passed": true
+    },
+    {
+      "id": "login-errors-keyboard-390",
+      "passed": true
+    },
+    {
+      "id": "public-console-390",
+      "passed": true
+    },
+    {
+      "id": "rep-dashboard-390",
+      "passed": true
+    },
+    {
+      "id": "rep-navigation-390",
+      "passed": true
+    },
+    {
+      "id": "rep-ranking-search-filter-details-390",
+      "passed": true
+    },
+    {
+      "id": "rep-permission-390",
+      "passed": true
+    },
+    {
+      "id": "rep-console-390",
+      "passed": true
+    },
+    {
+      "id": "tl-dashboard-390",
+      "passed": true
+    },
+    {
+      "id": "tl-navigation-390",
+      "passed": true
+    },
+    {
+      "id": "tl-ranking-search-filter-details-390",
+      "passed": true
+    },
+    {
+      "id": "tl-permission-390",
+      "passed": true
+    },
+    {
+      "id": "tl-console-390",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-dashboard-390",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-navigation-390",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-ranking-search-filter-details-390",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-permission-390",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-console-390",
+      "passed": true
+    },
+    {
+      "id": "division_manager-dashboard-390",
+      "passed": true
+    },
+    {
+      "id": "division_manager-navigation-390",
+      "passed": true
+    },
+    {
+      "id": "division_manager-ranking-search-filter-details-390",
+      "passed": true
+    },
+    {
+      "id": "division_manager-permission-390",
+      "passed": true
+    },
+    {
+      "id": "division_manager-console-390",
+      "passed": true
+    },
+    {
+      "id": "admin-dashboard-390",
+      "passed": true
+    },
+    {
+      "id": "admin-navigation-390",
+      "passed": true
+    },
+    {
+      "id": "admin-ranking-search-filter-details-390",
+      "passed": true
+    },
+    {
+      "id": "admin-permission-390",
+      "passed": true
+    },
+    {
+      "id": "admin-console-390",
+      "passed": true
+    },
+    {
+      "id": "superadmin-dashboard-390",
+      "passed": true
+    },
+    {
+      "id": "superadmin-navigation-390",
+      "passed": true
+    },
+    {
+      "id": "superadmin-ranking-search-filter-details-390",
+      "passed": true
+    },
+    {
+      "id": "superadmin-permission-390",
+      "passed": true
+    },
+    {
+      "id": "superadmin-console-390",
+      "passed": true
+    },
+    {
+      "id": "public-430",
+      "passed": true
+    },
+    {
+      "id": "public-routes-430",
+      "passed": true
+    },
+    {
+      "id": "login-errors-keyboard-430",
+      "passed": true
+    },
+    {
+      "id": "public-console-430",
+      "passed": true
+    },
+    {
+      "id": "rep-dashboard-430",
+      "passed": true
+    },
+    {
+      "id": "rep-navigation-430",
+      "passed": true
+    },
+    {
+      "id": "rep-ranking-search-filter-details-430",
+      "passed": true
+    },
+    {
+      "id": "rep-permission-430",
+      "passed": true
+    },
+    {
+      "id": "rep-console-430",
+      "passed": true
+    },
+    {
+      "id": "tl-dashboard-430",
+      "passed": true
+    },
+    {
+      "id": "tl-navigation-430",
+      "passed": true
+    },
+    {
+      "id": "tl-ranking-search-filter-details-430",
+      "passed": true
+    },
+    {
+      "id": "tl-permission-430",
+      "passed": true
+    },
+    {
+      "id": "tl-console-430",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-dashboard-430",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-navigation-430",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-ranking-search-filter-details-430",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-permission-430",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-console-430",
+      "passed": true
+    },
+    {
+      "id": "division_manager-dashboard-430",
+      "passed": true
+    },
+    {
+      "id": "division_manager-navigation-430",
+      "passed": true
+    },
+    {
+      "id": "division_manager-ranking-search-filter-details-430",
+      "passed": true
+    },
+    {
+      "id": "division_manager-permission-430",
+      "passed": true
+    },
+    {
+      "id": "division_manager-console-430",
+      "passed": true
+    },
+    {
+      "id": "admin-dashboard-430",
+      "passed": true
+    },
+    {
+      "id": "admin-navigation-430",
+      "passed": true
+    },
+    {
+      "id": "admin-ranking-search-filter-details-430",
+      "passed": true
+    },
+    {
+      "id": "admin-permission-430",
+      "passed": true
+    },
+    {
+      "id": "admin-console-430",
+      "passed": true
+    },
+    {
+      "id": "superadmin-dashboard-430",
+      "passed": true
+    },
+    {
+      "id": "superadmin-navigation-430",
+      "passed": true
+    },
+    {
+      "id": "superadmin-ranking-search-filter-details-430",
+      "passed": true
+    },
+    {
+      "id": "superadmin-permission-430",
+      "passed": true
+    },
+    {
+      "id": "superadmin-console-430",
+      "passed": true
+    },
+    {
+      "id": "public-768",
+      "passed": true
+    },
+    {
+      "id": "public-routes-768",
+      "passed": true
+    },
+    {
+      "id": "login-errors-keyboard-768",
+      "passed": true
+    },
+    {
+      "id": "public-console-768",
+      "passed": true
+    },
+    {
+      "id": "rep-dashboard-768",
+      "passed": true
+    },
+    {
+      "id": "rep-navigation-768",
+      "passed": true
+    },
+    {
+      "id": "rep-ranking-search-filter-details-768",
+      "passed": true
+    },
+    {
+      "id": "rep-permission-768",
+      "passed": true
+    },
+    {
+      "id": "rep-console-768",
+      "passed": true
+    },
+    {
+      "id": "tl-dashboard-768",
+      "passed": true
+    },
+    {
+      "id": "tl-navigation-768",
+      "passed": true
+    },
+    {
+      "id": "tl-ranking-search-filter-details-768",
+      "passed": true
+    },
+    {
+      "id": "tl-permission-768",
+      "passed": true
+    },
+    {
+      "id": "tl-console-768",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-dashboard-768",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-navigation-768",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-ranking-search-filter-details-768",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-permission-768",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-console-768",
+      "passed": true
+    },
+    {
+      "id": "division_manager-dashboard-768",
+      "passed": true
+    },
+    {
+      "id": "division_manager-navigation-768",
+      "passed": true
+    },
+    {
+      "id": "division_manager-ranking-search-filter-details-768",
+      "passed": true
+    },
+    {
+      "id": "division_manager-permission-768",
+      "passed": true
+    },
+    {
+      "id": "division_manager-console-768",
+      "passed": true
+    },
+    {
+      "id": "admin-dashboard-768",
+      "passed": true
+    },
+    {
+      "id": "admin-navigation-768",
+      "passed": true
+    },
+    {
+      "id": "admin-ranking-search-filter-details-768",
+      "passed": true
+    },
+    {
+      "id": "admin-permission-768",
+      "passed": true
+    },
+    {
+      "id": "admin-console-768",
+      "passed": true
+    },
+    {
+      "id": "superadmin-dashboard-768",
+      "passed": true
+    },
+    {
+      "id": "superadmin-navigation-768",
+      "passed": true
+    },
+    {
+      "id": "superadmin-ranking-search-filter-details-768",
+      "passed": true
+    },
+    {
+      "id": "superadmin-permission-768",
+      "passed": true
+    },
+    {
+      "id": "superadmin-console-768",
+      "passed": true
+    },
+    {
+      "id": "public-1024",
+      "passed": true
+    },
+    {
+      "id": "public-routes-1024",
+      "passed": true
+    },
+    {
+      "id": "login-errors-keyboard-1024",
+      "passed": true
+    },
+    {
+      "id": "public-console-1024",
+      "passed": true
+    },
+    {
+      "id": "rep-dashboard-1024",
+      "passed": true
+    },
+    {
+      "id": "rep-navigation-1024",
+      "passed": true
+    },
+    {
+      "id": "rep-ranking-search-filter-details-1024",
+      "passed": true
+    },
+    {
+      "id": "rep-permission-1024",
+      "passed": true
+    },
+    {
+      "id": "rep-console-1024",
+      "passed": true
+    },
+    {
+      "id": "tl-dashboard-1024",
+      "passed": true
+    },
+    {
+      "id": "tl-navigation-1024",
+      "passed": true
+    },
+    {
+      "id": "tl-ranking-search-filter-details-1024",
+      "passed": true
+    },
+    {
+      "id": "tl-permission-1024",
+      "passed": true
+    },
+    {
+      "id": "tl-console-1024",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-dashboard-1024",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-navigation-1024",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-ranking-search-filter-details-1024",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-permission-1024",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-console-1024",
+      "passed": true
+    },
+    {
+      "id": "division_manager-dashboard-1024",
+      "passed": true
+    },
+    {
+      "id": "division_manager-navigation-1024",
+      "passed": true
+    },
+    {
+      "id": "division_manager-ranking-search-filter-details-1024",
+      "passed": true
+    },
+    {
+      "id": "division_manager-permission-1024",
+      "passed": true
+    },
+    {
+      "id": "division_manager-console-1024",
+      "passed": true
+    },
+    {
+      "id": "admin-dashboard-1024",
+      "passed": true
+    },
+    {
+      "id": "admin-navigation-1024",
+      "passed": true
+    },
+    {
+      "id": "admin-ranking-search-filter-details-1024",
+      "passed": true
+    },
+    {
+      "id": "admin-permission-1024",
+      "passed": true
+    },
+    {
+      "id": "admin-console-1024",
+      "passed": true
+    },
+    {
+      "id": "superadmin-dashboard-1024",
+      "passed": true
+    },
+    {
+      "id": "superadmin-navigation-1024",
+      "passed": true
+    },
+    {
+      "id": "superadmin-ranking-search-filter-details-1024",
+      "passed": true
+    },
+    {
+      "id": "superadmin-permission-1024",
+      "passed": true
+    },
+    {
+      "id": "superadmin-console-1024",
+      "passed": true
+    },
+    {
+      "id": "public-1440",
+      "passed": true
+    },
+    {
+      "id": "public-routes-1440",
+      "passed": true
+    },
+    {
+      "id": "login-errors-keyboard-1440",
+      "passed": true
+    },
+    {
+      "id": "public-console-1440",
+      "passed": true
+    },
+    {
+      "id": "rep-dashboard-1440",
+      "passed": true
+    },
+    {
+      "id": "rep-navigation-1440",
+      "passed": true
+    },
+    {
+      "id": "rep-ranking-search-filter-details-1440",
+      "passed": true
+    },
+    {
+      "id": "rep-permission-1440",
+      "passed": true
+    },
+    {
+      "id": "rep-console-1440",
+      "passed": true
+    },
+    {
+      "id": "tl-dashboard-1440",
+      "passed": true
+    },
+    {
+      "id": "tl-navigation-1440",
+      "passed": true
+    },
+    {
+      "id": "tl-ranking-search-filter-details-1440",
+      "passed": true
+    },
+    {
+      "id": "tl-permission-1440",
+      "passed": true
+    },
+    {
+      "id": "tl-console-1440",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-dashboard-1440",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-navigation-1440",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-ranking-search-filter-details-1440",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-permission-1440",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-console-1440",
+      "passed": true
+    },
+    {
+      "id": "division_manager-dashboard-1440",
+      "passed": true
+    },
+    {
+      "id": "division_manager-navigation-1440",
+      "passed": true
+    },
+    {
+      "id": "division_manager-ranking-search-filter-details-1440",
+      "passed": true
+    },
+    {
+      "id": "division_manager-permission-1440",
+      "passed": true
+    },
+    {
+      "id": "division_manager-console-1440",
+      "passed": true
+    },
+    {
+      "id": "admin-dashboard-1440",
+      "passed": true
+    },
+    {
+      "id": "admin-navigation-1440",
+      "passed": true
+    },
+    {
+      "id": "admin-ranking-search-filter-details-1440",
+      "passed": true
+    },
+    {
+      "id": "admin-permission-1440",
+      "passed": true
+    },
+    {
+      "id": "admin-console-1440",
+      "passed": true
+    },
+    {
+      "id": "superadmin-dashboard-1440",
+      "passed": true
+    },
+    {
+      "id": "superadmin-navigation-1440",
+      "passed": true
+    },
+    {
+      "id": "superadmin-ranking-search-filter-details-1440",
+      "passed": true
+    },
+    {
+      "id": "superadmin-permission-1440",
+      "passed": true
+    },
+    {
+      "id": "superadmin-console-1440",
+      "passed": true
+    },
+    {
+      "id": "public-1920",
+      "passed": true
+    },
+    {
+      "id": "public-routes-1920",
+      "passed": true
+    },
+    {
+      "id": "login-errors-keyboard-1920",
+      "passed": true
+    },
+    {
+      "id": "public-console-1920",
+      "passed": true
+    },
+    {
+      "id": "rep-dashboard-1920",
+      "passed": true
+    },
+    {
+      "id": "rep-navigation-1920",
+      "passed": true
+    },
+    {
+      "id": "rep-ranking-search-filter-details-1920",
+      "passed": true
+    },
+    {
+      "id": "rep-permission-1920",
+      "passed": true
+    },
+    {
+      "id": "rep-console-1920",
+      "passed": true
+    },
+    {
+      "id": "tl-dashboard-1920",
+      "passed": true
+    },
+    {
+      "id": "tl-navigation-1920",
+      "passed": true
+    },
+    {
+      "id": "tl-ranking-search-filter-details-1920",
+      "passed": true
+    },
+    {
+      "id": "tl-permission-1920",
+      "passed": true
+    },
+    {
+      "id": "tl-console-1920",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-dashboard-1920",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-navigation-1920",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-ranking-search-filter-details-1920",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-permission-1920",
+      "passed": true
+    },
+    {
+      "id": "dept_manager-console-1920",
+      "passed": true
+    },
+    {
+      "id": "division_manager-dashboard-1920",
+      "passed": true
+    },
+    {
+      "id": "division_manager-navigation-1920",
+      "passed": true
+    },
+    {
+      "id": "division_manager-ranking-search-filter-details-1920",
+      "passed": true
+    },
+    {
+      "id": "division_manager-permission-1920",
+      "passed": true
+    },
+    {
+      "id": "division_manager-console-1920",
+      "passed": true
+    },
+    {
+      "id": "admin-dashboard-1920",
+      "passed": true
+    },
+    {
+      "id": "admin-navigation-1920",
+      "passed": true
+    },
+    {
+      "id": "admin-ranking-search-filter-details-1920",
+      "passed": true
+    },
+    {
+      "id": "admin-permission-1920",
+      "passed": true
+    },
+    {
+      "id": "admin-console-1920",
+      "passed": true
+    },
+    {
+      "id": "superadmin-dashboard-1920",
+      "passed": true
+    },
+    {
+      "id": "superadmin-navigation-1920",
+      "passed": true
+    },
+    {
+      "id": "superadmin-ranking-search-filter-details-1920",
+      "passed": true
+    },
+    {
+      "id": "superadmin-permission-1920",
+      "passed": true
+    },
+    {
+      "id": "superadmin-console-1920",
+      "passed": true
+    },
+    {
+      "id": "axe-public",
+      "passed": true
+    },
+    {
+      "id": "axe-rep",
+      "passed": true
+    },
+    {
+      "id": "axe-tl",
+      "passed": true
+    },
+    {
+      "id": "axe-dept_manager",
+      "passed": true
+    },
+    {
+      "id": "axe-division_manager",
+      "passed": true
+    },
+    {
+      "id": "axe-admin",
+      "passed": true
+    },
+    {
+      "id": "axe-superadmin",
+      "passed": true
+    }
+  ],
+  "browser": "Chromium",
+  "widths": [
+    320,
+    360,
+    390,
+    430,
+    768,
+    1024,
+    1440,
+    1920
+  ],
+  "screenshots": [
+    "public-320.png",
+    "public-390.png",
+    "rep-390.png",
+    "tl-390.png",
+    "dept_manager-390.png",
+    "division_manager-390.png",
+    "admin-390.png",
+    "superadmin-390.png",
+    "public-1440.png",
+    "rep-1440.png",
+    "tl-1440.png",
+    "dept_manager-1440.png",
+    "division_manager-1440.png",
+    "admin-1440.png",
+    "superadmin-1440.png"
+  ],
+  "axe": [
+    {
+      "role": "public",
+      "violations": [],
+      "incomplete": [
+        "color-contrast",
+        "link-in-text-block"
+      ]
+    },
+    {
+      "role": "rep",
+      "violations": [],
+      "incomplete": [
+        "aria-prohibited-attr",
+        "color-contrast",
+        "link-in-text-block"
+      ]
+    },
+    {
+      "role": "tl",
+      "violations": [],
+      "incomplete": [
+        "aria-prohibited-attr",
+        "color-contrast",
+        "link-in-text-block"
+      ]
+    },
+    {
+      "role": "dept_manager",
+      "violations": [],
+      "incomplete": [
+        "color-contrast",
+        "link-in-text-block"
+      ]
+    },
+    {
+      "role": "division_manager",
+      "violations": [],
+      "incomplete": [
+        "color-contrast",
+        "link-in-text-block"
+      ]
+    },
+    {
+      "role": "admin",
+      "violations": [],
+      "incomplete": [
+        "color-contrast",
+        "link-in-text-block"
+      ]
+    },
+    {
+      "role": "superadmin",
+      "violations": [],
+      "incomplete": [
+        "aria-prohibited-attr",
+        "color-contrast",
+        "link-in-text-block"
+      ]
+    }
+  ],
+  "buildHashes": {
+    "index.html": "9e6cabc3eb76c1c6ce2d81da1719676e0a4362d9bf1e5e21b4d24b716d16a2eb",
+    "airlines.js": "f5d48ebceefdab991ce088b16fe974af7ab23af04a268a958b974dacf8f344ca",
+    "airlines.css": "107a0dbe852f8aea46186be40fc970e39e5edf18c92459a378dcefd14aef5c2e",
+    "airlines-data.js": "d2243b8c458d1808730b28272956ad1403b4182fb680b3aeafd3e44be9483ca1"
+  },
+  "finishedAt": "2026-11-07T14:40:20.181Z",
+  "passed": true
+}

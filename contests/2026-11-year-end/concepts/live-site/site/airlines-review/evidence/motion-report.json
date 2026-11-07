@@ -1,0 +1,66 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "id": "cinematic-390",
+      "passed": true
+    },
+    {
+      "id": "reduced-motion-390",
+      "passed": true
+    },
+    {
+      "id": "keyboard-cancels-390",
+      "passed": true
+    },
+    {
+      "id": "preference-change-390",
+      "passed": true
+    },
+    {
+      "id": "journey-cleanup-390",
+      "passed": true
+    },
+    {
+      "id": "boarding-pass-390",
+      "passed": true
+    },
+    {
+      "id": "admin-no-replay-390",
+      "passed": true
+    },
+    {
+      "id": "cinematic-1440",
+      "passed": true
+    },
+    {
+      "id": "reduced-motion-1440",
+      "passed": true
+    },
+    {
+      "id": "keyboard-cancels-1440",
+      "passed": true
+    },
+    {
+      "id": "preference-change-1440",
+      "passed": true
+    },
+    {
+      "id": "journey-cleanup-1440",
+      "passed": true
+    },
+    {
+      "id": "boarding-pass-1440",
+      "passed": true
+    },
+    {
+      "id": "admin-no-replay-1440",
+      "passed": true
+    }
+  ],
+  "buildHashes": {
+    "airlines.js": "f5d48ebceefdab991ce088b16fe974af7ab23af04a268a958b974dacf8f344ca",
+    "airlines.css": "107a0dbe852f8aea46186be40fc970e39e5edf18c92459a378dcefd14aef5c2e",
+    "airlines-data.js": "d2243b8c458d1808730b28272956ad1403b4182fb680b3aeafd3e44be9483ca1"
+  }
+}
