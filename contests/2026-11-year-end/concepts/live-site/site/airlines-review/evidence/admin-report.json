@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "id": "admin-full-flow-390",
+      "passed": true
+    },
+    {
+      "id": "admin-console-390",
+      "passed": true
+    },
+    {
+      "id": "superadmin-access-config-audit-390",
+      "passed": true
+    },
+    {
+      "id": "admin-full-flow-1440",
+      "passed": true
+    },
+    {
+      "id": "admin-console-1440",
+      "passed": true
+    },
+    {
+      "id": "superadmin-access-config-audit-1440",
+      "passed": true
+    }
+  ]
+}

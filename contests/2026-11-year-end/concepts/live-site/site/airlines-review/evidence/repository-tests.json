@@ -1,0 +1,10 @@
+{
+  "source": "e3fd4e28367db5ddddbf092f8c7b9d08bc0ff379",
+  "repositoryTests": {
+    "total": 310,
+    "passed": 309,
+    "failed": 0,
+    "skipped": 1,
+    "skip": "Managed local Chromium blocks file:// polling; real folder writes passed."
+  }
+}

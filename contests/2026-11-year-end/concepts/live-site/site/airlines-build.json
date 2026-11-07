@@ -1,8 +1,17 @@
 {
-  "sourceCommit": "c2f4f002a429c85826cd021ffc4707e92591cefa",
+  "sourceCommit": "bf3136f01a03678d0715dec782e56d14dd743f28",
   "synthetic": true,
   "seed": 20261101,
   "asOf": "2026-11-05",
   "people": 60,
-  "scope": "contests/2026-11-year-end/concepts/live-site/site"
+  "scope": "contests/2026-11-year-end/concepts/live-site/site",
+  "initialJavaScriptGzipBytes": 73305,
+  "initialScripts": [
+    "airlines-data.js",
+    "airlines-bootstrap.js",
+    "airlines-route.js",
+    "airlines.js",
+    "airlines-chunk-NHA4QZM3.js"
+  ],
+  "lazyExcel": "airlines-excel.js"
 }

@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "id": "before",
+      "asOf": "2026-10-31",
+      "passed": true
+    },
+    {
+      "id": "paris",
+      "asOf": "2026-11-03",
+      "passed": true
+    },
+    {
+      "id": "milan",
+      "asOf": "2026-11-10",
+      "passed": true
+    },
+    {
+      "id": "weekend",
+      "asOf": "2026-11-14",
+      "passed": true
+    },
+    {
+      "id": "marrakech",
+      "asOf": "2026-11-17",
+      "passed": true
+    },
+    {
+      "id": "vegas",
+      "asOf": "2026-11-24",
+      "passed": true
+    },
+    {
+      "id": "cancun",
+      "asOf": "2026-12-01",
+      "passed": true
+    },
+    {
+      "id": "tokyo",
+      "asOf": "2026-12-08",
+      "passed": true
+    },
+    {
+      "id": "athens",
+      "asOf": "2026-12-15",
+      "passed": true
+    },
+    {
+      "id": "delhi",
+      "asOf": "2026-12-22",
+      "passed": true
+    },
+    {
+      "id": "jerusalem",
+      "asOf": "2026-12-29",
+      "passed": true
+    },
+    {
+      "id": "after",
+      "asOf": "2027-01-01",
+      "passed": true
+    }
+  ]
+}
