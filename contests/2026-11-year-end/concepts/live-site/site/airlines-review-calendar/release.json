@@ -1,0 +1,74 @@
+{
+  "synthetic": true,
+  "sourceCommit": "9a4212932cae3dad7b55550e6762a4a810967d2b",
+  "baseline": "83880b6cb1d3e65d726e577163e4d9960a1071b6",
+  "resultsAsOf": "2026-11-05",
+  "calendarThroughAtBuild": "2026-11-08",
+  "checks": {
+    "responsive": {
+      "passed": true,
+      "cases": 281,
+      "mode": "Historical results-date display replay"
+    },
+    "mobile": {
+      "passed": true,
+      "cases": 21,
+      "mode": "Historical results-date display replay"
+    },
+    "refinement": {
+      "passed": true,
+      "cases": 18,
+      "mode": "Historical results-date display replay"
+    },
+    "admin": {
+      "passed": true,
+      "cases": 6,
+      "mode": "Historical results-date display replay"
+    },
+    "calendar": {
+      "passed": true,
+      "cases": 12,
+      "mode": "Historical results-date display replay"
+    },
+    "motion": {
+      "passed": true,
+      "cases": 14,
+      "mode": "Historical results-date display replay"
+    },
+    "independentCalendar": {
+      "passed": true,
+      "cases": 25,
+      "mode": "Actual calendar channel and controlled trusted-channel transitions"
+    }
+  },
+  "repositoryTests": {
+    "total": 334,
+    "passed": 333,
+    "failed": 0,
+    "skipped": 1,
+    "skip": "Managed local Chromium blocks file:// polling; real folder writes passed."
+  },
+  "runtimeHashes": {
+    "airlines-bootstrap.js": "d1087bf78967684b59fc49949f2bd3633a2657033d2953e0ea8c7694c0588812",
+    "airlines-build.json": "847ef127829334dabb980e452b15df7228d0677d28b42e7f9986bf9212d36469",
+    "airlines-calendar.js": "b088d2a12721d7310db76d087f652f5d34a5b757c910ba082122972e9ed3e6e5",
+    "airlines-chunk-NHA4QZM3.js": "6290d9f63097074876503fa52e1d48e282692f2b211a7dfd95122f7b96163db0",
+    "airlines-data.js": "a6687b4e1f12d8c9bd8b0b59a43935f26b81c71c1afe811a6a440255dd53fad9",
+    "airlines-excel.js": "8ac6d9e9165f0c52dd76a2229b091014b9e5b9c446f954b4792732c8720da48e",
+    "airlines-route.js": "b82c2e6cfe82d958d7d871f40c66987b72a5a8465a38a2e5cd7f315225aba670",
+    "airlines.css": "603bdcdf810f39e228c609bce8f482980dd2fdebeea754bda147538ef56ce3a3",
+    "airlines.js": "5c5417eedd343e6e5332139a0779c44af1575b5b57b8565b0825d4662cc5af41",
+    "index.html": "5a86ba092b7d4899d12043d8807df78a810156dbd38c7f14366db54ece05ae91"
+  },
+  "mutableAfterRelease": [
+    "airlines-calendar.js",
+    "airlines-calendar-status.json"
+  ],
+  "publication": "Preview-only gh-pages; exact deployment and automation evidence recorded in the release PR.",
+  "limitations": [
+    "Synthetic preview only; production and Claude legacy unchanged.",
+    "GitHub cron is best effort: up to 15 minutes plus scheduler/build/cache delays.",
+    "Live Pages browser verification remains subject to the environment domain policy.",
+    "No scheduled automation claim until its first actual run succeeds."
+  ]
+}
