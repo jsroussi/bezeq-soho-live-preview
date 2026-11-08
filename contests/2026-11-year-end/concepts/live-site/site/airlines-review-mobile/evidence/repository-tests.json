@@ -1,0 +1,11 @@
+{
+  "source": "a8ff45b81b253696cb24c116b80b2efa85d98db8",
+  "note": "Repository suite ran on the mobile implementation. Subsequent changes add keyboard focus/arrow scrolling to the itinerary and adjust motion QA/handoff only; all browser suites rerun on the final artifact identified by airlines-build.json.",
+  "repositoryTests": {
+    "total": 310,
+    "passed": 309,
+    "failed": 0,
+    "skipped": 1,
+    "skip": "Managed local Chromium blocks file:// polling; real folder writes passed."
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "at": "2026-11-08T07:08:33.730Z",
+  "conditions": "Local uncompressed HTTP, cold browser cache, 4x CPU throttling, no network throttling, reduced motion. Lab sample only; not field data.",
+  "samples": [
+    {
+      "width": 390,
+      "lcpMs": 844,
+      "cls": 0.0011013928458372903,
+      "domContentLoadedMs": 258,
+      "resources": [
+        {
+          "path": "Simpler-Regular.otf",
+          "transferSize": 73328,
+          "durationMs": 26
+        },
+        {
+          "path": "airlines.css",
+          "transferSize": 78442,
+          "durationMs": 25
+        },
+        {
+          "path": "airlines-route.js",
+          "transferSize": 453,
+          "durationMs": 28
+        },
+        {
+          "path": "airlines-bootstrap.js",
+          "transferSize": 1053,
+          "durationMs": 6
+        },
+        {
+          "path": "airlines-data.js",
+          "transferSize": 399799,
+          "durationMs": 10
+        },
+        {
+          "path": "favicon.svg",
+          "transferSize": 505,
+          "durationMs": 85
+        },
+        {
+          "path": "airlines.js",
+          "transferSize": 163333,
+          "durationMs": 21
+        },
+        {
+          "path": "airlines-chunk-NHA4QZM3.js",
+          "transferSize": 1100,
+          "durationMs": 10
+        },
+        {
+          "path": "paris-phone.webp",
+          "transferSize": 137278,
+          "durationMs": 6
+        },
+        {
+          "path": "paris.webp",
+          "transferSize": 141626,
+          "durationMs": 3
+        },
+        {
+          "path": "Simpler-Bold.otf",
+          "transferSize": 82120,
+          "durationMs": 5
+        },
+        {
+          "path": "Simpler-Black.otf",
+          "transferSize": 66844,
+          "durationMs": 4
+        }
+      ]
+    },
+    {
+      "width": 1440,
+      "lcpMs": 772,
+      "cls": 0.0021060492537803284,
+      "domContentLoadedMs": 209,
+      "resources": [
+        {
+          "path": "Simpler-Regular.otf",
+          "transferSize": 73328,
+          "durationMs": 12
+        },
+        {
+          "path": "airlines.css",
+          "transferSize": 78442,
+          "durationMs": 9
+        },
+        {
+          "path": "airlines-route.js",
+          "transferSize": 453,
+          "durationMs": 9
+        },
+        {
+          "path": "airlines-bootstrap.js",
+          "transferSize": 1053,
+          "durationMs": 26
+        },
+        {
+          "path": "airlines-data.js",
+          "transferSize": 399799,
+          "durationMs": 8
+        },
+        {
+          "path": "favicon.svg",
+          "transferSize": 505,
+          "durationMs": 7
+        },
+        {
+          "path": "airlines.js",
+          "transferSize": 163333,
+          "durationMs": 23
+        },
+        {
+          "path": "airlines-chunk-NHA4QZM3.js",
+          "transferSize": 1100,
+          "durationMs": 3
+        },
+        {
+          "path": "paris.webp",
+          "transferSize": 141626,
+          "durationMs": 3
+        },
+        {
+          "path": "Simpler-Black.otf",
+          "transferSize": 66844,
+          "durationMs": 4
+        },
+        {
+          "path": "Simpler-Bold.otf",
+          "transferSize": 82120,
+          "durationMs": 3
+        }
+      ]
+    }
+  ]
+}
