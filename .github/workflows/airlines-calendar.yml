@@ -1,0 +1,36 @@
+name: Publish Airlines calendar
+
+on:
+  schedule:
+    # UTC schedule; Israel calendar date is computed by the publisher.
+    - cron: '*/15 * * 11,12 *'
+    - cron: '*/15 21-23 31 10 *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: airlines-calendar-preview
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.repository == 'jsroussi/bezeq-soho-live-preview' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out approved automation only
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+          sparse-checkout: automation/airlines-calendar
+      - name: Publish revealed calendar and request legacy Pages build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node --version
+          node automation/airlines-calendar/publish.mjs
