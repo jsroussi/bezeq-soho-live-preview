@@ -1,0 +1,205 @@
+{
+  "sourceCommit": "9a4212932cae3dad7b55550e6762a4a810967d2b",
+  "files": [
+    {
+      "name": "CALENDAR-AUTOMATION.md",
+      "bytes": 5286,
+      "sha256": "a02b0f2c976955a593444dbf54b31b1a2566c533a5a97bf40d7988d6781babc1"
+    },
+    {
+      "name": "README.md",
+      "bytes": 1613,
+      "sha256": "37738bd0a9e038ec2cae8c58de5ed9d730998e1d6c24700a6d10325d197b3bbd"
+    },
+    {
+      "name": "evidence/accessibility-check.mjs",
+      "bytes": 3091,
+      "sha256": "e7f7bc7265b3812c0617be68a27bf778f6b091d29cc3faf79ab928de5d8b5ba5"
+    },
+    {
+      "name": "evidence/admin.json",
+      "bytes": 481,
+      "sha256": "bdb8ed0c284f80e2f4d65b8d55137f97d4de528ba5b753df837c1d7f9d4185ed"
+    },
+    {
+      "name": "evidence/calendar.json",
+      "bytes": 1047,
+      "sha256": "723206c61695b315c9652fcea2ac61b27cac64a92b801817af911be554c37418"
+    },
+    {
+      "name": "evidence/independentCalendar.json",
+      "bytes": 2526,
+      "sha256": "0b598675bdadeb384ebd2f2716c678df106c863562ea9a4fbf40b02eead44ea8"
+    },
+    {
+      "name": "evidence/mobile.json",
+      "bytes": 2019,
+      "sha256": "ad473fa93bac2575675781c33029beb43b3bf20059dc0395aca8fb34b2c9e562"
+    },
+    {
+      "name": "evidence/motion.json",
+      "bytes": 1289,
+      "sha256": "60c10075054d67148eb660e5ccfdd5513a17071fd7ce1e7291caa7c7acadc575"
+    },
+    {
+      "name": "evidence/refinement.json",
+      "bytes": 1922,
+      "sha256": "c1901d289859c5fd6bf62e3ed3de0bb3bfa2feb1ad502e6c9e7be75b6d34c93e"
+    },
+    {
+      "name": "evidence/repository-tests.json",
+      "bytes": 717,
+      "sha256": "deba619ddb275b60e5ec0c4cbbde90a723a1b23a146b5a81141e4ca76cb27855"
+    },
+    {
+      "name": "evidence/repository-tests.log",
+      "bytes": 34915,
+      "sha256": "81f11d07c330ce3a2ca4c2c6955e269a45924fc36ffba70157152543a2620299"
+    },
+    {
+      "name": "evidence/responsive.json",
+      "bytes": 23628,
+      "sha256": "f5e4a6dad288b0ad0fa9ef9b446d6a5aa81d791adf6d887edd7d9409ba280483"
+    },
+    {
+      "name": "evidence/screenshots/admin-calendar-1440.png",
+      "bytes": 88617,
+      "sha256": "0b1c8b09d6bf8ea1018229ca8bd406dd4170675e9a7037234c15d6153f6106b6"
+    },
+    {
+      "name": "evidence/screenshots/admin-calendar-390.png",
+      "bytes": 50716,
+      "sha256": "9dfc9d724d5b513771ee74027fe78ede2d43a14459c020617912c8ad1de324ec"
+    },
+    {
+      "name": "evidence/screenshots/current-milan-1440.png",
+      "bytes": 1402359,
+      "sha256": "4564796b4be0c4f1ad42b78abae88fc9c838af10f087b5e5292f1a7e6e15a6ef"
+    },
+    {
+      "name": "evidence/screenshots/current-milan-390.png",
+      "bytes": 271521,
+      "sha256": "dded5e86e36a5fca8ef766dc335b4c1181f0b8e153e93432cf5c87cf41fc2baf"
+    },
+    {
+      "name": "evidence/screenshots/midnight-milan.png",
+      "bytes": 271521,
+      "sha256": "dded5e86e36a5fca8ef766dc335b4c1181f0b8e153e93432cf5c87cf41fc2baf"
+    },
+    {
+      "name": "evidence/screenshots/rep-calendar-1440.png",
+      "bytes": 106908,
+      "sha256": "a17fb843bdc31648e8502c285db3512dcbdb23ef3f90ee2b87d10070094559cd"
+    },
+    {
+      "name": "evidence/screenshots/rep-calendar-390.png",
+      "bytes": 179984,
+      "sha256": "ffffc280ea90688d6bbf3eae1a70025736ad5ac7ecf8515c2f3e21fbd178cf27"
+    },
+    {
+      "name": "release.json",
+      "bytes": 2811,
+      "sha256": "f2f7a61aa8357f6e088863cfb48392034f4a7649d41c71eaae24dc4e75402a30"
+    },
+    {
+      "name": "source/contests/platform/scripts/airlines-calendar-publish.mjs",
+      "bytes": 16563,
+      "sha256": "1d965caa0e5d9b36a8358637e8c48e53e7524c4a0471185ca09593a841cefd86"
+    },
+    {
+      "name": "source/contests/platform/scripts/airlines-calendar-source.json",
+      "bytes": 2225,
+      "sha256": "c962fbea1b451f57194c4b472582f2f5c89c1e2e358ef12c61e25384f863f831"
+    },
+    {
+      "name": "source/contests/platform/scripts/airlines-calendar.workflow.yml",
+      "bytes": 1019,
+      "sha256": "3b9770ab69bd492312fb087b78e2e3c6174ca6163a42c462124f0f9400941166"
+    },
+    {
+      "name": "source/contests/platform/scripts/build-airlines-preview.mjs",
+      "bytes": 15484,
+      "sha256": "5edcef1332ebf6e5329825e6d7d1f0d4142d4aa5a548916a109d721c3e714d97"
+    },
+    {
+      "name": "source/contests/platform/scripts/check-airlines-admin.mjs",
+      "bytes": 9125,
+      "sha256": "6b6da0707536a0779116ad2d87d610843494ec8e8dedc1b7ee56f1ed5c72240e"
+    },
+    {
+      "name": "source/contests/platform/scripts/check-airlines-calendar-live.mjs",
+      "bytes": 11827,
+      "sha256": "86c634e592e0a0711ef4bb5277fb03faf2396b629190d322cfe36e2e0467568a"
+    },
+    {
+      "name": "source/contests/platform/scripts/check-airlines-calendar.mjs",
+      "bytes": 3663,
+      "sha256": "1d2afe7dbcf92d513113538d2496b2226d39887cba84c0ac2d7d2ef786a0753e"
+    },
+    {
+      "name": "source/contests/platform/scripts/check-airlines-mobile.mjs",
+      "bytes": 11064,
+      "sha256": "99ee83da3769bd01c09845a58b7b6b9ad2a36bd38b3dd4f1bee7e437a08b12a1"
+    },
+    {
+      "name": "source/contests/platform/scripts/check-airlines-motion.mjs",
+      "bytes": 6282,
+      "sha256": "bb30e5619b473eb1ebb41f2706fc9a7bc37e37680578e3afb8b477aad65b6355"
+    },
+    {
+      "name": "source/contests/platform/scripts/check-airlines-preview.mjs",
+      "bytes": 10019,
+      "sha256": "a623bf10ce406a2bc9306f84afd1e7fd097ae11f5864e09c2705d378509fbaa7"
+    },
+    {
+      "name": "source/contests/platform/scripts/check-airlines-refinement.mjs",
+      "bytes": 13458,
+      "sha256": "662c2e094a9c4cdc76eff1773125e8cb77ba6a870b3aaa7ef68f686eafa6e356"
+    },
+    {
+      "name": "source/contests/platform/scripts/package-airlines-calendar-review.mjs",
+      "bytes": 6535,
+      "sha256": "8f715b392d371f4a2121025462a99111bf536be27a012875d6ae99168ac16560"
+    },
+    {
+      "name": "source/contests/platform/site/src/airlines/calendar-model.js",
+      "bytes": 8997,
+      "sha256": "2e5c0563d1f8d552d2be860a26e64a25f9b8d7077fd6c2f5684aa10629257421"
+    },
+    {
+      "name": "source/contests/platform/site/src/airlines/calendar.js",
+      "bytes": 2552,
+      "sha256": "e7bd43082e2dbaf152bad37c63f9f07cf44b8d2f4efc32c20e0213eed4da06eb"
+    },
+    {
+      "name": "source/contests/platform/site/src/airlines/main.js",
+      "bytes": 57607,
+      "sha256": "d60e36ace8f8a24331e0c1a97a5ce61017d2361dc6e160836326aa1baa200e8c"
+    },
+    {
+      "name": "source/contests/platform/site/src/airlines/styles.css",
+      "bytes": 55123,
+      "sha256": "2f8f38498a84456d1313243f028557095a90139623c269312a90b78b3b64b6ee"
+    },
+    {
+      "name": "source/contests/platform/test/airlines-calendar-model.test.js",
+      "bytes": 8057,
+      "sha256": "4ccf59bf57c70214653b5ac6e54d03c0d70f0c35371382f0e2bb87d5499658be"
+    },
+    {
+      "name": "source/contests/platform/test/airlines-calendar-publish.test.js",
+      "bytes": 20094,
+      "sha256": "1bc98282c03a55e909519a74c26de89caec9441ca6e9af04cc7cfd669e2501c5"
+    },
+    {
+      "name": "source/contests/platform/test/browser/airlines-calendar-replay.mjs",
+      "bytes": 1286,
+      "sha256": "1e06897a39ecd0818047c87c5ac488d3852b482500679c2a540156f382f91d76"
+    },
+    {
+      "name": "source.patch",
+      "bytes": 172461,
+      "sha256": "cd4f5ac322f3354d32e565965086c844e8c4ecf422d8aea52cea911f25f7a599"
+    }
+  ]
+}

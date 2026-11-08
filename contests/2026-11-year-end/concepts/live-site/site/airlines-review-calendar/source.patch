@@ -1,0 +1,1184 @@
+diff --git a/contests/platform/scripts/airlines-calendar-publish.mjs b/contests/platform/scripts/airlines-calendar-publish.mjs
+new file mode 100644
+index 0000000..280038b
+--- /dev/null
++++ b/contests/platform/scripts/airlines-calendar-publish.mjs
+@@ -0,0 +1,219 @@
++// Calendar-only publisher for the explicitly approved public, synthetic preview.
++import {createHash} from 'node:crypto';
++import {fileURLToPath} from 'node:url';
++import {calendarPacket,israelDate} from '../site/src/airlines/calendar-model.js';
++
++export const TARGET_REPOSITORY='jsroussi/bezeq-soho-live-preview';
++export const TARGET_BRANCH='gh-pages';
++export const SITE_PREFIX='contests/2026-11-year-end/concepts/live-site/site';
++export const FEED_PATH=SITE_PREFIX+'/airlines-calendar.js';
++export const STATUS_PATH=SITE_PREFIX+'/airlines-calendar-status.json';
++export const SOURCE_COMMIT='e1c467fed2279429056badba987a13140a4caa21';
++export const SOURCE_TREE='a4139fd6fbfc7f5bd5ffe77213545e1d89109e72';
++export const SOURCE_PATH=SITE_PREFIX+'/demo-data/week-9.js';
++const PHOTO_PREFIX='contests/2026-11-year-end/site-photos/web/';
++const PERIOD={start:'2026-11-01',end:'2026-12-31'};
++const PLACES={paris:['PARIS','CDG'],milan:['MILAN','MXP'],marrakech:['MARRAKECH','RAK'],'las-vegas':['LAS VEGAS','LAS'],cancun:['CANCUN','CUN'],tokyo:['TOKYO','HND'],athens:['ATHENS','ATH'],'new-delhi':['NEW DELHI','DEL'],jerusalem:['JERUSALEM','TLV']};
++const shaPattern=/^[0-9a-f]{40}$/;
++const assert=(condition,message)=>{if(!condition)throw new Error(message);};
++export const gitBlobSha=text=>createHash('sha1').update('blob '+Buffer.byteLength(text)+'\0').update(text).digest('hex');
++
++// JSON.parse only: even a valid assignment followed by executable code is rejected.
++export function parsePinnedCatalog(text){
++ assert(typeof text==='string'&&text.length<8_000_000,'Invalid pinned source size');
++ const match=/^\s*window\.CONTEST\s*=\s*(\{[\s\S]*\})\s*;?\s*$/.exec(text);
++ assert(match,'Pinned source must be a JSON assignment');
++ let source;try{source=JSON.parse(match[1]);}catch{throw new Error('Pinned source contains invalid JSON');}
++ assert(source?.provenance?.synthetic===true,'Pinned source is not explicitly synthetic');
++ assert(source.contest?.start===PERIOD.start&&source.contest?.end===PERIOD.end,'Pinned calendar period mismatch');
++ assert(Array.isArray(source.stops)&&source.stops.length===9,'Pinned source must contain nine stops');
++ const ids=Object.keys(PLACES);
++ const stops=source.stops.map((s,i)=>{
++  assert(s&&s.id===ids[i]&&typeof s.he==='string'&&s.he.length>0&&typeof s.country==='string','Pinned destination metadata missing');
++  const expectedStart=new Date(Date.UTC(2026,10,1+i*7)).toISOString().slice(0,10);
++  const expectedEnd=new Date(Date.UTC(2026,10,5+i*7)).toISOString().slice(0,10);
++  assert(s.start===expectedStart&&s.end===expectedEnd,'Pinned destination dates mismatch');
++  assert(s.photo===s.id&&/^[a-z]+(?:-[a-z]+)*$/.test(s.photo),'Pinned image name invalid');
++  assert(typeof s.look==='string'&&typeof s.line==='string'&&Array.isArray(s.palette)&&s.palette.length===4&&s.palette.every(c=>/^#[0-9a-f]{6}$/i.test(c))&&/^#[0-9a-f]{6}$/i.test(s.accent),'Pinned theme metadata invalid');
++  assert(s.landmark&&typeof s.landmark.kind==='string'&&typeof s.landmark.name==='string','Pinned landmark metadata missing');
++  // Deliberately never project people, source identifiers, results, prizes or rules.
++  const landmark=s.id==='las-vegas'?{kind:'fountains',name:'מזרקות בלאג׳יו'}:s.id==='cancun'?{kind:'pier',name:'מזח ודקלים'}:{kind:s.landmark.kind,name:s.landmark.name};
++  return {id:s.id,he:s.he,country:s.country,start:s.start,end:s.end,dial:s.dial??null,ll:s.ll??null,tz:s.tz??null,look:s.look,photo:s.photo,line:s.line,palette:[...s.palette],accent:s.accent,landmark,en:PLACES[s.id][0],airport:PLACES[s.id][1],photoExt:'webp',focus:'center 43%',peaks:[]};
++ });
++ return {period:{...PERIOD},stops};
++}
++
++export function feedSource(packet){
++ return 'window.AIRLINES_CALENDAR='+JSON.stringify(packet).replaceAll('<','\\u003c')+";window.dispatchEvent(new CustomEvent('airlines:calendar',{detail:window.AIRLINES_CALENDAR}));\n";
++}
++export function parseFeed(text){
++ const match=/^window\.AIRLINES_CALENDAR=(\{[^\n]*\});window\.dispatchEvent\(new CustomEvent\('airlines:calendar',\{detail:window\.AIRLINES_CALENDAR\}\)\);\n?$/.exec(text);
++ assert(match,'Existing calendar feed format is invalid');
++ let packet;try{packet=JSON.parse(match[1]);}catch{throw new Error('Existing calendar feed JSON is invalid');}
++ assert(packet?.schema===1&&packet.synthetic===true&&packet.channel==='bezeq-airlines-calendar'&&packet.timeZone==='Asia/Jerusalem'&&/^\d{4}-\d{2}-\d{2}$/.test(packet.publishedThrough)&&packet.publishedThrough>='2026-10-31'&&packet.publishedThrough<='2027-01-01','Existing calendar feed identity is invalid');
++ return packet;
++}
++
++export function parseStatus(text){
++ assert(typeof text==='string'&&text.length<4096,'Existing calendar status size invalid');
++ let status;try{status=JSON.parse(text);}catch{throw new Error('Existing calendar status JSON invalid');}
++ const fields=['schema','synthetic','timeZone','publishedThrough','sourceCommit','origin','publishedAt','runId'];
++ assert(status&&typeof status==='object'&&!Array.isArray(status)&&Object.keys(status).every(key=>fields.includes(key)),'Existing calendar status fields invalid');
++ assert(status.schema===1&&status.synthetic===true&&status.timeZone==='Asia/Jerusalem'&&status.sourceCommit===SOURCE_COMMIT&&status.origin==='github-actions-calendar','Existing calendar status identity invalid');
++ assert(/^\d{4}-\d{2}-\d{2}$/.test(status.publishedThrough)&&status.publishedThrough>='2026-10-31'&&status.publishedThrough<='2027-01-01','Existing calendar status date invalid');
++ const instant=new Date(status.publishedAt);
++ assert(typeof status.publishedAt==='string'&&Number.isFinite(instant.getTime())&&instant.toISOString()===status.publishedAt,'Existing calendar status time invalid');
++ assert(israelDate(instant)===status.publishedThrough,'Existing calendar status time/date mismatch');
++ assert(!Object.hasOwn(status,'runId')||typeof status.runId==='string'&&/^\d{1,30}$/.test(status.runId),'Existing calendar status run ID invalid');
++ return status;
++}
++
++function treeMap(tree){
++ assert(tree&&!tree.truncated&&Array.isArray(tree.tree),'Complete Git tree required');
++ const map=new Map();
++ for(const entry of tree.tree){assert(typeof entry.path==='string'&&!map.has(entry.path)&&shaPattern.test(entry.sha),'Invalid Git tree entry');map.set(entry.path,entry);}
++ return map;
++}
++const sameEntry=(a,b)=>a?.sha===b?.sha&&a?.mode===b?.mode&&a?.type===b?.type;
++export function planPublication({packet,sourceTree,targetTree,existingFeed,existingStatus,now,runId}){
++ const source=treeMap(sourceTree),target=treeMap(targetTree),content=feedSource(packet),sha=gitBlobSha(content),entries=[];
++ let previousStatus;
++ if(target.has(FEED_PATH)){
++  const feed=target.get(FEED_PATH);assert(feed.type==='blob'&&feed.mode==='100644','Existing calendar feed mode invalid');
++  assert(typeof existingFeed==='string'&&gitBlobSha(existingFeed)===feed.sha,'Existing calendar feed integrity mismatch');
++  const previous=parseFeed(existingFeed);
++  assert(previous.publishedThrough<=packet.publishedThrough,'Calendar rollback refused');
++ }
++ if(target.has(STATUS_PATH)){
++  const status=target.get(STATUS_PATH);assert(status.type==='blob'&&status.mode==='100644','Existing calendar status mode invalid');
++  assert(typeof existingStatus==='string'&&gitBlobSha(existingStatus)===status.sha,'Existing calendar status integrity mismatch');
++  previousStatus=parseStatus(existingStatus);
++  assert(previousStatus.publishedThrough<=packet.publishedThrough,'Calendar status rollback refused');
++ }
++ for(const stop of packet.stops.filter(s=>s.he)){
++  assert(typeof stop.photo==='string'&&/^[a-z]+(?:-[a-z]+)*$/.test(stop.photo),'Revealed image name invalid');
++  for(const suffix of ['.webp','-phone.webp']){
++   const name=stop.photo+suffix,original=source.get(PHOTO_PREFIX+name),path=SITE_PREFIX+'/airlines-assets/'+name;
++   assert(original?.type==='blob'&&original.mode==='100644','Approved revealed image missing or invalid');
++   const expected={path,mode:'100644',type:'blob',sha:original.sha};
++   if(target.has(path))assert(sameEntry(target.get(path),expected),'Existing revealed asset differs from approved source');
++   else entries.push(expected);
++  }
++ }
++ if(target.get(FEED_PATH)?.sha!==sha)entries.push({path:FEED_PATH,mode:'100644',type:'blob',sha});
++ const blobs=entries.some(e=>e.path===FEED_PATH)?[{path:FEED_PATH,content,sha}]:[];
++ const assetCount=entries.filter(e=>e.path.startsWith(SITE_PREFIX+'/airlines-assets/')).length;
++ if(entries.length||!previousStatus||previousStatus.publishedThrough!==packet.publishedThrough){
++  assert(runId===undefined||typeof runId==='string'&&/^\d{1,30}$/.test(runId),'Calendar status run ID invalid');
++  const instant=new Date(now);assert(Number.isFinite(instant.getTime()),'Calendar status time required');
++  const status={schema:1,synthetic:true,timeZone:'Asia/Jerusalem',publishedThrough:packet.publishedThrough,sourceCommit:SOURCE_COMMIT,origin:'github-actions-calendar',publishedAt:instant.toISOString(),...(runId===undefined?{}:{runId})};
++  const statusContent=JSON.stringify(status)+'\n';parseStatus(statusContent);
++  const statusSha=gitBlobSha(statusContent);
++  entries.push({path:STATUS_PATH,mode:'100644',type:'blob',sha:statusSha});
++  blobs.push({path:STATUS_PATH,content:statusContent,sha:statusSha});
++ }
++ return {entries,content,sha,blobs,assetCount};
++}
++
++// Validate all non-tree objects and their modes; ancestor tree SHAs necessarily change.
++export function verifyTreeDelta(before,after,entries){
++ const old=treeMap(before),next=treeMap(after),allowed=new Map(entries.map(e=>[e.path,e]));
++ assert(allowed.size===entries.length,'Duplicate planned change');
++ for(const [path,entry]of old){
++  assert(next.has(path),'Tree deletion refused');
++  if(entry.type==='tree')assert(next.get(path).type==='tree'&&next.get(path).mode===entry.mode,'Tree mode/type change refused');
++  else assert(sameEntry(next.get(path),allowed.get(path)??entry),'Unrelated blob or mode changed');
++ }
++ for(const [path,entry]of next){
++  if(entry.type==='tree'){
++   assert(old.has(path)||entries.some(e=>e.path.startsWith(path+'/')),'Unrelated directory added');
++   assert(entry.mode==='040000','Invalid directory mode');
++  }else if(!old.has(path))assert(allowed.has(path)&&sameEntry(entry,allowed.get(path)),'Unrelated blob added');
++ }
++ for(const entry of entries){
++  assert(entry.path===FEED_PATH||entry.path===STATUS_PATH||entry.path.startsWith(SITE_PREFIX+'/airlines-assets/'),'Publication path is forbidden');
++  assert(entry.sha&&sameEntry(next.get(entry.path),entry),'Planned blob not applied');
++  assert(entry.path===FEED_PATH||entry.path===STATUS_PATH||!old.has(entry.path),'Existing asset overwrite refused');
++ }
++}
++
++export class GithubApiError extends Error{constructor(status,method,path){super(`GitHub API ${method} ${path} failed (${status})`);this.status=status;}}
++export function createGithubApi({token,fetchImpl=globalThis.fetch}){
++ assert(typeof token==='string'&&token.length>0,'GH_TOKEN or GITHUB_TOKEN is required');
++ return {async request(method,path,body){
++  assert(/^\/[a-zA-Z0-9_?=./%-]+$/.test(path)&&!path.includes('..'),'Invalid GitHub API path');
++  const response=await fetchImpl('https://api.github.com/repos/'+TARGET_REPOSITORY+path,{method,headers:{Accept:'application/vnd.github+json',Authorization:'Bearer '+token,'X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),redirect:'error',signal:AbortSignal.timeout(30_000)});
++  if(!response.ok)throw new GithubApiError(response.status,method,path);
++  if(response.status===204)return null;
++  try{return await response.json();}catch{throw new Error('GitHub API returned invalid JSON');}
++ }};
++}
++async function readBlob(api,entry){
++ assert(entry?.type==='blob'&&shaPattern.test(entry.sha),'Expected Git blob');
++ const blob=await api.request('GET','/git/blobs/'+entry.sha);
++ assert(blob.encoding==='base64'&&typeof blob.content==='string','Git blob encoding mismatch');
++ const bytes=Buffer.from(blob.content.replaceAll('\n',''),'base64');
++ assert(createHash('sha1').update('blob '+bytes.length+'\0').update(bytes).digest('hex')===entry.sha,'Git blob integrity mismatch');
++ return new TextDecoder('utf-8',{fatal:true}).decode(bytes);
++}
++async function currentHead(api){const ref=await api.request('GET','/git/ref/heads/'+TARGET_BRANCH);assert(shaPattern.test(ref?.object?.sha),'Invalid branch head');return ref.object.sha;}
++async function loadTree(api,commit){const detail=await api.request('GET','/git/commits/'+commit);assert(shaPattern.test(detail?.tree?.sha),'Invalid commit tree');const tree=await api.request('GET','/git/trees/'+detail.tree.sha+'?recursive=1');assert(tree.sha===detail.tree.sha,'Git tree integrity mismatch');return tree;}
++async function assertPagesTarget(api){
++ const pages=await api.request('GET','/pages');
++ assert(pages.source?.branch===TARGET_BRANCH&&pages.source?.path==='/'&&pages.build_type==='legacy','Pages must use legacy gh-pages root');
++}
++export async function ensurePagesBuild(api,commit){
++ await assertPagesTarget(api);
++ let latest;
++ try{latest=await api.request('GET','/pages/builds/latest');}catch(error){if(error.status!==404)throw error;}
++ if(latest?.commit===commit&&['built','building','queued'].includes(latest.status))return {requested:false,status:latest.status};
++ const build=await api.request('POST','/pages/builds');
++ return {requested:true,status:build?.status??'requested'};
++}
++
++export async function publishCalendar({api,now=new Date(),repository=TARGET_REPOSITORY,maxAttempts=3,runId}){
++ assert(repository===TARGET_REPOSITORY,'Repository guard refused target');
++ assert(Number.isInteger(maxAttempts)&&maxAttempts>=1&&maxAttempts<=5,'Invalid retry bound');
++ const instant=new Date(now);assert(Number.isFinite(instant.getTime()),'Invalid calendar time');
++ const date=israelDate(instant);
++ if(date<'2026-10-31'||date>'2027-01-01')return {changed:false,reason:'outside-2026-calendar'};
++ await assertPagesTarget(api);
++ const sourceTree=await loadTree(api,SOURCE_COMMIT);
++ assert(sourceTree.sha===SOURCE_TREE,'Pinned source tree mismatch');
++ const source=treeMap(sourceTree),catalog=parsePinnedCatalog(await readBlob(api,source.get(SOURCE_PATH))),packet=calendarPacket(catalog,instant);
++ assert(packet.publishedThrough===date,'Calendar model returned unexpected publication date');
++ for(let attempt=0;attempt<maxAttempts;attempt++){
++  const head=await currentHead(api),targetTree=await loadTree(api,head),target=treeMap(targetTree);
++  const existingFeed=target.has(FEED_PATH)?await readBlob(api,target.get(FEED_PATH)):undefined;
++  const existingStatus=target.has(STATUS_PATH)?await readBlob(api,target.get(STATUS_PATH)):undefined;
++  const plan=planPublication({packet,sourceTree,targetTree,existingFeed,existingStatus,now:instant,runId});
++  if(!plan.entries.length){
++   if(await currentHead(api)!==head)continue;
++   return {changed:false,date,commit:head,assetCount:0,pages:await ensurePagesBuild(api,head)};
++  }
++  for(const planned of plan.blobs){
++   const blob=await api.request('POST','/git/blobs',{content:planned.content,encoding:'utf-8'});
++   assert(blob.sha===planned.sha,'Created calendar blob integrity mismatch');
++  }
++  const tree=await api.request('POST','/git/trees',{base_tree:targetTree.sha,tree:plan.entries});
++  assert(shaPattern.test(tree.sha),'Created tree SHA invalid');
++  const verified=await api.request('GET','/git/trees/'+tree.sha+'?recursive=1');
++  verifyTreeDelta(targetTree,verified,plan.entries);
++  const commit=await api.request('POST','/git/commits',{message:'Advance synthetic preview calendar to '+date,tree:tree.sha,parents:[head]});
++  assert(shaPattern.test(commit.sha),'Created commit SHA invalid');
++  if(await currentHead(api)!==head)continue;
++  try{await api.request('PATCH','/git/refs/heads/'+TARGET_BRANCH,{sha:commit.sha,force:false});}
++  catch(error){if([409,422].includes(error.status)&&await currentHead(api)!==head)continue;throw error;}
++  return {changed:true,date,commit:commit.sha,assetCount:plan.assetCount,pages:await ensurePagesBuild(api,commit.sha)};
++ }
++ throw new Error('Branch advanced during bounded publication retries; no forced update attempted');
++}
++
++if(process.argv[1]===fileURLToPath(import.meta.url)){
++ try{
++  const repository=process.env.GITHUB_REPOSITORY??TARGET_REPOSITORY;
++  assert(repository===TARGET_REPOSITORY,'Repository guard refused workflow context');
++  const result=await publishCalendar({api:createGithubApi({token:process.env.GH_TOKEN??process.env.GITHUB_TOKEN}),repository,runId:process.env.GITHUB_RUN_ID});
++  console.log(JSON.stringify(result));
++ }catch(error){console.error(error.message);process.exitCode=1;}
++}
+diff --git a/contests/platform/scripts/airlines-calendar-source.json b/contests/platform/scripts/airlines-calendar-source.json
+new file mode 100644
+index 0000000..eef215c
+--- /dev/null
++++ b/contests/platform/scripts/airlines-calendar-source.json
+@@ -0,0 +1,25 @@
++{
++  "sourceCommit": "e1c467fed2279429056badba987a13140a4caa21",
++  "sourceTree": "a4139fd6fbfc7f5bd5ffe77213545e1d89109e72",
++  "blobs": {
++    "contests/2026-11-year-end/concepts/live-site/site/demo-data/week-9.js": "5ac70d7521802595fc3996ae09d6d4c7141a18c3",
++    "contests/2026-11-year-end/site-photos/web/athens-phone.webp": "8f1e9e567a0e82bcec338eff81c9eae8abf4de1b",
++    "contests/2026-11-year-end/site-photos/web/athens.webp": "eb220107b600f86fa2d3493fe44c0c81716cc9ba",
++    "contests/2026-11-year-end/site-photos/web/cancun-phone.webp": "7a6ba8371d7a8f6dbee7e41fe4a04cfa2f63ef96",
++    "contests/2026-11-year-end/site-photos/web/cancun.webp": "857a2d5a299910f6eaa06396cf5fc18484484d7c",
++    "contests/2026-11-year-end/site-photos/web/jerusalem-phone.webp": "87828f8aba1b00b25473a71672ca07bae7364663",
++    "contests/2026-11-year-end/site-photos/web/jerusalem.webp": "7ca2d9efdd690ffbd15055664d23d48851848d32",
++    "contests/2026-11-year-end/site-photos/web/las-vegas-phone.webp": "305d2f93ae83df154cc2155951eede844c6897fd",
++    "contests/2026-11-year-end/site-photos/web/las-vegas.webp": "556c91719ab132b13046cf7bb711d37407d2482d",
++    "contests/2026-11-year-end/site-photos/web/marrakech-phone.webp": "fde85eef92762e1a8b9b8768c1b4345f481f750d",
++    "contests/2026-11-year-end/site-photos/web/marrakech.webp": "4cb75208b3861667df85ae38bb86049cc32210d4",
++    "contests/2026-11-year-end/site-photos/web/milan-phone.webp": "07a27738353e81ce2a8472610dc6a4345cd6d770",
++    "contests/2026-11-year-end/site-photos/web/milan.webp": "9a32d9f8b1163e9c76b5ccb1ff8451042c0febad",
++    "contests/2026-11-year-end/site-photos/web/new-delhi-phone.webp": "f9d0e8ba40da80be7212bf15a1f45a94c3f6998b",
++    "contests/2026-11-year-end/site-photos/web/new-delhi.webp": "4123f0c4b36d8d0e526c8da42fc306ff224374b3",
++    "contests/2026-11-year-end/site-photos/web/paris-phone.webp": "9ab69484f2df185eb963637009421e3a795db173",
++    "contests/2026-11-year-end/site-photos/web/paris.webp": "a47bb21423f98b476c7b1da2b523c70beba284f1",
++    "contests/2026-11-year-end/site-photos/web/tokyo-phone.webp": "84a0ada6f7fb52effb05ebdbbb88dac52a312848",
++    "contests/2026-11-year-end/site-photos/web/tokyo.webp": "839683c218c47b19b71f943b698a1027337dd1d7"
++  }
++}
+diff --git a/contests/platform/scripts/airlines-calendar.workflow.yml b/contests/platform/scripts/airlines-calendar.workflow.yml
+new file mode 100644
+index 0000000..96cab78
+--- /dev/null
++++ b/contests/platform/scripts/airlines-calendar.workflow.yml
+@@ -0,0 +1,36 @@
++name: Publish Airlines calendar
++
++on:
++  schedule:
++    # UTC schedule; Israel calendar date is computed by the publisher.
++    - cron: '*/15 * * 11,12 *'
++    - cron: '*/15 21-23 31 10 *'
++  workflow_dispatch:
++
++permissions:
++  contents: write
++  pages: write
++
++concurrency:
++  group: airlines-calendar-preview
++  cancel-in-progress: false
++
++jobs:
++  publish:
++    if: github.repository == 'jsroussi/bezeq-soho-live-preview' && github.ref == 'refs/heads/main'
++    runs-on: ubuntu-latest
++    timeout-minutes: 10
++    steps:
++      - name: Check out approved automation only
++        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
++        with:
++          ref: ${{ github.sha }}
++          fetch-depth: 1
++          persist-credentials: false
++          sparse-checkout: automation/airlines-calendar
++      - name: Publish revealed calendar and request legacy Pages build
++        env:
++          GH_TOKEN: ${{ github.token }}
++        run: |
++          node --version
++          node automation/airlines-calendar/publish.mjs
+diff --git a/contests/platform/scripts/build-airlines-preview.mjs b/contests/platform/scripts/build-airlines-preview.mjs
+index 9f7ae4e..2b0798d 100644
+--- a/contests/platform/scripts/build-airlines-preview.mjs
++++ b/contests/platform/scripts/build-airlines-preview.mjs
+@@ -7,6 +7,8 @@ import {build} from 'esbuild';
+ import {gzipSync} from 'node:zlib';
+ import {createHash} from 'node:crypto';
+ import {attachActivity} from '../site/src/airlines/activity.js';
++import {calendarPacket} from '../site/src/airlines/calendar-model.js';
++import {parsePinnedCatalog,feedSource,gitBlobSha,SOURCE_COMMIT,SOURCE_TREE,SOURCE_PATH} from './airlines-calendar-publish.mjs';
+ import {evaluate} from '../src/engine.js';
+ import {buildSiteData} from '../src/site-data.js';
+ const platform=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+@@ -78,18 +80,25 @@ export function syntheticScenario(asOf='2026-11-05'){
+ }
+ export async function buildAirlines(output=path.join(platform,'exports/airlines-preview'),assetRoot=process.env.AIRLINES_APPROVED_PREVIEW||'/workspace/bezeq-soho-live-preview',asOf=process.env.AIRLINES_AS_OF||'2026-11-05'){
+  const siteDir=path.join(output,SITE_PATH);fs.mkdirSync(siteDir,{recursive:true});
+- const {data}=syntheticScenario(asOf);
++ const {data,config}=syntheticScenario(asOf);
++ const provenance=JSON.parse(fs.readFileSync(path.join(platform,'scripts/airlines-calendar-source.json'),'utf8'));
++ if(provenance.sourceCommit!==SOURCE_COMMIT||provenance.sourceTree!==SOURCE_TREE)throw Error('Pinned calendar provenance mismatch');
++ function approvedBytes(relative){const bytes=fs.readFileSync(path.join(assetRoot,relative));if(gitBlobSha(bytes)!==provenance.blobs[relative])throw Error('Approved source integrity mismatch: '+relative);return bytes;}
++ const catalog=parsePinnedCatalog(approvedBytes(SOURCE_PATH).toString('utf8'));
++ if(JSON.stringify(catalog.stops.map(s=>[s.start,s.end]))!==JSON.stringify(config.journey.stops.map(s=>[s.start,s.end])))throw Error('Calendar source differs from approved schedule');
++ const calendar=calendarPacket(catalog,new Date());
+  data.meta.sourceCommit=execFileSync('git',['rev-parse','HEAD'],{cwd:repo,encoding:'utf8'}).trim();
+  const serialized=JSON.stringify(data).replaceAll('<','\\u003c');
+  if(/synthetic-demo-person-|"uid"|"pinHash"|"secret"/.test(serialized))throw Error('Private input identity leaked into public payload');
+  const source=path.join(platform,'site/src/airlines');
+  const compiled=await build({absWorkingDir:platform,entryPoints:{airlines:path.join(source,'main.js'),'airlines-excel':path.join(source,'excel.js')},bundle:true,format:'esm',splitting:true,platform:'browser',target:'es2022',outdir:siteDir,chunkNames:'airlines-chunk-[hash]',minify:true,legalComments:'none',metafile:true,external:['airlines-assets/*']});
+  fs.writeFileSync(path.join(siteDir,'airlines-data.js'),'window.AIRLINES_DEMO='+serialized+';\n');
++ fs.writeFileSync(path.join(siteDir,'airlines-calendar.js'),feedSource(calendar));
+  const assets=path.join(siteDir,'airlines-assets');fs.rmSync(assets,{recursive:true,force:true});fs.mkdirSync(assets,{recursive:true});
+- for(const stop of data.site.stops.filter(s=>s.he&&s.photo))for(const phone of [false,true]){
++ for(const stop of calendar.stops.filter(s=>s.he&&s.photo))for(const phone of [false,true]){
+   const name=stop.photo+(phone?'-phone':'')+'.'+stop.photoExt;
+-  const approved=path.join(assetRoot,'contests/2026-11-year-end/site-photos/web',name);
+-  fs.copyFileSync(approved,path.join(assets,name));
++  const approved=approvedBytes('contests/2026-11-year-end/site-photos/web/'+name);
++  fs.writeFileSync(path.join(assets,name),approved);
+  }
+  for(const weight of ['Regular','Bold','Black'])fs.copyFileSync(path.join(platform,'public/fonts',`Simpler-${weight}.otf`),path.join(assets,`Simpler-${weight}.otf`));
+  // Preserve incumbent query links without executing old scripts on the new application.
+@@ -99,18 +108,18 @@ export async function buildAirlines(output=path.join(platform,'exports/airlines-
+  const version=data.meta.sourceCommit.slice(0,12);
+  fs.writeFileSync(path.join(siteDir,'airlines-bootstrap.js'),`(async()=>{try{await import('./airlines-data.js?v=${version}');await import('./airlines.js?v=${version}');}catch{const root=document.getElementById('root'),box=document.createElement('main'),title=document.createElement('h1'),body=document.createElement('p'),retry=document.createElement('button');box.className='bootstrap-error';box.setAttribute('role','alert');title.textContent='לא הצלחנו להכין את הטיסה';body.textContent='טעינת האתר לא הושלמה. בדקו את החיבור ונסו לרענן את הדף.';retry.type='button';retry.className='button';retry.textContent='ניסיון נוסף';retry.addEventListener('click',()=>location.reload());box.append(title,body,retry);root.replaceChildren(box);}})();\n`);
+  const html=`<!doctype html>
+-<html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content"><meta name="description" content="BEZEQ AIRLINES — מסביב לעולם ב־60 יום. אתר הדגמה סינתטי לתחרות אגף סוהו, חשמל ושירותי דיגיטל."><meta name="theme-color" content="#20294D"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; worker-src 'none'"><title>BEZEQ AIRLINES · מסביב לעולם ב־60 יום</title><link rel="icon" type="image/svg+xml" href="airlines-assets/favicon.svg"><link rel="preload" href="airlines-assets/Simpler-Regular.otf" as="font" type="font/otf" crossorigin><link rel="stylesheet" href="airlines.css?v=${version}"><script src="airlines-route.js?v=${version}"></script><script defer src="airlines-bootstrap.js?v=${version}"></script></head><body><div id="root"><p role="status" style="padding:40px;text-align:center">מתכוננים להמראה…</p></div><noscript>יש להפעיל JavaScript כדי להשתמש באתר ההדגמה.</noscript></body></html>`;
++<html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content"><meta name="description" content="BEZEQ AIRLINES — מסביב לעולם ב־60 יום. אתר הדגמה סינתטי לתחרות אגף סוהו, חשמל ושירותי דיגיטל."><meta name="theme-color" content="#20294D"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; worker-src 'none'"><title>BEZEQ AIRLINES · מסביב לעולם ב־60 יום</title><link rel="icon" type="image/svg+xml" href="airlines-assets/favicon.svg"><link rel="preload" href="airlines-assets/Simpler-Regular.otf" as="font" type="font/otf" crossorigin><link rel="stylesheet" href="airlines.css?v=${version}"><script src="airlines-route.js?v=${version}"></script><script defer src="airlines-calendar.js?v=${version}"></script><script defer src="airlines-bootstrap.js?v=${version}"></script></head><body><div id="root"><p role="status" style="padding:40px;text-align:center">מתכוננים להמראה…</p></div><noscript>יש להפעיל JavaScript כדי להשתמש באתר ההדגמה.</noscript></body></html>`;
+  fs.writeFileSync(path.join(siteDir,'index.html'),html);
+  fs.writeFileSync(path.join(siteDir,'airlines-route.js'),`const q=new URLSearchParams(location.search);if(q.has('look')||q.has('demoWeek'))location.replace('airlines-legacy.html'+location.search+location.hash);\n`);
+  fs.writeFileSync(path.join(assets,'favicon.svg'),'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="#20294d"/><path d="m37 10-9 29-6-13-13-6 28-10Z" fill="none" stroke="#00aeef" stroke-width="3"/></svg>');
+- const staticFiles=new Set(['airlines-data.js','airlines-bootstrap.js','airlines-route.js']);
++ const staticFiles=new Set(['airlines-data.js','airlines-calendar.js','airlines-bootstrap.js','airlines-route.js']);
+  const outputs=compiled.metafile.outputs;
+  function collect(file){const info=outputs[file];if(!info)return;staticFiles.add(path.basename(file));for(const item of info.imports||[])if(!item.external&&item.kind!=='dynamic-import')collect(item.path);}
+  collect(Object.keys(outputs).find(file=>outputs[file].entryPoint&&path.resolve(platform,outputs[file].entryPoint)===path.join(source,'main.js')));
+  const initialJavaScriptGzipBytes=[...staticFiles].reduce((sum,file)=>sum+gzipSync(fs.readFileSync(path.join(siteDir,file))).length,0);
+  if(initialJavaScriptGzipBytes>100*1024)throw Error('Initial JavaScript exceeds100KiB gzip: '+initialJavaScriptGzipBytes);
+  fs.writeFileSync(path.join(output,'airlines-build-metafile.json'),JSON.stringify(compiled.metafile));
+- fs.writeFileSync(path.join(siteDir,'airlines-build.json'),JSON.stringify({sourceCommit:data.meta.sourceCommit,synthetic:true,seed:data.meta.seed,asOf:data.site.asOf,people:data.site.people.length,scope:SITE_PATH,initialJavaScriptGzipBytes,initialScripts:[...staticFiles],lazyExcel:'airlines-excel.js'},null,2));
++ fs.writeFileSync(path.join(siteDir,'airlines-build.json'),JSON.stringify({sourceCommit:data.meta.sourceCommit,synthetic:true,seed:data.meta.seed,asOf:data.site.asOf,resultsAsOf:data.site.asOf,calendarThroughAtBuild:calendar.publishedThrough,calendarChannel:'airlines-calendar.js',people:data.site.people.length,scope:SITE_PATH,initialJavaScriptGzipBytes,initialScripts:[...staticFiles],lazyExcel:'airlines-excel.js'},null,2));
+  console.log(JSON.stringify({output,siteDir,people:data.site.people.length,roles:Object.keys(data.roles),asOf:data.site.asOf}));return {siteDir,data};
+ }
+ if(process.argv[1]===fileURLToPath(import.meta.url))await buildAirlines(process.argv[2],process.argv[3]);
+diff --git a/contests/platform/scripts/check-airlines-admin.mjs b/contests/platform/scripts/check-airlines-admin.mjs
+index aed185c..3107f5a 100644
+--- a/contests/platform/scripts/check-airlines-admin.mjs
++++ b/contests/platform/scripts/check-airlines-admin.mjs
+@@ -1,3 +1,4 @@
++import {calendarReplay} from '../test/browser/airlines-calendar-replay.mjs';
+ import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {chromium} from 'playwright';import {staticServer} from '../test/browser/helpers.mjs';import {SITE_PATH} from './build-airlines-preview.mjs';
+ const dir=path.resolve('exports/airlines-admin-qa');fs.mkdirSync(dir,{recursive:true});
+ const server=await staticServer(path.resolve('exports/airlines-preview')),base=server.base+'/'+SITE_PATH+'/',browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});
+@@ -6,7 +7,7 @@ async function check(id,fn){try{await fn();checks.push({id,passed:true});}catch(
+ const state=p=>p.evaluate(k=>JSON.parse(localStorage.getItem(k)),key);
+ async function login(p,role){await p.goto(base);await p.locator('.header-login').click();await p.locator('#demo-role').selectOption(role);await p.locator('#demo-password').fill('demo2026');await p.locator('[data-testid=demo-login-form] button[type=submit]').click();await p.locator('#demo-login').waitFor({state:'detached'});await p.locator('.air-admin').waitFor();}
+ const step=(p,i)=>p.locator('.air-admin-step').nth(i-1).click();
+-try{for(const width of [390,1440]){const c=await browser.newContext({viewport:{width,height:900},reducedMotion:'reduce'}),p=await c.newPage(),faults=[];p.on('pageerror',e=>faults.push(e.message));p.on('console',m=>{if(m.type()==='error')faults.push(m.text());});p.on('requestfailed',r=>faults.push(r.url()));p.setDefaultTimeout(8000);
++try{for(const width of [390,1440]){const c=await calendarReplay(await browser.newContext({viewport:{width,height:900},reducedMotion:'reduce'})),p=await c.newPage(),faults=[];p.on('pageerror',e=>faults.push(e.message));p.on('console',m=>{if(m.type()==='error')faults.push(m.text());});p.on('requestfailed',r=>faults.push(r.url()));p.setDefaultTimeout(8000);
+ await check('admin-full-flow-'+width,async()=>{await login(p,'admin');await step(p,6);assert.ok(await p.getByRole('button',{name:'פרסום הדגמה בדפדפן',exact:true}).isDisabled());
+ await step(p,1);const downloaded=p.waitForEvent('download');await p.getByRole('button',{name:'הורדת קובץ הדגמה',exact:true}).click();const dl=await downloaded,bytes=fs.readFileSync(await dl.path());await p.getByRole('button',{name:'הורדת קובץ הדגמה',exact:true}).waitFor({state:'visible'});
+ await p.getByLabel('קובץ Excel סינתטי',{exact:true}).setInputFiles({name:'not-a-demo.xlsx',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',buffer:Buffer.from('invalid')});await p.getByRole('button',{name:'טעינת קובץ הדגמה',exact:true}).click();await p.getByRole('alert').filter({hasText:'בחרו רק'}).waitFor();assert.equal((await state(p))?.draft.rows.length??0,0);
+@@ -26,7 +27,7 @@ await p.getByLabel('השבוע הנבחר',{exact:true}).selectOption('2');await
+ await p.getByLabel('השבוע הנבחר',{exact:true}).selectOption('2');await p.getByRole('button',{name:'פתיחת טיוטה חדשה',exact:true}).click();s=await state(p);assert.equal(s.draft.week,'2');assert.equal(s.draft.rows.length,0);assert.ok(s.published['1']);
+ await p.reload();await p.locator('.air-admin').waitFor();assert.equal((await state(p)).draft.week,'2');assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));});
+ await check('admin-console-'+width,()=>assert.deepEqual(faults,[]));await c.close();
+-const sc=await browser.newContext({viewport:{width,height:900},reducedMotion:'reduce'}),sp=await sc.newPage();sp.setDefaultTimeout(8000);
++const sc=await calendarReplay(await browser.newContext({viewport:{width,height:900},reducedMotion:'reduce'})),sp=await sc.newPage();sp.setDefaultTimeout(8000);
+ await check('superadmin-access-config-audit-'+width,async()=>{await login(sp,'superadmin');await sp.getByLabel('גישה עבור מנהל דמה 02',{exact:true}).selectOption('admin');assert.equal((await state(sp)).access['מנהל דמה 02'],'admin');await sp.getByRole('button',{name:'אישור סקירת ההרשאות המוצגות',exact:true}).click();assert.ok((await state(sp)).reviewedAt);await sp.getByLabel('כותרת סביבת ההדגמה המקומית',{exact:true}).fill('BEZEQ AIRLINES · תצורת דמה');await sp.getByRole('button',{name:'שמירת תצורה מקומית',exact:true}).click();assert.equal((await state(sp)).config.title,'BEZEQ AIRLINES · תצורת דמה');await sp.reload();await sp.locator('.air-admin').waitFor();assert.equal(await sp.getByLabel('כותרת סביבת ההדגמה המקומית',{exact:true}).inputValue(),'BEZEQ AIRLINES · תצורת דמה');assert.ok((await state(sp)).audit.length>=3);await sp.waitForFunction(()=>!document.querySelector('#airlines-toast.visible'));await sp.screenshot({path:path.join(dir,'system-'+width+'.png'),fullPage:true});assert.ok(await sp.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));});await sc.close();}
+ }finally{await browser.close();await server.close();fs.writeFileSync(path.join(dir,'report.json'),JSON.stringify({passed:checks.every(x=>x.passed),checks},null,2));console.log(JSON.stringify({checks:checks.length,failed:checks.filter(x=>!x.passed).length,report:path.join(dir,'report.json')}));}
+ if(checks.some(x=>!x.passed))process.exitCode=1;
+diff --git a/contests/platform/scripts/check-airlines-calendar-live.mjs b/contests/platform/scripts/check-airlines-calendar-live.mjs
+new file mode 100644
+index 0000000..afbedfa
+--- /dev/null
++++ b/contests/platform/scripts/check-airlines-calendar-live.mjs
+@@ -0,0 +1,37 @@
++import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {createHash} from 'node:crypto';import {chromium} from 'playwright';
++import {staticServer} from '../test/browser/helpers.mjs';import {SITE_PATH} from './build-airlines-preview.mjs';
++import {calendarPacket} from '../site/src/airlines/calendar-model.js';import {feedSource} from './airlines-calendar-publish.mjs';import {approvedCalendarCatalog} from '../test/browser/airlines-calendar-replay.mjs';
++const root=path.resolve('exports/airlines-preview'),siteDir=path.join(root,SITE_PATH),out=path.resolve('exports/airlines-calendar-live-qa');fs.mkdirSync(out,{recursive:true});
++const catalog=approvedCalendarCatalog(),packet=date=>calendarPacket(catalog,new Date(date.length===10?date+'T12:00:00Z':date)),server=await staticServer(root),url=server.base+'/'+SITE_PATH+'/',browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});
++const report={startedAt:new Date().toISOString(),mode:'Independent calendar channel; results remain 2026-11-05. No production calls.',checks:[],buildHashes:Object.fromEntries(['index.html','airlines.js','airlines.css','airlines-data.js','airlines-calendar.js'].map(n=>[n,createHash('sha256').update(fs.readFileSync(path.join(siteDir,n))).digest('hex')]))};
++const roles=['rep','tl','dept_manager','division_manager','admin','superadmin'];
++async function check(id,width,fn,{date=null,clock=null,failure=false}={}){
++ if(process.env.AIRLINES_CALENDAR_CASE&&!id.includes(process.env.AIRLINES_CALENDAR_CASE))return;
++ const c=await browser.newContext({viewport:{width,height:900},reducedMotion:'reduce'}),p=await c.newPage(),errors=[],requests=[];p.setDefaultTimeout(10000);
++ const source={date,fail:false,raw:null};
++ if(date)await c.route(u=>u.pathname.endsWith('/airlines-calendar.js'),r=>source.fail?r.fulfill({status:503,body:'test-only calendar outage'}):r.fulfill({contentType:'text/javascript',body:source.raw||feedSource(packet(source.date))}));
++ await c.route('**/airlines-assets/*.webp',async r=>{const file=path.join('/workspace/bezeq-soho-live-preview/contests/2026-11-year-end/site-photos/web',path.basename(new URL(r.request().url()).pathname));if(fs.existsSync(file))await r.fulfill({contentType:'image/webp',body:fs.readFileSync(file)});else await r.continue();});
++ p.on('pageerror',e=>errors.push(e.message));p.on('console',m=>{if(m.type()==='error'&&!(failure&&m.text().includes('503')))errors.push(m.text());});p.on('request',r=>requests.push(r.url()));p.on('response',r=>{if(r.status()>=400&&!(failure&&r.url().includes('airlines-calendar.js')))errors.push('HTTP '+r.status()+' '+r.url());});
++ try{if(clock)await p.clock.install({time:new Date(clock)});await p.goto(url);await p.locator('#hero-title').waitFor();await fn(p,source,requests);assert.equal(await p.locator('#root').getAttribute('data-results-date'),'2026-11-05');assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));assert.deepEqual(errors,[]);report.checks.push({id,passed:true});}catch(e){report.checks.push({id,passed:false,error:e.message});console.log('FAIL '+id+': '+e.message.slice(0,700));}finally{await c.close();}
++}
++async function login(p,role){await p.locator('.header-login').click();await p.locator('#demo-role').selectOption(role);await p.locator('#demo-password').fill('demo2026');await p.locator('[data-testid=demo-login-form] button[type=submit]').click();await p.locator('#demo-login').waitFor({state:'detached'});await p.waitForFunction(r=>document.querySelector('#root').dataset.role===r,role);}
++const focusReload=p=>p.evaluate(()=>window.dispatchEvent(new Event('focus')));
++async function shown(p,date){await p.waitForFunction(date=>document.querySelector('#root')?.dataset.calendarDate===date,date);}
++async function immutable(p){assert.equal(await p.evaluate(()=>window.AIRLINES_DEMO.site.asOf),'2026-11-05');assert.deepEqual(await p.evaluate(()=>{const d=window.AIRLINES_DEMO,q=d.site.people.find(x=>x.key===d.roles.rep.personKey);return[q.stampCard.stamps,q.activity.groups.find(g=>g.id==='sales').quantity,d.site.stops[1].he];}),[378,137,null]);}
++async function shot(p,name){await p.screenshot({path:path.join(out,name+'.png'),fullPage:false});}
++try{
++for(const width of [390,1440]){
++ await check('built-current-calendar-'+width,width,async p=>{await p.locator('.mobile-flight-heading h2').waitFor({state:'attached'});assert.equal(await p.locator('.mobile-flight-heading h2').innerText(),'מילאנו');assert.equal(await p.locator('.destination-code').innerText(),'MXP');assert.ok((await p.locator('.mobile-flight-facts').innerText()).includes('05.11.2026'));await immutable(p);await shot(p,'current-milan-'+width);});
++ for(const role of roles)await check('role-'+role+'-'+width,width,async p=>{await login(p,role);await immutable(p);if(role==='rep'){assert.equal(await p.locator('.pass-stamps>bdi').textContent(),'378');assert.equal(await p.locator('.passport-stamp strong').textContent(),'MILAN');const current=p.locator('.weekly-stamp.current');assert.ok((await current.innerText()).includes('מילאנו'));assert.ok((await current.innerText()).includes('ממתין לתוצאות השבוע'));}if(['rep','admin'].includes(role))await shot(p,role+'-calendar-'+width);await p.locator(width<=600?'.mobile-dock a[href="#/journey"]':'.app-sidebar a[href="#/journey"]').click();await p.locator('.destination-code').waitFor();assert.equal(await p.locator('.destination-code').innerText(),'MXP');assert.equal(await p.locator('.route-stop.upcoming').count(),7);assert.ok(!(await p.locator('main').innerText()).includes('מרקש'));});
++}
++await check('israeli-midnight-without-upload',390,async(p,s,requests)=>{assert.equal(await p.locator('.mobile-flight-heading h2').innerText(),'פריז');s.date='2026-11-08';await p.clock.runFor(4000);await shown(p,'2026-11-08');assert.equal(await p.locator('.mobile-flight-heading h2').innerText(),'מילאנו');await immutable(p);assert.ok(!requests.some(u=>/upload|\.xlsx/.test(u)));await shot(p,'midnight-milan');},{date:'2026-11-07',clock:'2026-11-07T21:59:58Z'});
++await check('foreground-refresh-with-stale-results',1440,async(p,s)=>{await login(p,'rep');s.date='2026-11-08';await focusReload(p);await shown(p,'2026-11-08');assert.equal(await p.locator('.passport-stamp strong').innerText(),'MILAN');assert.equal(await p.locator('.pass-stamps>bdi').innerText(),'378');await immutable(p);},{date:'2026-11-07'});
++await check('admin-form-preserved',390,async(p,s)=>{await login(p,'admin');await p.locator('.air-admin-step').nth(3).click();const field=p.getByLabel('יעד היפותטי · צוות דמה א׳',{exact:true});await field.fill('123');await field.focus();await p.evaluate(()=>window.__calendarFocused=document.activeElement);s.date='2026-11-08';await focusReload(p);await shown(p,'2026-11-08');assert.equal(await field.inputValue(),'123');assert.ok(await p.evaluate(()=>document.activeElement===window.__calendarFocused));assert.equal(await p.getByLabel('השבוע הנבחר',{exact:true}).inputValue(),'1');await immutable(p);},{date:'2026-11-07'});
++await check('ranking-filters-pagination-preserved',1440,async(p,s)=>{await login(p,'division_manager');await p.locator('.app-sidebar a[href="#/ranking"]').click();await p.locator('#ranking-query').fill('נציג דמה');await p.getByRole('button',{name:'העמוד הבא',exact:true}).click();assert.ok((await p.locator('#ranking-page').innerText()).includes('2'));const before=await p.locator('#ranking-results').count()?await p.locator('#ranking-results').innerHTML():await p.locator('#ranking-results-head').count();s.date='2026-11-08';await focusReload(p);await shown(p,'2026-11-08');assert.equal(await p.locator('#ranking-query').inputValue(),'נציג דמה');assert.ok((await p.locator('#ranking-page').innerText()).includes('2'));assert.equal(await p.locator('#ranking-results').count()?await p.locator('#ranking-results').innerHTML():await p.locator('#ranking-results-head').count(),before);await immutable(p);},{date:'2026-11-07'});
++await check('open-detail-dialog-defers-view-refresh',390,async(p,s)=>{await login(p,'rep');const opener=p.getByRole('button',{name:'לכל פרטי הכרטיס',exact:true});await opener.click();const d=p.locator('dialog[open]');await d.waitFor();s.date='2026-11-08';await focusReload(p);await p.waitForFunction(()=>window.AIRLINES_DEMO.site.presentation.publishedThrough==='2026-11-08');assert.equal(await d.count(),1);await p.keyboard.press('Escape');await d.waitFor({state:'detached'});await shown(p,'2026-11-08');assert.equal(await p.locator('.passport-stamp strong').innerText(),'MILAN');assert.ok(await opener.evaluate(e=>e===document.activeElement));await immutable(p);},{date:'2026-11-07'});
++await check('calendar-outage-and-recovery',390,async(p,s)=>{s.fail=true;await focusReload(p);await p.locator('#calendar-status').waitFor();assert.equal(await p.locator('.mobile-flight-heading h2').innerText(),'פריז');s.fail=false;s.date='2026-11-08';await focusReload(p);await shown(p,'2026-11-08');await p.locator('#calendar-status').waitFor({state:'detached'});assert.equal(await p.locator('.mobile-flight-heading h2').innerText(),'מילאנו');await immutable(p);},{date:'2026-11-07',failure:true});
++await check('invalid-packet-and-replay-rejected',1440,async(p,s)=>{await shown(p,'2026-11-08');const bad=packet('2026-11-08');bad.stops[2].he='מרקש';s.raw=feedSource(bad);await focusReload(p);await p.locator('#calendar-status').waitFor();assert.equal(await p.locator('.mobile-flight-heading h2').innerText(),'מילאנו');s.raw=feedSource(packet('2026-11-07'));await focusReload(p);await p.waitForTimeout(100);assert.equal(await p.locator('#root').getAttribute('data-calendar-date'),'2026-11-08');s.raw=feedSource(packet('2026-11-08'));await focusReload(p);await p.locator('#calendar-status').waitFor({state:'detached'});await immutable(p);},{date:'2026-11-08'});
++await check('device-clock-cannot-reveal-future',390,async(p,s,requests)=>{assert.equal(await p.locator('.mobile-flight-heading h2').innerText(),'מילאנו');await focusReload(p);await p.waitForTimeout(100);const text=await p.locator('main').innerText();for(const city of ['מרקש','טוקיו','ירושלים'])assert.ok(!text.includes(city));assert.ok(!requests.some(u=>/marrakech|tokyo|jerusalem/.test(u)));await immutable(p);},{date:'2026-11-08',clock:'2026-12-29T10:00:00Z'});
++await check('weekend-retains-milan-next-date-reveals',390,async(p,s,requests)=>{assert.equal(await p.locator('.mobile-flight-heading h2').innerText(),'מילאנו');assert.ok(!requests.some(u=>u.includes('marrakech')));s.date='2026-11-15';await focusReload(p);await shown(p,'2026-11-15');assert.equal(await p.locator('.mobile-flight-heading h2').innerText(),'מרקש');assert.ok(!((await p.locator('main').innerText()).includes('לאס וגאס')));await immutable(p);},{date:'2026-11-14'});
++for(const [name,date]of [['before','2026-10-31'],['after','2027-01-01']])await check('calendar-'+name,390,async p=>{await shown(p,date);assert.equal(await p.locator('.route-stop').count(),9);if(name==='before')assert.equal(await p.locator('.hero-photo').evaluate(e=>getComputedStyle(e).backgroundImage),'none');else{assert.equal(await p.locator('.mobile-flight-heading h2').innerText(),'ירושלים');assert.ok((await p.locator('.mobile-journey-panel').innerText()).includes('המסע הושלם'));}await immutable(p);},{date});
++}finally{await browser.close();await server.close();report.finishedAt=new Date().toISOString();report.passed=report.checks.every(c=>c.passed);fs.writeFileSync(path.join(out,'report.json'),JSON.stringify(report,null,2));console.log(JSON.stringify({passed:report.passed,checks:report.checks.length,failed:report.checks.filter(c=>!c.passed).length}));}if(!report.passed)process.exitCode=1;
+diff --git a/contests/platform/scripts/check-airlines-calendar.mjs b/contests/platform/scripts/check-airlines-calendar.mjs
+index 8a21a0e..66acfeb 100644
+--- a/contests/platform/scripts/check-airlines-calendar.mjs
++++ b/contests/platform/scripts/check-airlines-calendar.mjs
+@@ -1,6 +1,7 @@
++import {calendarReplay} from '../test/browser/airlines-calendar-replay.mjs';
+ import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {chromium} from 'playwright';import {staticServer} from '../test/browser/helpers.mjs';import {syntheticScenario,SITE_PATH} from './build-airlines-preview.mjs';
+ const out=path.resolve('exports/airlines-calendar-qa');fs.mkdirSync(out,{recursive:true});const server=await staticServer(path.resolve('exports/airlines-preview')),browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']}),checks=[],approved=syntheticScenario('2027-01-01').config;
+ const cases=[['before','2026-10-31',null,null],['paris','2026-11-03','פריז','CDG'],['milan','2026-11-10','מילאנו','MXP'],['weekend','2026-11-14','מילאנו','MXP'],['marrakech','2026-11-17','מרקש','RAK'],['vegas','2026-11-24','לאס וגאס','LAS'],['cancun','2026-12-01','קנקון','CUN'],['tokyo','2026-12-08','טוקיו','HND'],['athens','2026-12-15','אתונה','ATH'],['delhi','2026-12-22','ניו דלהי','DEL'],['jerusalem','2026-12-29','ירושלים','TLV'],['after','2027-01-01','ירושלים','TLV']];
+-try{for(const[id,asOf,city,airport]of cases){const c=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'}),p=await c.newPage(),data=syntheticScenario(asOf).data,errors=[];p.on('pageerror',e=>errors.push(e.message));p.on('response',r=>{if(r.status()>=400)errors.push('HTTP '+r.status()+' '+r.url());});await p.route(url=>url.pathname.endsWith('/airlines-data.js'),r=>r.fulfill({contentType:'text/javascript',body:'window.AIRLINES_DEMO='+JSON.stringify(data)+';'}));await p.route('**'+'/airlines-assets/'+ '*.webp',async r=>{const name=path.basename(new URL(r.request().url()).pathname),file='/workspace/bezeq-soho-live-preview/contests/2026-11-year-end/site-photos/web/'+name;if(fs.existsSync(file))await r.fulfill({contentType:'image/webp',body:fs.readFileSync(file)});else await r.continue();});
++try{for(const[id,asOf,city,airport]of cases){const c=await calendarReplay(await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'}),asOf),p=await c.newPage(),data=syntheticScenario(asOf).data,errors=[];p.on('pageerror',e=>errors.push(e.message));p.on('response',r=>{if(r.status()>=400)errors.push('HTTP '+r.status()+' '+r.url());});await p.route(url=>url.pathname.endsWith('/airlines-data.js'),r=>r.fulfill({contentType:'text/javascript',body:'window.AIRLINES_DEMO='+JSON.stringify(data)+';'}));await p.route('**'+'/airlines-assets/'+ '*.webp',async r=>{const name=path.basename(new URL(r.request().url()).pathname),file='/workspace/bezeq-soho-live-preview/contests/2026-11-year-end/site-photos/web/'+name;if(fs.existsSync(file))await r.fulfill({contentType:'image/webp',body:fs.readFileSync(file)});else await r.continue();});
+ try{await p.goto(server.base+'/'+SITE_PATH+'/');await p.locator('#hero-title').waitFor();const text=await p.locator('main').innerText();assert.equal(await p.locator('.route-stop').count(),9);for(const stop of data.site.stops.filter(s=>!s.he)){const original=approved.journey.stops[data.site.stops.indexOf(stop)];assert.ok(!text.includes(original.he),'unrevealed city '+original.he);}if(city){assert.equal(await p.locator('.flight-destination strong').innerText(),city);assert.equal(await p.locator('.destination-code').innerText(),airport);assert.equal(await p.locator('.image-caption').innerText(),data.site.stops.findLast(s=>s.he)?.en);const s=data.site.stops.find(x=>x.status==='current')||data.site.stops.findLast(x=>x.he),bg=await p.locator('.hero-photo').evaluate(e=>getComputedStyle(e).backgroundImage);if(s.photo)assert.ok(bg.includes(s.photo+'-phone.webp'),'current photo must match the current city');else assert.equal(bg,'none');}else assert.equal(await p.locator('.hero-photo').evaluate(e=>getComputedStyle(e).backgroundImage),'none');assert.deepEqual(errors,[]);await p.screenshot({path:path.join(out,id+'.png'),fullPage:false});checks.push({id,asOf,passed:true});}catch(e){checks.push({id,asOf,passed:false,error:e.message});console.log('FAIL '+id+': '+e.message.slice(0,350));}await c.close();}}
+ finally{await browser.close();await server.close();fs.writeFileSync(path.join(out,'report.json'),JSON.stringify({passed:checks.every(c=>c.passed),checks},null,2));console.log(JSON.stringify({checks:checks.length,failed:checks.filter(c=>!c.passed).length}));}if(checks.some(c=>!c.passed))process.exitCode=1;
+diff --git a/contests/platform/scripts/check-airlines-mobile.mjs b/contests/platform/scripts/check-airlines-mobile.mjs
+index d5f4858..fc2328a 100644
+--- a/contests/platform/scripts/check-airlines-mobile.mjs
++++ b/contests/platform/scripts/check-airlines-mobile.mjs
+@@ -1,3 +1,4 @@
++import {calendarReplay} from '../test/browser/airlines-calendar-replay.mjs';
+ import fs from 'node:fs';
+ import path from 'node:path';
+ import assert from 'node:assert/strict';
+@@ -10,7 +11,7 @@ const root=path.resolve('exports/airlines-preview'),site=path.join(root,SITE_PAT
+ fs.mkdirSync(out,{recursive:true});
+ const report={startedAt:new Date().toISOString(),browser:'System Chromium, emulated touch (not physical iOS/Android)',checks:[],buildHashes:Object.fromEntries(['index.html','airlines.js','airlines.css','airlines-data.js'].map(n=>[n,createHash('sha256').update(fs.readFileSync(path.join(site,n))).digest('hex')]))};
+ const server=await staticServer(root),browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']}),url=server.base+'/'+SITE_PATH+'/';
+-async function check(id,width,height,fn){if(process.env.AIRLINES_MOBILE_CASE&&!id.includes(process.env.AIRLINES_MOBILE_CASE))return;const c=await browser.newContext({viewport:{width,height},hasTouch:true,isMobile:width<=600,deviceScaleFactor:1,reducedMotion:'reduce'}),p=await c.newPage(),errors=[];p.setDefaultTimeout(process.env.AIRLINES_MOBILE_SMOKE?2000:7000);p.on('pageerror',e=>errors.push(e.message));p.on('requestfailed',r=>errors.push(r.failure()?.errorText));p.on('response',r=>{if(r.status()>=400)errors.push(String(r.status())+' '+r.url());});try{await p.goto(url);await p.locator('#hero-title').waitFor();await fn(p,c);assert.deepEqual(errors,[]);await layout(p);report.checks.push({id,passed:true});}catch(e){report.checks.push({id,passed:false,error:e.message});console.log('FAIL '+id+': '+e.message.slice(0,500));}finally{await c.close();}}
++async function check(id,width,height,fn){if(process.env.AIRLINES_MOBILE_CASE&&!id.includes(process.env.AIRLINES_MOBILE_CASE))return;const c=await calendarReplay(await browser.newContext({viewport:{width,height},hasTouch:true,isMobile:width<=600,deviceScaleFactor:1,reducedMotion:'reduce'})),p=await c.newPage(),errors=[];p.setDefaultTimeout(process.env.AIRLINES_MOBILE_SMOKE?2000:7000);p.on('pageerror',e=>errors.push(e.message));p.on('requestfailed',r=>errors.push(r.failure()?.errorText));p.on('response',r=>{if(r.status()>=400)errors.push(String(r.status())+' '+r.url());});try{await p.goto(url);await p.locator('#hero-title').waitFor();await fn(p,c);assert.deepEqual(errors,[]);await layout(p);report.checks.push({id,passed:true});}catch(e){report.checks.push({id,passed:false,error:e.message});console.log('FAIL '+id+': '+e.message.slice(0,500));}finally{await c.close();}}
+ async function layout(p){assert.ok(await p.evaluate(()=>Math.max(document.documentElement.scrollWidth,document.body.scrollWidth)<=innerWidth+1),'horizontal page overflow');assert.equal(await p.locator('html').getAttribute('dir'),'rtl');}
+ async function login(p,role){await p.locator('.header-login').click();await p.locator('#demo-role').selectOption(role);await p.locator('#demo-password').fill('demo2026');await p.locator('[data-testid=demo-login-form] button[type=submit]').click();await p.locator('#demo-login').waitFor({state:'detached'});await p.waitForFunction(r=>document.querySelector('#root').dataset.role===r,role);}
+ async function shot(p,name){await p.waitForFunction(()=>!document.querySelector('#airlines-toast.visible'));await p.screenshot({path:path.join(out,name+'.png'),fullPage:true});await p.screenshot({path:path.join(out,name+'-viewport.png')});}
+diff --git a/contests/platform/scripts/check-airlines-motion.mjs b/contests/platform/scripts/check-airlines-motion.mjs
+index 2ffe5e3..aa16f54 100644
+--- a/contests/platform/scripts/check-airlines-motion.mjs
++++ b/contests/platform/scripts/check-airlines-motion.mjs
+@@ -1,7 +1,8 @@
++import {calendarReplay} from '../test/browser/airlines-calendar-replay.mjs';
+ import fs from 'node:fs';import {createHash} from 'node:crypto';import path from 'node:path';import assert from 'node:assert/strict';import {chromium} from 'playwright';import {staticServer} from '../test/browser/helpers.mjs';import {SITE_PATH} from './build-airlines-preview.mjs';
+ const out=path.resolve('exports/airlines-motion-qa');fs.mkdirSync(out,{recursive:true});const server=await staticServer(path.resolve('exports/airlines-preview')),base=server.base+'/'+SITE_PATH+'/',browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']}),checks=[];
+ const active=()=>document.getAnimations().filter(a=>a.id.startsWith('airlines-')&&a.playState==='running').length;
+-async function test(id,width,mode,run){const c=await browser.newContext({viewport:{width,height:844},reducedMotion:mode,...(id==='cinematic'?{recordVideo:{dir:out,size:{width,height:844}}}:{})}),p=await c.newPage(),errors=[];p.setDefaultTimeout(6000);p.on('pageerror',e=>errors.push(e.message));p.on('console',m=>{if(m.type()==='error')errors.push(m.text());});p.on('requestfailed',r=>errors.push(r.url()));await p.addInitScript(()=>{window.__observedAnimations=[];const animate=Element.prototype.animate;Element.prototype.animate=function(...args){const result=animate.apply(this,args);window.__observedAnimations.push(result);return result;};});try{await p.goto(base);await p.locator('#hero-title').waitFor();await run(p);assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));assert.deepEqual(errors,[]);checks.push({id:id+'-'+width,passed:true});}catch(e){checks.push({id:id+'-'+width,passed:false,error:e.message});console.log('FAIL '+id+'-'+width+': '+e.message.slice(0,250));}finally{const video=p.video();await c.close();if(id==='cinematic'&&video){const original=await video.path();fs.renameSync(original,path.join(out,'arrival-'+width+'.webm'));}}}
++async function test(id,width,mode,run){const c=await calendarReplay(await browser.newContext({viewport:{width,height:844},reducedMotion:mode,...(id==='cinematic'?{recordVideo:{dir:out,size:{width,height:844}}}:{})})),p=await c.newPage(),errors=[];p.setDefaultTimeout(6000);p.on('pageerror',e=>errors.push(e.message));p.on('console',m=>{if(m.type()==='error')errors.push(m.text());});p.on('requestfailed',r=>errors.push(r.url()));await p.addInitScript(()=>{window.__observedAnimations=[];const animate=Element.prototype.animate;Element.prototype.animate=function(...args){const result=animate.apply(this,args);window.__observedAnimations.push(result);return result;};});try{await p.goto(base);await p.locator('#hero-title').waitFor();await run(p);assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));assert.deepEqual(errors,[]);checks.push({id:id+'-'+width,passed:true});}catch(e){checks.push({id:id+'-'+width,passed:false,error:e.message});console.log('FAIL '+id+'-'+width+': '+e.message.slice(0,250));}finally{const video=p.video();await c.close();if(id==='cinematic'&&video){const original=await video.path();fs.renameSync(original,path.join(out,'arrival-'+width+'.webm'));}}}
+ async function login(p,role){await p.locator('.header-login').click();await p.locator('#demo-role').selectOption(role);await p.locator('#demo-password').fill('demo2026');await p.locator('[data-testid=demo-login-form] button[type=submit]').click();await p.locator('#root[data-role='+role+']').waitFor();}
+ try{for(const width of [390,1440]){
+ await test('cinematic',width,'no-preference',async p=>{await p.locator('.air-flight-trace').waitFor({state:'attached'});assert.equal(await p.locator('.air-flight-trace').count(),1,'enhanced destination flight trace');assert.ok(await p.evaluate(active),'real native entrance animations running');assert.equal(await p.locator('.air-flight-trace').getAttribute('aria-hidden'),'true');await p.waitForTimeout(180);await p.screenshot({path:path.join(out,'arrival-'+width+'.png')});await p.locator(width<=600?'.mobile-journey-panel .button':'.hero-actions .button').click();await p.locator('#demo-login[open]').waitFor();await p.keyboard.press('Escape');await p.waitForTimeout(2200);assert.equal(await p.evaluate(active),0,'bounded animations finish');});
+diff --git a/contests/platform/scripts/check-airlines-preview.mjs b/contests/platform/scripts/check-airlines-preview.mjs
+index 44f45c0..27fcf6a 100644
+--- a/contests/platform/scripts/check-airlines-preview.mjs
++++ b/contests/platform/scripts/check-airlines-preview.mjs
+@@ -1,3 +1,4 @@
++import {calendarReplay} from '../test/browser/airlines-calendar-replay.mjs';
+ import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {createHash} from 'node:crypto';
+ import {chromium} from 'playwright';import {staticServer} from '../test/browser/helpers.mjs';import {SITE_PATH} from './build-airlines-preview.mjs';
+ const root=path.resolve('exports/airlines-preview'),out=path.resolve('exports/airlines-qa');fs.mkdirSync(out,{recursive:true});
+@@ -12,13 +13,13 @@ async function shot(p,name){await p.waitForFunction(()=>!document.querySelector(
+ async function login(p,role){await p.locator('.header-login').click();await p.locator('#demo-role').selectOption(role);await p.locator('#demo-code').fill(runtime.roles[role].code);await p.locator('#demo-password').fill('demo2026');await p.locator('[data-testid="demo-login-form"] button[type=submit]').click();await p.locator('#demo-login').waitFor({state:'detached'});await p.waitForFunction(()=>location.hash==='#/dashboard');await p.waitForFunction(r=>document.querySelector('#root').dataset.role===r,role);}
+ async function nav(p,section){await p.evaluate(s=>{location.hash='/'+s},section);await p.waitForFunction(s=>document.querySelector('.app-sidebar a.active')?.getAttribute('href')==='#/'+s||document.querySelector('.access-denied'),section);}
+ try{
+- for(const mode of ['no-preference','reduce']){const c=await browser.newContext({viewport:{width:390,height:844},reducedMotion:mode}),p=await c.newPage();await check('motion-'+mode,async()=>{await p.goto(base);await p.locator('#hero-title').waitFor();const duration=await p.locator('.hero .button').first().evaluate(e=>parseFloat(getComputedStyle(e).transitionDuration));assert.ok(mode==='reduce'?duration<.001:duration>=.1);assert.equal(await p.locator('html').evaluate(e=>getComputedStyle(e).scrollBehavior),mode==='reduce'?'auto':'smooth');});await c.close();}
+- for(const width of report.widths){const context=await browser.newContext({viewport:{width,height:width<768?844:1000},reducedMotion:'reduce'});const p=await context.newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));p.on('console',m=>{if(m.type()==='error')errors.push(m.text());});p.on('requestfailed',r=>errors.push('request '+r.url()));p.on('response',r=>{if(r.status()>=400)errors.push('HTTP '+r.status()+' '+r.url());});
++ for(const mode of ['no-preference','reduce']){const c=await calendarReplay(await browser.newContext({viewport:{width:390,height:844},reducedMotion:mode})),p=await c.newPage();await check('motion-'+mode,async()=>{await p.goto(base);await p.locator('#hero-title').waitFor();const duration=await p.locator('.hero .button').first().evaluate(e=>parseFloat(getComputedStyle(e).transitionDuration));assert.ok(mode==='reduce'?duration<.001:duration>=.1);assert.equal(await p.locator('html').evaluate(e=>getComputedStyle(e).scrollBehavior),mode==='reduce'?'auto':'smooth');});await c.close();}
++ for(const width of report.widths){const context=await calendarReplay(await browser.newContext({viewport:{width,height:width<768?844:1000},reducedMotion:'reduce'}));const p=await context.newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));p.on('console',m=>{if(m.type()==='error')errors.push(m.text());});p.on('requestfailed',r=>errors.push('request '+r.url()));p.on('response',r=>{if(r.status()>=400)errors.push('HTTP '+r.status()+' '+r.url());});
+   await check('public-'+width,async()=>{await p.goto(base);await p.locator('#hero-title').waitFor();await inspect(p);assert.ok(await p.locator('.hero').evaluate(e=>e.getBoundingClientRect().height)>=(width<=600?430:550),'substantial composed hero');if(width<=600)assert.equal(await p.locator('.mobile-journey-panel .button').isVisible(),true,'usable mobile journey action');if([320,390,1440].includes(width))await shot(p,'public-'+width);});
+   await check('public-routes-'+width,async()=>{for(const r of ['journey','rules','announcements']){await p.goto(base+'#/'+r);await p.locator('main').waitFor();await inspect(p);}await p.goto(base);await p.locator('.faq-list summary').first().click();assert.equal(await p.locator('.faq-list details').first().getAttribute('open'),'');});
+   await check('login-errors-keyboard-'+width,async()=>{await p.locator('.header-login').click();await p.locator('#demo-password').fill('wrong');await p.locator('[data-testid="demo-login-form"] button[type=submit]').click();await p.locator('#login-error').filter({hasText:'הקוד או הסיסמה'}).waitFor();assert.equal(await p.locator('#demo-password').evaluate(e=>e===document.activeElement),true);await p.keyboard.press('Escape');await p.locator('#demo-login').waitFor({state:'detached'});});
+   await check('public-console-'+width,async()=>assert.deepEqual(errors,[]));await context.close();
+-  for(const role of Object.keys(runtime.roles)){const c=await browser.newContext({viewport:{width,height:width<768?844:1000},reducedMotion:'reduce'}),page=await c.newPage(),faults=[];page.on('pageerror',e=>faults.push(e.message));page.on('console',m=>{if(m.type()==='error')faults.push(m.text());});page.on('requestfailed',r=>faults.push(r.url()));page.on('response',r=>{if(r.status()>=400)faults.push('HTTP '+r.status()+' '+r.url());});
++  for(const role of Object.keys(runtime.roles)){const c=await calendarReplay(await browser.newContext({viewport:{width,height:width<768?844:1000},reducedMotion:'reduce'})),page=await c.newPage(),faults=[];page.on('pageerror',e=>faults.push(e.message));page.on('console',m=>{if(m.type()==='error')faults.push(m.text());});page.on('requestfailed',r=>faults.push(r.url()));page.on('response',r=>{if(r.status()>=400)faults.push('HTTP '+r.status()+' '+r.url());});
+    await check(role+'-dashboard-'+width,async()=>{await page.goto(base);await login(page,role);await inspect(page);const signatures={rep:'YOUR BOARDING PASS',tl:'TEAM FLIGHT CONTROL',dept_manager:'DEPARTMENT OVERVIEW',division_manager:'THE BIG PICTURE'};if(signatures[role])assert.ok((await page.locator('main').innerText()).includes(signatures[role]),'distinct role experience');if([390,1440].includes(width))await shot(page,role+'-'+width);});
+    await check(role+'-navigation-'+width,async()=>{for(const r of ['ranking','journey','announcements','rules']){await nav(page,r);await inspect(page);}await nav(page,'journey');const t=await page.locator('main').innerText();for(const secret of ['מילאנו','מרקש','לאס וגאס','קנקון','טוקיו','אתונה','ניו דלהי','ירושלים'])assert.ok(!t.includes(secret),'future destination '+secret);assert.equal(await page.locator('.route-stop').count(),9);});
+    await check(role+'-ranking-search-filter-details-'+width,async()=>{await nav(page,'ranking');await page.locator('#ranking-query').fill('אין-כזה-משתתף');assert.equal(await page.locator('#ranking-results tbody tr').count(),0);await page.locator('#ranking-results').getByRole('button',{name:'איפוס סינון'}).click();assert.ok(await page.locator('#ranking-results tbody tr').count()>0);await page.locator('#ranking-sector').selectOption({index:1});const aria=await page.locator('#ranking-results table').ariaSnapshot();assert.ok(aria.includes('columnheader "מיקום"')&&aria.includes('columnheader "חותמות"'),'mobile table column labels preserved');await inspect(page);await page.locator('#ranking-results').getByRole('button',{name:'פתיחת כרטיס'}).first().click();await page.locator('dialog[open]').waitFor();await page.keyboard.press('Escape');await page.locator('dialog[open]').waitFor({state:'detached'});});
+@@ -27,6 +28,6 @@ try{
+   }
+  }
+  // Same-origin, test-only axe script; never included in the publication allowlist.
+- const axePath='/tmp/soho-airlines-a11y/node_modules/axe-core/axe.min.js';if(fs.existsSync(axePath)){fs.mkdirSync(path.join(root,'_qa'),{recursive:true});fs.copyFileSync(axePath,path.join(root,'_qa/axe.js'));for(const role of ['public',...Object.keys(runtime.roles)]){const c=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'}),p=await c.newPage();await check('axe-'+role,async()=>{await p.goto(base);if(role!=='public')await login(p,role);await p.addScriptTag({url:server.base+'/_qa/axe.js'});const result=await p.evaluate(async()=>await window.axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa','wcag22aa']}}));report.axe.push({role,violations:result.violations.map(v=>({id:v.id,impact:v.impact,description:v.description,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))})),incomplete:result.incomplete.map(v=>v.id)});assert.deepEqual(result.violations.map(v=>v.id),[]);});await c.close();}}
++ const axePath='/tmp/soho-airlines-a11y/node_modules/axe-core/axe.min.js';if(fs.existsSync(axePath)){fs.mkdirSync(path.join(root,'_qa'),{recursive:true});fs.copyFileSync(axePath,path.join(root,'_qa/axe.js'));for(const role of ['public',...Object.keys(runtime.roles)]){const c=await calendarReplay(await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'})),p=await c.newPage();await check('axe-'+role,async()=>{await p.goto(base);if(role!=='public')await login(p,role);await p.addScriptTag({url:server.base+'/_qa/axe.js'});const result=await p.evaluate(async()=>await window.axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa','wcag22aa']}}));report.axe.push({role,violations:result.violations.map(v=>({id:v.id,impact:v.impact,description:v.description,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))})),incomplete:result.incomplete.map(v=>v.id)});assert.deepEqual(result.violations.map(v=>v.id),[]);});await c.close();}}
+ }finally{await browser.close();await server.close();report.finishedAt=new Date().toISOString();report.passed=report.checks.every(c=>c.passed);fs.writeFileSync(path.join(shots,'report.json'),JSON.stringify(report,null,2));console.log(JSON.stringify({passed:report.passed,checks:report.checks.length,failed:report.checks.filter(c=>!c.passed).length,screenshots:report.screenshots.length,report:path.join(shots,'report.json')}));}
+ if(!report.passed)process.exitCode=1;
+diff --git a/contests/platform/scripts/check-airlines-refinement.mjs b/contests/platform/scripts/check-airlines-refinement.mjs
+index c096881..1e505cd 100644
+--- a/contests/platform/scripts/check-airlines-refinement.mjs
++++ b/contests/platform/scripts/check-airlines-refinement.mjs
+@@ -1,10 +1,11 @@
++import {calendarReplay} from '../test/browser/airlines-calendar-replay.mjs';
+ import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {createHash} from 'node:crypto';import {chromium} from 'playwright';import {staticServer} from '../test/browser/helpers.mjs';import {SITE_PATH,syntheticScenario} from './build-airlines-preview.mjs';
+ const root=path.resolve('exports/airlines-preview'),siteDir=path.join(root,SITE_PATH),out=path.resolve('exports/airlines-refinement-qa',process.env.AIRLINES_QA_RUN||'latest'),key='bzq-airlines-demo-v1:operations';fs.mkdirSync(out,{recursive:true});
+ const report={startedAt:new Date().toISOString(),checks:[],buildHashes:Object.fromEntries(['index.html','airlines.js','airlines.css','airlines-data.js','airlines-bootstrap.js','airlines-excel.js'].map(n=>[n,createHash('sha256').update(fs.readFileSync(path.join(siteDir,n))).digest('hex')]))},runtime=JSON.parse(fs.readFileSync(path.join(siteDir,'airlines-data.js'),'utf8').replace(/^window.AIRLINES_DEMO=/,'').trim().replace(/;$/,''));
+ const server=await staticServer(root),base=server.base+'/'+SITE_PATH+'/',browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});
+ const number=t=>Number(t.replace(/[^0-9-]/g,'')),sales=p=>p.locator('.pass-sales [data-kind=sales] bdi');
+ async function layout(p){assert.ok(await p.evaluate(()=>Math.max(document.documentElement.scrollWidth,document.body.scrollWidth)<=innerWidth+1),'page overflow');assert.equal(await p.locator('html').getAttribute('dir'),'rtl');assert.deepEqual(await p.locator('.data-table tr').evaluateAll(rows=>rows.flatMap(row=>{const cells=[...row.querySelectorAll('td')].map(e=>({label:e.dataset.label,rect:e.getBoundingClientRect()})).filter(x=>x.rect.width&&x.rect.height),bad=[];for(let i=0;i<cells.length;i++)for(let j=i+1;j<cells.length;j++){const a=cells[i].rect,b=cells[j].rect;if(Math.min(a.right,b.right)-Math.max(a.left,b.left)>1&&Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>1)bad.push([cells[i].label,cells[j].label]);}return bad;})),[],'participant table cells overlap');}
+-async function test(id,width,run,options={}){const c=await browser.newContext({viewport:{width,height:844},reducedMotion:'reduce'}),errors=[],requests=[],responses=[];try{if(options.init)await c.addInitScript(options.init,{key});if(options.data)await c.route(u=>u.pathname.endsWith('/airlines-data.js'),r=>r.fulfill({contentType:'text/javascript',body:'window.AIRLINES_DEMO='+JSON.stringify(options.data)+';'}));const p=await c.newPage();p.setDefaultTimeout(10000);p.on('pageerror',e=>errors.push(e.message));p.on('console',m=>{if(m.type()==='error'&&!options.failure)errors.push(m.text());});p.on('request',r=>requests.push(r.url()));p.on('requestfailed',r=>{if(!options.failure)errors.push(r.url());});p.on('response',r=>responses.push({url:r.url(),status:r.status()}));await p.goto(base);await p.locator('#hero-title').waitFor();await run(p,c,requests,responses);await layout(p);assert.deepEqual(errors,[]);await p.screenshot({path:path.join(out,id+'.png'),fullPage:true});report.checks.push({id,passed:true});}catch(e){report.checks.push({id,passed:false,error:e.message});console.log('FAIL '+id+': '+e.message.slice(0,400));}finally{await c.close();}}
++async function test(id,width,run,options={}){const c=await calendarReplay(await browser.newContext({viewport:{width,height:844},reducedMotion:'reduce'})),errors=[],requests=[],responses=[];try{if(options.init)await c.addInitScript(options.init,{key});if(options.data)await c.route(u=>u.pathname.endsWith('/airlines-data.js'),r=>r.fulfill({contentType:'text/javascript',body:'window.AIRLINES_DEMO='+JSON.stringify(options.data)+';'}));const p=await c.newPage();p.setDefaultTimeout(10000);p.on('pageerror',e=>errors.push(e.message));p.on('console',m=>{if(m.type()==='error'&&!options.failure)errors.push(m.text());});p.on('request',r=>requests.push(r.url()));p.on('requestfailed',r=>{if(!options.failure)errors.push(r.url());});p.on('response',r=>responses.push({url:r.url(),status:r.status()}));await p.goto(base);await p.locator('#hero-title').waitFor();await run(p,c,requests,responses);await layout(p);assert.deepEqual(errors,[]);await p.screenshot({path:path.join(out,id+'.png'),fullPage:true});report.checks.push({id,passed:true});}catch(e){report.checks.push({id,passed:false,error:e.message});console.log('FAIL '+id+': '+e.message.slice(0,400));}finally{await c.close();}}
+ async function login(p,role){await p.getByRole('button',{name:'בחירת תפקיד להדגמה',exact:true}).click();await p.locator('#demo-role').selectOption(role);await p.locator('#demo-password').fill('demo2026');await p.locator('[data-testid=demo-login-form] button[type=submit]').click();await p.locator('#demo-login').waitFor({state:'detached'});await p.waitForFunction(r=>document.querySelector('#root').dataset.role===r,role);}
+ async function nav(p,s){await p.evaluate(s=>{location.hash='/'+s},s);await p.waitForFunction(s=>document.querySelector('.app-sidebar a.active')?.getAttribute('href')==='#/'+s,s);}
+ function parseCSV(text){const rows=[];let row=[],cell='',quote=false;for(let i=0;i<text.length;i++){const c=text[i];if(c==='"'){if(quote&&text[i+1]==='"'){cell+='"';i++;}else quote=!quote;}else if(c===','&&!quote){row.push(cell);cell='';}else if((c==='\n'||c==='\r')&&!quote){if(c==='\r'&&text[i+1]==='\n')i++;row.push(cell);rows.push(row);row=[];cell='';}else if(c!=='\uFEFF')cell+=c;}if(cell||row.length){row.push(cell);rows.push(row);}return rows;}
+diff --git a/contests/platform/scripts/package-airlines-calendar-review.mjs b/contests/platform/scripts/package-airlines-calendar-review.mjs
+new file mode 100644
+index 0000000..8a5528d
+--- /dev/null
++++ b/contests/platform/scripts/package-airlines-calendar-review.mjs
+@@ -0,0 +1,22 @@
++// Additive public review package; private application dependencies remain private.
++import fs from 'node:fs';import path from 'node:path';import {execFileSync} from 'node:child_process';import {createHash} from 'node:crypto';
++import {SITE_PATH} from './build-airlines-preview.mjs';
++const repo=path.resolve('../..'),site=path.resolve('exports/airlines-preview',SITE_PATH),out=path.join(site,'airlines-review-calendar'),build=JSON.parse(fs.readFileSync(path.join(site,'airlines-build.json'))),baseline='83880b6cb1d3e65d726e577163e4d9960a1071b6';
++const files=['site/src/airlines/main.js','site/src/airlines/styles.css','site/src/airlines/calendar.js','site/src/airlines/calendar-model.js','scripts/build-airlines-preview.mjs','scripts/airlines-calendar-publish.mjs','scripts/airlines-calendar.workflow.yml','scripts/airlines-calendar-source.json','scripts/check-airlines-calendar-live.mjs','scripts/package-airlines-calendar-review.mjs',...['preview','mobile','refinement','admin','calendar','motion'].map(n=>'scripts/check-airlines-'+n+'.mjs'),'test/airlines-calendar-model.test.js','test/airlines-calendar-publish.test.js','test/browser/airlines-calendar-replay.mjs'].map(n=>'contests/platform/'+n);
++const sha=b=>createHash('sha256').update(b).digest('hex');
++function put(name,bytes){const p=path.join(out,name);fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,bytes);}
++if(fs.existsSync(out))fs.rmSync(out,{recursive:true});
++for(const f of files)put('source/'+f,execFileSync('git',['show',build.sourceCommit+':'+f],{cwd:repo,maxBuffer:10e6}));
++put('source.patch',execFileSync('git',['diff','--binary',baseline,build.sourceCommit,'--',...files],{cwd:repo,maxBuffer:10e6}));
++put('CALENDAR-AUTOMATION.md',fs.readFileSync(path.join(repo,'docs/airlines-rebuild/CALENDAR-AUTOMATION.md')));
++const expected={responsive:['airlines-qa/latest',281],mobile:['airlines-mobile-qa',21],refinement:['airlines-refinement-qa/latest',18],admin:['airlines-admin-qa',6],calendar:['airlines-calendar-qa',12],motion:['airlines-motion-qa',14],independentCalendar:['airlines-calendar-live-qa',25]},checks={};
++for(const [name,[dir,count]] of Object.entries(expected)){const r=JSON.parse(fs.readFileSync(path.resolve('exports',dir,'report.json')));if(!r.passed||r.checks.length!==count)throw Error('Incomplete/failed '+name);for(const [file,h] of Object.entries(r.buildHashes||{}))if(sha(fs.readFileSync(path.join(site,file)))!==h)throw Error('Stale '+name+': '+file);checks[name]={passed:true,cases:count,mode:name==='independentCalendar'?'Actual calendar channel and controlled trusted-channel transitions':'Historical results-date display replay'};put('evidence/'+name+'.json',JSON.stringify(r,null,2));}
++for(const f of fs.readdirSync(path.resolve('exports/airlines-calendar-live-qa')).filter(n=>n.endsWith('.png')))put('evidence/screenshots/'+f,fs.readFileSync(path.resolve('exports/airlines-calendar-live-qa',f)));
++const repositoryTests=JSON.parse(fs.readFileSync(path.join(repo,'docs/airlines-rebuild/final-verification.json')));put('evidence/repository-tests.json',JSON.stringify(repositoryTests,null,2));
++const runtimeHashes=Object.fromEntries(fs.readdirSync(site).filter(n=>fs.statSync(path.join(site,n)).isFile()&&(/^(airlines.*\.(js|css|json)|index\.html)$/.test(n))).map(n=>[n,sha(fs.readFileSync(path.join(site,n)))]));
++put('release.json',JSON.stringify({synthetic:true,sourceCommit:build.sourceCommit,baseline,resultsAsOf:build.resultsAsOf,calendarThroughAtBuild:build.calendarThroughAtBuild,checks,repositoryTests:repositoryTests.repositoryTests,runtimeHashes,mutableAfterRelease:['airlines-calendar.js','airlines-calendar-status.json'],publication:'Preview-only gh-pages; exact deployment and automation evidence recorded in the release PR.',limitations:['Synthetic preview only; production and Claude legacy unchanged.','GitHub cron is best effort: up to 15 minutes plus scheduler/build/cache delays.','Live Pages browser verification remains subject to the environment domain policy.','No scheduled automation claim until its first actual run succeeds.']},null,2));
++put('README.md',`# Calendar-driven destinations\n\nThe display calendar now advances independently of weekly result uploads. On 8 November the preview shows Milan/MXP while the result snapshot remains 5 November (378 stamps, 137 units for the example representative). All approved dates and scoring inputs are preserved. Future presentation metadata stays hidden until trusted publication; changing a device clock cannot unlock destinations.\n\nRead [CALENDAR-AUTOMATION.md](CALENDAR-AUTOMATION.md), [release.json](release.json) and the actual test evidence. The 352 existing browser checks replay their historical date; 25 independent checks cover the current calendar and refresh behavior.\n\nClaude handoff: compare these changes with your current private application. Take the independent presentation clock, Israel timezone boundaries, separate result-freshness labels, pending-results states and form-preserving refresh where appropriate. Preserve the current real adapters, authorization, scoring, eligibility, schedule and original design work. Do not blindly replace your website. Readable changed files are in source/. The patch is relative to the prior UI source ${baseline}; run git apply --check in an isolated private checkout first. Unchanged engine/config dependencies are intentionally absent. No secrets or employee data are packaged.\n\nThe scheduled publisher uses only the public preview repository and GitHub's built-in token. Its installation and first run must be verified separately. The initial channel hash is recorded here; scheduled channel/status updates are expected afterward.\n`);
++function walk(d,p=''){return fs.readdirSync(d).sort().flatMap(n=>fs.statSync(path.join(d,n)).isDirectory()?walk(path.join(d,n),p+n+'/'):[p+n]);}
++put('manifest.json',JSON.stringify({sourceCommit:build.sourceCommit,files:walk(out).map(n=>({name:n,bytes:fs.statSync(path.join(out,n)).size,sha256:sha(fs.readFileSync(path.join(out,n)))}))},null,2));
++execFileSync('python',['-c',"import pathlib,zipfile,sys; p=pathlib.Path(sys.argv[1]); files=sorted(x for x in p.rglob('*') if x.is_file()); z=zipfile.ZipFile(p/'source-and-evidence.zip','w',zipfile.ZIP_DEFLATED); [z.write(x,x.relative_to(p)) for x in files]; z.close()",out]);
++put('source-and-evidence.zip.sha256',sha(fs.readFileSync(path.join(out,'source-and-evidence.zip')))+'  source-and-evidence.zip\n');console.log(JSON.stringify({sourceCommit:build.sourceCommit,checks,files:walk(out).length}));
+diff --git a/contests/platform/site/src/airlines/calendar-model.js b/contests/platform/site/src/airlines/calendar-model.js
+new file mode 100644
+index 0000000..71a8279
+--- /dev/null
++++ b/contests/platform/site/src/airlines/calendar-model.js
+@@ -0,0 +1,118 @@
++// Presentation only. The catalog belongs to the trusted publisher, never to this browser module.
++const TIME_ZONE='Asia/Jerusalem',CHANNEL='bezeq-airlines-calendar';
++const formatter=new Intl.DateTimeFormat('en-CA',{timeZone:TIME_ZONE,year:'numeric',month:'2-digit',day:'2-digit'});
++const displayFields=['he','country','dial','ll','look','photo','photoNight','line','palette','accent','peakPalette','tz','landmark','photoExt','en','airport','focus'];
++const stopFields=['id','start','end','status','peaks',...displayFields];
++const parameterFields=['height','base','levels','flare','arms','dome','width','arch','attic','bands','columns','depth','pediment','cables','bend'];
++const plain=x=>!!x&&typeof x==='object'&&!Array.isArray(x)&&[Object.prototype,null].includes(Object.getPrototypeOf(x));
++const exact=(x,keys)=>plain(x)&&Object.keys(x).length===keys.length&&keys.every(k=>Object.hasOwn(x,k));
++const only=(x,keys)=>plain(x)&&Object.keys(x).every(k=>keys.includes(k));
++const text=(x,max=4000)=>typeof x==='string'&&x.length>0&&x.length<=max&&!/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/u.test(x);
++const slug=x=>typeof x==='string'&&/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,99}$/.test(x);
++const color=x=>typeof x==='string'&&/^#(?:[\da-f]{3}|[\da-f]{4}|[\da-f]{6}|[\da-f]{8})$/i.test(x);
++const palette=x=>Array.isArray(x)&&x.length>0&&x.length<=12&&x.every(color);
++const isoDate=x=>typeof x==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(x)&&Number.isFinite(Date.parse(x+'T12:00:00Z'))&&new Date(x+'T12:00:00Z').toISOString().slice(0,10)===x;
++const status=(stop,date)=>date<stop.start?'upcoming':date>stop.end?'past':'current';
++const selected=(stops,period,date)=>date>period.end?'after':date<period.start?'before':stops.findIndex(s=>s.start<=date&&date<=s.end)>=0?stops.findIndex(s=>s.start<=date&&date<=s.end):stops.findLastIndex(s=>s.start<=date)>=0?stops.findLastIndex(s=>s.start<=date):'before';
++const copy=x=>JSON.parse(JSON.stringify(x));
++
++export function israelDate(now=new Date()){
++ const date=new Date(now);if(!Number.isFinite(+date))throw new RangeError('Invalid calendar time');
++ const parts=Object.fromEntries(formatter.formatToParts(date).map(p=>[p.type,p.value]));
++ return `${parts.year}-${parts.month}-${parts.day}`;
++}
++
++export function millisecondsToIsraelMidnight(now=new Date()){
++ const timestamp=+new Date(now),today=israelDate(now);
++ // Search the actual IANA date boundary; a DST day is not necessarily 24 hours.
++ let low=1,high=26*3600000;
++ while(low<high){const middle=Math.floor((low+high)/2);if(israelDate(new Date(timestamp+middle))===today)low=middle+1;else high=middle;}
++ return low;
++}
++
++function projectLandmark(source){
++ if(!plain(source))return null;
++ const result={};for(const key of ['kind','name','icon'])if(source[key]!=null)result[key]=source[key];
++ if(plain(source.params))result.params=Object.fromEntries(parameterFields.filter(k=>source.params[k]!=null).map(k=>[k,source.params[k]]));
++ return result;
++}
++
++function projectPeak(peak,stop){
++ return {date:peak.date??null,theme:peak.theme||`יום שיא בסגנון ${stop.country??stop.he}`,tbd:!!peak.tbd||!peak.theme,text:peak.text??null,themePhoto:peak.themePhoto??null,themePalette:peak.themePalette??null};
++}
++
++export function calendarPacket(catalog,now=new Date()){
++ const date=israelDate(now);
++ if(!plain(catalog)||!plain(catalog.period)||!Array.isArray(catalog.stops))throw new TypeError('Invalid presentation catalog');
++ const period={start:catalog.period.start,end:catalog.period.end};
++ const stops=catalog.stops.map((source,index)=>{
++  const state=status(source,date),stop={id:state==='upcoming'?'stop'+(index+1):source.id,start:source.start,end:source.end,status:state};
++  if(state==='upcoming'){for(const key of displayFields)stop[key]=null;stop.peaks=[];return stop;}
++  for(const key of displayFields){
++   if(['en','airport','focus'].includes(key)&&source[key]==null)continue;
++   stop[key]=key==='photoExt'?'webp':key==='landmark'?projectLandmark(source[key]):source[key]??null;
++  }
++  stop.peaks=(Array.isArray(source.peaks)&&source.peaks.length?source.peaks:[{}]).map(peak=>projectPeak(peak,source));
++  return stop;
++ });
++ const result={schema:1,synthetic:true,channel:CHANNEL,timeZone:TIME_ZONE,publishedThrough:date,period,now:{stop:selected(stops,period,date)},stops};
++ const reference={contest:period,stops:catalog.stops};
++ if(!validateCalendarPacket(reference,result))throw new TypeError('Invalid presentation catalog');
++ return copy(result);
++}
++
++function validLandmark(value){
++ return only(value,['kind','name','icon','params'])&&text(value.kind,100)&&(!Object.hasOwn(value,'name')||text(value.name,500))&&(!Object.hasOwn(value,'icon')||slug(value.icon))&&(!Object.hasOwn(value,'params')||(only(value.params,parameterFields)&&Object.values(value.params).every(v=>typeof v==='boolean'||(typeof v==='number'&&Number.isFinite(v))||(typeof v==='string'&&/^[a-zA-Z0-9 -]{1,60}$/.test(v)))));
++}
++
++function validPeak(peak,stop){
++ return exact(peak,['date','theme','tbd','text','themePhoto','themePalette'])&&(peak.date===null||(isoDate(peak.date)&&peak.date>=stop.start&&peak.date<=stop.end))&&text(peak.theme,500)&&typeof peak.tbd==='boolean'&&(peak.text===null||text(peak.text))&&(peak.themePhoto===null||slug(peak.themePhoto))&&(peak.themePalette===null||palette(peak.themePalette));
++}
++
++function validMetadata(stop){
++ if(!text(stop.he,200)||!text(stop.country,200)||!slug(stop.id)||stop.photoExt!=='webp')return false;
++ for(const key of ['dial','line','en','airport'])if(stop[key]!=null&&!text(stop[key],key==='line'?4000:200))return false;
++ for(const key of ['look','photo','photoNight'])if(stop[key]!=null&&!slug(stop[key]))return false;
++ if(stop.ll!==null&&(!Array.isArray(stop.ll)||stop.ll.length!==2||!stop.ll.every(Number.isFinite)||Math.abs(stop.ll[0])>180||Math.abs(stop.ll[1])>90))return false;
++ for(const key of ['palette','peakPalette'])if(stop[key]!==null&&!palette(stop[key]))return false;
++ if(stop.accent!==null&&!color(stop.accent))return false;
++ if(stop.tz!==null){if(!text(stop.tz,100))return false;try{new Intl.DateTimeFormat('en',{timeZone:stop.tz});}catch{return false;}}
++ if(stop.focus!=null&&(typeof stop.focus!=='string'||! /^(?:center|left|right|top|bottom|\d{1,3}(?:\.\d+)?%)(?: (?:center|left|right|top|bottom|\d{1,3}(?:\.\d+)?%))?$/.test(stop.focus)))return false;
++ return (stop.landmark===null||validLandmark(stop.landmark))&&Array.isArray(stop.peaks)&&stop.peaks.length>0&&stop.peaks.length<=30&&stop.peaks.every(p=>validPeak(p,stop));
++}
++
++export function validateCalendarPacket(site,packet){
++ try{
++  if(!plain(site)||!Array.isArray(site.stops)||site.stops.length!==9||!plain(site.contest))return false;
++  if(!exact(packet,['schema','synthetic','channel','timeZone','publishedThrough','period','now','stops'])||packet.schema!==1||packet.synthetic!==true||packet.channel!==CHANNEL||packet.timeZone!==TIME_ZONE||!isoDate(packet.publishedThrough))return false;
++  if(!exact(packet.period,['start','end'])||!isoDate(packet.period.start)||!isoDate(packet.period.end)||packet.period.start>packet.period.end||packet.period.start!==site.contest.start||packet.period.end!==site.contest.end)return false;
++  if(!exact(packet.now,['stop'])||!Array.isArray(packet.stops)||packet.stops.length!==site.stops.length)return false;
++  for(let index=0;index<packet.stops.length;index++){
++   const stop=packet.stops[index],original=site.stops[index];
++   if(!only(stop,stopFields)||!plain(original)||!isoDate(stop.start)||!isoDate(stop.end)||stop.start>stop.end||stop.start!==original.start||stop.end!==original.end||stop.start<packet.period.start||stop.end>packet.period.end||(index&&stop.start<=packet.stops[index-1].end)||stop.status!==status(stop,packet.publishedThrough))return false;
++   if(stop.status==='upcoming'){
++    if(stop.id!=='stop'+(index+1)||!Array.isArray(stop.peaks)||stop.peaks.length||displayFields.some(key=>Object.hasOwn(stop,key)&&stop[key]!==null))return false;
++   }else{
++    const required=displayFields.filter(key=>!['en','airport','focus'].includes(key));
++    if(!required.every(key=>Object.hasOwn(stop,key))||!validMetadata(stop)||(original.he&&stop.id!==original.id))return false;
++   }
++  }
++  return packet.now.stop===selected(packet.stops,packet.period,packet.publishedThrough);
++ }catch{return false;}
++}
++
++export function applyCalendarPacket(data,packet){
++ const rejected={accepted:false,changed:false};
++ try{
++  if(data?.meta?.synthetic!==true||!validateCalendarPacket(data.site,packet))return rejected;
++  const previous=data.site.presentation;
++  if(previous&&(!validateCalendarPacket(data.site,previous)||packet.publishedThrough<previous.publishedThrough))return rejected;
++  const changed=JSON.stringify(previous)!==JSON.stringify(packet);
++  if(changed)data.site.presentation=copy(packet);
++  return {accepted:true,changed};
++ }catch{return rejected;}
++}
++
++export const presentationStops=site=>site?.presentation?.stops??site?.stops;
++export const presentationNow=site=>site?.presentation?.now??site?.now;
++export const presentationDate=site=>site?.presentation?.publishedThrough??site?.asOf;
+diff --git a/contests/platform/site/src/airlines/calendar.js b/contests/platform/site/src/airlines/calendar.js
+new file mode 100644
+index 0000000..4b81ba7
+--- /dev/null
++++ b/contests/platform/site/src/airlines/calendar.js
+@@ -0,0 +1,46 @@
++import {applyCalendarPacket,millisecondsToIsraelMidnight} from './calendar-model.js';
++
++// The clock schedules a reload only. It never reveals a destination: the trusted
++// publisher has already redacted the same-origin packet before the browser gets it.
++export function watchCalendar(data,{onChange=()=>{},onAvailable=()=>{},onUnavailable=()=>{},intervalMs=300000,source='airlines-calendar.js',now=()=>new Date()}={}){
++ let stopped=false,inflight=null,deadline=null,midnight=null,sequence=0;
++ const consume=packet=>{
++  if(stopped)return false;
++  const result=applyCalendarPacket(data,packet);
++  if(!result.accepted){onUnavailable();return false;}
++  onAvailable();if(result.changed)onChange();return true;
++ };
++ const received=e=>consume(e.detail);
++ const reload=()=>{
++  if(stopped||inflight||document.visibilityState==='hidden')return;
++  const url=new URL(source,document.baseURI);
++  if(url.origin!==location.origin){onUnavailable();return;}
++  url.searchParams.set('refresh',String(+now())+'-'+(++sequence));
++  const script=document.createElement('script');inflight=script;
++  const done=failed=>{
++   if(inflight!==script)return;
++   clearTimeout(deadline);deadline=null;inflight=null;script.onload=null;script.onerror=null;script.remove();
++   if(stopped)return;
++   if(failed)onUnavailable();else consume(window.AIRLINES_CALENDAR);
++  };
++  script.src=url.href;script.async=true;script.onload=()=>done(false);script.onerror=()=>done(true);
++  deadline=setTimeout(()=>done(true),12000);document.head.append(script);
++ };
++ const scheduleMidnight=()=>{
++  if(stopped)return;
++  clearTimeout(midnight);
++  midnight=setTimeout(()=>{reload();scheduleMidnight();},millisecondsToIsraelMidnight(now())+1000);
++ };
++ const visible=()=>{if(document.visibilityState==='visible'){reload();scheduleMidnight();}};
++ window.addEventListener('airlines:calendar',received);
++ window.addEventListener('focus',visible);
++ window.addEventListener('pageshow',visible);
++ document.addEventListener('visibilitychange',visible);
++ if(window.AIRLINES_CALENDAR)consume(window.AIRLINES_CALENDAR);
++ const interval=setInterval(reload,intervalMs);scheduleMidnight();reload();
++ return ()=>{
++  if(stopped)return;stopped=true;clearInterval(interval);clearTimeout(deadline);clearTimeout(midnight);
++  if(inflight){inflight.onload=null;inflight.onerror=null;inflight.remove();inflight=null;}
++  window.removeEventListener('airlines:calendar',received);window.removeEventListener('focus',visible);window.removeEventListener('pageshow',visible);document.removeEventListener('visibilitychange',visible);
++ };
++}
+diff --git a/contests/platform/site/src/airlines/main.js b/contests/platform/site/src/airlines/main.js
+index 7026ed4..9da6c06 100644
+--- a/contests/platform/site/src/airlines/main.js
++++ b/contests/platform/site/src/airlines/main.js
+@@ -1,5 +1,7 @@
+ import './styles.css';
+ import './mobile.css';
++import {watchCalendar} from './calendar.js';
++import {applyCalendarPacket,presentationStops,presentationNow,presentationDate} from './calendar-model.js';
+ import {mountAirlinesMotion} from './motion.js';
+ import {disposeTree,onCleanup} from '../lifecycle.js';
+ import {attachActivity,summarizeActivity} from './activity.js';
+@@ -11,6 +13,7 @@ if(!data?.site||!data?.meta?.synthetic)throw new Error('Synthetic Airlines data
+ function restorePublished(){applyPublishedSnapshots(data,getPublishedSnapshots());}
+ attachActivity(data);
+ restorePublished();
++data.meta.calendarUnavailable=!applyCalendarPacket(data,window.AIRLINES_CALENDAR).accepted;
+ const site=data.site,root=document.querySelector('#root');document.documentElement.lang='he';document.documentElement.dir='rtl';
+ const SESSION='bzq-airlines-demo-v1-session';
+ const codes={rep:'DEMO-REP',tl:'DEMO-TL',dept_manager:'DEMO-DEPT',division_manager:'DEMO-DIV',admin:'DEMO-ADMIN',superadmin:'DEMO-ROOT'};
+@@ -51,20 +54,21 @@ function header(){
+  onCleanup(head,()=>{window.removeEventListener('keydown',key);document.removeEventListener('click',outside);wide.removeEventListener('change',resize);});
+  return head;
+ }
+-function demoBar(){return h('div',{class:'demo-bar'},h('div',{class:'container'},h('span',{class:'demo-indicator'}),h('strong',{},'הדגמה סינתטית'),h('span',{},'נתונים לדוגמה בלבד'),h('span',{class:'demo-date'},'תמונת מצב ',bdi(new Date(`${site.asOf}T12:00:00Z`).toLocaleDateString('he-IL')))));}
++function demoBar(){return h('div',{class:'demo-bar'},h('div',{class:'container'},h('span',{class:'demo-indicator'}),h('strong',{},'הדגמה סינתטית'),h('span',{},'נתונים לדוגמה בלבד'),h('span',{class:'demo-date'},'נתונים עד ',bdi(new Date(`${site.asOf}T12:00:00Z`).toLocaleDateString('he-IL')))));}
+ function footer(){return h('footer',{class:'site-footer'},h('div',{class:'container footer-grid'},h('div',{},brand(),h('p',{},'אגף סוהו · חשמל · שירותי דיגיטל'),h('p',{class:'footer-small'},'מסביב לעולם ב־60 יום · נובמבר–דצמבר 2026')),h('div',{class:'footer-links'},link('המסע שלנו','#/journey'),link('כללי ההדגמה','#/rules'),button('בחירת תפקיד להדגמה',login,'text-button')),h('div',{class:'footer-note'},h('strong',{},'סביבת הדגמה סינתטית'),h('p',{},'הזהויות, התוצאות והפעולות באתר הן להמחשה. אין כאן אישור זכאות או פרסים.'),h('p',{class:'photo-credit'},'תמונות אווירה מתוך ספריית הנכסים המאושרת של הקמפיין.'))));}
+-const currentStop=()=>site.stops?.find(s=>s.status==='current')||site.stops?.findLast(s=>s.he);
+-function routeTrack(scrollable=false){return h('ol',{class:'route-track','aria-label':'תשע תחנות המסע',tabindex:scrollable?'0':null},site.stops.map((s,i)=>h('li',{class:`route-stop ${s.status}`,style:s.he&&s.photo?`--stop-photo:url("airlines-assets/${s.photo}.${s.photoExt||'webp'}")`:null},h('span',{class:'route-dot'},icon(s.status==='upcoming'?'lock':'plane')),h('span',{class:'route-number'},bdi(String(i+1).padStart(2,'0'))),h('strong',{},s.he||'יעד בהפתעה'),h('span',{class:'route-dates'},bdi(`${date(s.start)}–${date(s.end)}`)),h('span',{class:'route-state'},s.status==='current'?'נמצאים כאן':s.status==='past'?'ביקרנו כאן':'ייחשף בהמשך'))));}
+-function journey(full=false){const s=currentStop();return h('section',{class:`journey-section${full?' full-page':''}`},h('div',{class:'container'},heading('כל שבוע, עולם חדש','הדרך חשובה. היעד מפתיע.','תשע תחנות, מסע אחד משותף. כל יעד נחשף בתחילת השבוע שלו.'),routeTrack(!full),h('div',{class:'destination-feature'},h('div',{class:'destination-image',role:'img','aria-label':s?.landmark?.name||'היעד ייחשף במועדו'},h('span',{class:'image-caption'},s?.en||'המסע מתחיל בקרוב')),h('div',{class:'destination-copy'},badge(s?.status==='current'?'היעד הנוכחי':site.now.stop==='after'?'המסע הושלם':s?'התחנה האחרונה':'לקראת המראה','accent'),h('span',{class:'destination-code'},s?.airport||'…'),h('h3',{},s?.he||'יעד בהפתעה'),h('p',{},s?.line||'המסע שלנו מתחיל בעיר האורות. שבוע ראשון של עשייה, התקדמות וחותמות חדשות בדרכון.'),h('div',{class:'destination-meta'},h('span',{},icon('clock'),bdi(`${date(s?.start)}–${date(s?.end)}`)),h('span',{},icon('globe'),s?.country||'היעד ייחשף בהמשך')),s?.peaks?.[0]&&h('div',{class:'peak-note'},h('strong',{},s.peaks[0].theme||'יום שיא בפריז'),h('p',{},s.peaks[0].tbd?'הפרטים, התאריך והפרס יפורסמו לאחר אישור.':s.peaks[0].text||'פרטי הפעילות יפורסמו בהמשך.')),button(role?'לכרטיס הטיסה שלי':'מצטרפים למסע',()=>role?location.hash='/dashboard':login(),'button','arrow')))));}
++const journeyStops=()=>presentationStops(site),journeyNow=()=>presentationNow(site);
++const currentStop=()=>journeyStops()?.find(s=>s.status==='current')||journeyStops()?.findLast(s=>s.he);
++function routeTrack(scrollable=false){return h('ol',{class:'route-track','aria-label':'תשע תחנות המסע',tabindex:scrollable?'0':null},journeyStops().map((s,i)=>h('li',{class:`route-stop ${s.status}`,style:s.he&&s.photo?`--stop-photo:url("airlines-assets/${s.photo}.${s.photoExt||'webp'}")`:null},h('span',{class:'route-dot'},icon(s.status==='upcoming'?'lock':'plane')),h('span',{class:'route-number'},bdi(String(i+1).padStart(2,'0'))),h('strong',{},s.he||'יעד בהפתעה'),h('span',{class:'route-dates'},bdi(`${date(s.start)}–${date(s.end)}`)),h('span',{class:'route-state'},s.status==='current'?'נמצאים כאן':s.status==='past'?'ביקרנו כאן':'ייחשף בהמשך'))));}
++function journey(full=false){const s=currentStop();return h('section',{class:`journey-section${full?' full-page':''}`},h('div',{class:'container'},heading('כל שבוע, עולם חדש','הדרך חשובה. היעד מפתיע.','תשע תחנות, מסע אחד משותף. כל יעד נחשף בתחילת השבוע שלו.'),routeTrack(!full),h('div',{class:'destination-feature'},h('div',{class:'destination-image',role:'img','aria-label':s?.landmark?.name||'היעד ייחשף במועדו'},h('span',{class:'image-caption'},s?.en||'המסע מתחיל בקרוב')),h('div',{class:'destination-copy'},badge(s?.status==='current'?'היעד הנוכחי':journeyNow().stop==='after'?'המסע הושלם':s?'התחנה האחרונה':'לקראת המראה','accent'),h('span',{class:'destination-code'},s?.airport||'…'),h('h3',{},s?.he||'יעד בהפתעה'),h('p',{},s?.line||'המסע שלנו מתחיל בעיר האורות. שבוע ראשון של עשייה, התקדמות וחותמות חדשות בדרכון.'),h('div',{class:'destination-meta'},h('span',{},icon('clock'),bdi(`${date(s?.start)}–${date(s?.end)}`)),h('span',{},icon('globe'),s?.country||'היעד ייחשף בהמשך')),s?.peaks?.[0]&&h('div',{class:'peak-note'},h('strong',{},s.peaks[0].theme||'יום שיא בפריז'),h('p',{},s.peaks[0].tbd?'הפרטים, התאריך והפרס יפורסמו לאחר אישור.':s.peaks[0].text||'פרטי הפעילות יפורסמו בהמשך.')),button(role?'לכרטיס הטיסה שלי':'מצטרפים למסע',()=>role?location.hash='/dashboard':login(),'button','arrow')))));}
+ const faq=[['איך צוברים חותמות?','החותמות מחושבות לפי מסלול הפעילות וכללי התחרות המוגדרים במנוע. באזור האישי מוצגים הפירוט והצעד הבא. נתונים וכללים שטרם אושרו מסומנים במפורש.'],['מתי נחשף היעד הבא?','כל יעד נחשף בתחילת השבוע שלו לפי לוח המסע. עד אז מוצגים תאריכי התחנה בלבד.'],['האם הנתונים באתר הם נתוני אמת?','זו הדגמה סינתטית. השמות, התוצאות, קודי הכניסה ופעולות הניהול נועדו להתנסות בלבד, ואינם מחוברים למערכת ייצור.'],['האם דירוג נוכחי מבטיח זכייה?','דירוג הוא תמונת מצב מחושבת. זכאות, מחלקת טיסה והקצאת פרסים כפופות לתנאים ולאישורים המוצגים בכל מסלול.'],['איך נכנסים לתפקיד אחר?','פותחים את חלון הכניסה ובוחרים תפקיד. משתמשים בקוד המוצג ובסיסמת ההדגמה demo2026.']];
+ function rules(full=false){return h('section',{class:`rules-section${full?' full-page':''}`},h('div',{class:'container'},heading('המסע, צעד אחר צעד','העשייה שלכם. החותמות שלכם.','בכל מסלול מתקדמים לפי הכללים שלו. תמונת המצב שקופה, והשלב הבא תמיד מול העיניים.'),h('div',{class:'how-steps'},[['ticket','נכנסים עם כרטיס אישי','בוחרים תפקיד בהדגמה ופותחים את תמונת המצב האישית או הצוותית.'],['chart','עושים, צוברים, מתקדמים','עוקבים אחרי החותמות, השלמת התנאים והמיקום במסלול שלכם.'],['globe','מגלים יעד חדש','בכל שבוע נפתחת תחנה נוספת, עם עדכונים ופעילויות שיתפרסמו לאחר אישור.']].map(([i,t,b],j)=>h('article',{class:'how-step'},h('div',{class:'step-top'},icon(i),bdi(`0${j+1}`)),h('h3',{},t),h('p',{},b)))),full&&h('div',{class:'rules-by-sector'},Object.entries(site.stampRules||{}).map(([id,r])=>panel(r.label||sector(id),r.pending&&h('p',{class:'notice'},String(r.pending)),h('ul',{class:'rule-list'},(r.rules||[]).map(t=>h('li',{},icon('check'),t))),h('p',{class:'field-hint'},'תנאי הגרלה: ',typeof r.draw==='string'?r.draw:'ממתינים לאישור')))),h('div',{class:'faq-wrap'},h('div',{},h('span',{class:'eyebrow'},'לפני ההמראה'),h('h2',{},'שאלות טובות.\nתשובות בגובה העיניים.')),h('div',{class:'faq-list'},faq.map(([q,a])=>h('details',{},h('summary',{},q,icon('plus')),h('p',{},a)))))));}
+-function announcements(full=false){const s=currentStop(),items=[{date:date(site.asOf),tag:'עדכון מסע',title:`השבוע אנחנו ב${s?.he||'יעד בהפתעה'}`,text:'התחנה הנוכחית פתוחה. היכנסו לאזור האישי, בדקו את החותמות ואת הצעד הבא שלכם.'},{date:date(site.contest.start),tag:'יוצאים לדרך',title:'דרכון אחד. תשע תחנות. שישים יום.',text:'מסביב לעולם ב־60 יום יוצא לדרך באגף סוהו, חשמל ושירותי דיגיטל. בהדגמה אפשר להתנסות בכל התפקידים.'},{date:'בקרוב',tag:'ממתין לאישור',title:'יום השיא הבא בדרך',text:'מועד הפעילות, התוכן והפרס יפורסמו לאחר אישור. כדאי לעקוב אחרי עדכוני הטיסה.'}];return h('section',{class:`news-section${full?' full-page':''}`},h('div',{class:'container'},heading('עדכוני טיסה','כל מה שחדש במסע','חדשות התחנה הנוכחית, רגעים חשובים והעדכונים הבאים.'),h('div',{class:'news-list'},items.map((v,i)=>h('article',{class:'news-item'},h('div',{class:'news-date'},bdi(v.date),h('span',{},v.tag)),h('div',{},h('h3',{},v.title),h('p',{},v.text)),icon(i===0?'plane':'bell'))))));}
++function announcements(full=false){const s=currentStop(),items=[{date:date(s?.start||presentationDate(site)),tag:'עדכון מסע',title:`השבוע אנחנו ב${s?.he||'יעד בהפתעה'}`,text:'התחנה הנוכחית פתוחה. היכנסו לאזור האישי, בדקו את החותמות ואת הצעד הבא שלכם.'},{date:date(site.contest.start),tag:'יוצאים לדרך',title:'דרכון אחד. תשע תחנות. שישים יום.',text:'מסביב לעולם ב־60 יום יוצא לדרך באגף סוהו, חשמל ושירותי דיגיטל. בהדגמה אפשר להתנסות בכל התפקידים.'},{date:'בקרוב',tag:'ממתין לאישור',title:'יום השיא הבא בדרך',text:'מועד הפעילות, התוכן והפרס יפורסמו לאחר אישור. כדאי לעקוב אחרי עדכוני הטיסה.'}];return h('section',{class:`news-section${full?' full-page':''}`},h('div',{class:'container'},heading('עדכוני טיסה','כל מה שחדש במסע','חדשות התחנה הנוכחית, רגעים חשובים והעדכונים הבאים.'),h('div',{class:'news-list'},items.map((v,i)=>h('article',{class:'news-item'},h('div',{class:'news-date'},bdi(v.date),h('span',{},v.tag)),h('div',{},h('h3',{},v.title),h('p',{},v.text)),icon(i===0?'plane':'bell'))))));}
+ function mobileJourneyPanel(){
+- const s=currentStop(),index=s?site.stops.indexOf(s):-1,finished=site.now.stop==='after';
++ const s=currentStop(),index=s?journeyStops().indexOf(s):-1,finished=journeyNow().stop==='after';
+  return h('section',{class:'mobile-journey-panel','aria-label':'תמונת המסע'},
+   h('div',{class:'mobile-flight-heading'},h('div',{},h('span',{},finished?'מסע מלא בחוויות':s?'השבוע במסע':'לקראת ההמראה'),h('h2',{},s?.he||'המסע מתחיל בקרוב')),h('div',{class:'mobile-airport',dir:'ltr'},icon('plane'),bdi(s?.airport||'BEZEQ'))),
+-  h('div',{class:'mobile-flight-facts'},h('div',{},h('span',{},s?'השבוע שלנו':'מועד ההמראה'),bdi(s?`${date(s.start)}–${date(s.end)}`:date(site.contest.start))),h('div',{},h('span',{},'תמונת מצב סינתטית'),bdi(new Date(site.asOf+'T12:00:00Z').toLocaleDateString('he-IL',{day:'2-digit',month:'2-digit',year:'numeric'})))),
+-  h('div',{class:'mobile-flight-progress'},h('span',{},finished?'המסע הושלם':index>=0?`תחנה ${index+1} מתוך 9`:'תשע תחנות מחכות לנו'),h('ol',{'aria-label':'התקדמות במסע'},site.stops.map((st,i)=>h('li',{class:st.status,'aria-label':`תחנה ${i+1}: ${st.status==='current'?'נמצאים כאן':st.status==='past'?'הושלמה':'בהמשך המסע'}`},h('span',{}))))),
++  h('div',{class:'mobile-flight-facts'},h('div',{},h('span',{},s?'השבוע שלנו':'מועד ההמראה'),bdi(s?`${date(s.start)}–${date(s.end)}`:date(site.contest.start))),h('div',{},h('span',{},'נתונים מעודכנים עד'),bdi(new Date(site.asOf+'T12:00:00Z').toLocaleDateString('he-IL',{day:'2-digit',month:'2-digit',year:'numeric'})))),
++  h('div',{class:'mobile-flight-progress'},h('span',{},finished?'המסע הושלם':index>=0?`תחנה ${index+1} מתוך 9`:'תשע תחנות מחכות לנו'),h('ol',{'aria-label':'התקדמות במסע'},journeyStops().map((st,i)=>h('li',{class:st.status,'aria-label':`תחנה ${i+1}: ${st.status==='current'?'נמצאים כאן':st.status==='past'?'הושלמה':'בהמשך המסע'}`},h('span',{}))))),
+   button(role?'לאזור האישי שלי':'כרטיס הטיסה שלכם מחכה',()=>role?location.hash='/dashboard':login(),'button full','arrow'));
+ }
+ function mobileQuickLinks(){return h('nav',{class:'mobile-quick-links','aria-label':'קיצורי דרך למסע'},[['ranking','chart','הדירוג'],['journey','globe','המסלול'],['announcements','bell','עדכונים'],['rules','shield','כללי המסע']].map(([key,i,text])=>h('a',{href:'#/'+key},h('span',{},icon(i)),text)));}
+@@ -85,7 +89,7 @@ function mobileDock(active){
+  if(typeof ResizeObserver!=='undefined'){const observer=new ResizeObserver(([entry])=>{const size=entry.target.getBoundingClientRect().height;if(size>0)document.documentElement.style.setProperty('--dock-space',size+'px');});observer.observe(nav);onCleanup(nav,()=>observer.disconnect());}
+  return nav;
+ }
+-function landing(){const s=currentStop();return h('main',{id:'main-content',tabindex:'-1'},h('section',{class:'hero','aria-labelledby':'hero-title'},h('div',{class:'hero-photo'}),h('div',{class:'hero-wash'}),h('div',{class:'hero-content container'},h('div',{class:'hero-eyebrow'},h('span',{class:'short-line'}),'אגף סוהו · חשמל · שירותי דיגיטל'),h('h1',{id:'hero-title'},'מסביב לעולם',h('br'),h('span',{},'ב־60 יום')),h('p',{class:'hero-english',dir:'ltr'},'BEZEQ AIRLINES'),h('p',{class:'hero-body'},'העשייה שלכם לוקחת אותנו רחוק.\nמסע אחד, תשעה יעדים, והמון סיבות להמריא.'),h('div',{class:'hero-actions'},button(role?'לאזור האישי שלי':'כרטיס הטיסה שלכם מחכה',()=>role?location.hash='/dashboard':login(),'button accent','arrow'),link('לגלות את המסע','#/journey','hero-text-link')),h('span',{class:'hero-period'},bdi('01.11.2026 — 31.12.2026'))),h('div',{class:'hero-coordinate',dir:'ltr'},coordinates(s)),h('div',{class:'flight-strip'},h('div',{class:'flight-strip-inner container'},h('div',{class:'flight-destination'},h('span',{class:'tiny-label'},'עכשיו נוחתים ב־'),h('strong',{},s?.he||'יעד בהפתעה'),bdi(s?.en?`${s.en} / ${s.airport}`:'היעד ייחשף בקרוב')),h('div',{class:'flight-status'},h('span',{class:'status-light'}),site.now.stop==='after'?'המסע הושלם':s?'המסע בעיצומו':'ממריאים בקרוב',h('small',{},s?`תחנה ${String(site.stops.indexOf(s)+1).padStart(2,'0')} מתוך 09`:'תשע תחנות מחכות לנו')),h('div',{class:'flight-dates'},h('span',{class:'tiny-label'},'השבוע שלנו'),bdi(`${date(s?.start)} — ${date(s?.end)}`)),link('למסלול המלא','#/journey','strip-link','arrow')))),mobileJourneyPanel(),mobileQuickLinks(),journey(),rules(),announcements(),h('section',{class:'closing-cta'},h('div',{class:'container'},icon('plane'),h('span',{class:'eyebrow'},'READY FOR TAKEOFF'),h('h2',{},'היעד הבא מתחיל בכם.'),button(role?'חוזרים לאזור האישי':'פותחים את כרטיס הטיסה',()=>role?location.hash='/dashboard':login(),'button accent','arrow'))));}
++function landing(){const s=currentStop();return h('main',{id:'main-content',tabindex:'-1'},h('section',{class:'hero','aria-labelledby':'hero-title'},h('div',{class:'hero-photo'}),h('div',{class:'hero-wash'}),h('div',{class:'hero-content container'},h('div',{class:'hero-eyebrow'},h('span',{class:'short-line'}),'אגף סוהו · חשמל · שירותי דיגיטל'),h('h1',{id:'hero-title'},'מסביב לעולם',h('br'),h('span',{},'ב־60 יום')),h('p',{class:'hero-english',dir:'ltr'},'BEZEQ AIRLINES'),h('p',{class:'hero-body'},'העשייה שלכם לוקחת אותנו רחוק.\nמסע אחד, תשעה יעדים, והמון סיבות להמריא.'),h('div',{class:'hero-actions'},button(role?'לאזור האישי שלי':'כרטיס הטיסה שלכם מחכה',()=>role?location.hash='/dashboard':login(),'button accent','arrow'),link('לגלות את המסע','#/journey','hero-text-link')),h('span',{class:'hero-period'},bdi('01.11.2026 — 31.12.2026'))),h('div',{class:'hero-coordinate',dir:'ltr'},coordinates(s)),h('div',{class:'flight-strip'},h('div',{class:'flight-strip-inner container'},h('div',{class:'flight-destination'},h('span',{class:'tiny-label'},'עכשיו נוחתים ב־'),h('strong',{},s?.he||'יעד בהפתעה'),bdi(s?.en?`${s.en} / ${s.airport}`:'היעד ייחשף בקרוב')),h('div',{class:'flight-status'},h('span',{class:'status-light'}),journeyNow().stop==='after'?'המסע הושלם':s?'המסע בעיצומו':'ממריאים בקרוב',h('small',{},s?`תחנה ${String(journeyStops().indexOf(s)+1).padStart(2,'0')} מתוך 09`:'תשע תחנות מחכות לנו')),h('div',{class:'flight-dates'},h('span',{class:'tiny-label'},'השבוע שלנו'),bdi(`${date(s?.start)} — ${date(s?.end)}`)),link('למסלול המלא','#/journey','strip-link','arrow')))),mobileJourneyPanel(),mobileQuickLinks(),journey(),rules(),announcements(),h('section',{class:'closing-cta'},h('div',{class:'container'},icon('plane'),h('span',{class:'eyebrow'},'READY FOR TAKEOFF'),h('h2',{},'היעד הבא מתחיל בכם.'),button(role?'חוזרים לאזור האישי':'פותחים את כרטיס הטיסה',()=>role?location.hash='/dashboard':login(),'button accent','arrow'))));}
+ const identity=()=>data.roles[role]||{};
+ function scopedPeople(){const w=identity(),ps=site.people;if(role==='tl')return ps.filter(p=>p.team===w.team&&(!w.department||p.department===w.department));if(role==='dept_manager')return ps.filter(p=>p.department===w.department);if(role==='rep'){const me=ps.find(p=>p.key===w.personKey);return ps.filter(p=>p.sector===me?.sector);}return ps;}
+ function eligibility(p){const c=p.stampCard;if(c?.draw?.met===true)return{text:'תנאי הסף הושלמו',tone:'success'};if(c?.pending||c?.draw?.pending||(c?.draw?.met==null&&!p.missing?.length))return{text:'ממתין לאישור',tone:'pending'};if(p.qualified)return{text:'תנאי הסף הושלמו',tone:'success'};return{text:'תנאים להשלמה',tone:'neutral'};}
+@@ -101,7 +105,7 @@ function ruleQuantity(p,line){
+  return `${known.length?n(sum):'—'} יחידות בפועל${known.length<ids.length?' · נתונים חלקיים':''}`;
+ }
+ function unitPeople(unit){return site.people.filter(p=>unit.name?p.team===unit.name&&p.department===unit.department:p.department===unit.id);}
+-function snapshotMonth(){return new Intl.DateTimeFormat('en',{month:'short',year:'numeric',timeZone:'Asia/Jerusalem'}).format(new Date(site.asOf+'T12:00:00Z')).toUpperCase();}
++function snapshotMonth(){return new Intl.DateTimeFormat('en',{month:'short',year:'numeric',timeZone:'Asia/Jerusalem'}).format(new Date((currentStop()?.start||presentationDate(site))+'T12:00:00Z')).toUpperCase();}
+ function coordinates(stop){if(!stop?.ll)return '';const[lon,lat]=stop.ll;return `${Math.abs(lat).toFixed(2)}°${lat<0?'S':'N'}\n${Math.abs(lon).toFixed(2)}°${lon<0?'W':'E'}`;}
+ const dashboardTitles={rep:['האזור האישי','הפעילות והחותמות שלכם, בתמונה אחת.'],tl:['תמונת הצוות','הביצועים, הפערים והצעד הבא של הצוות.'],dept_manager:['תמונת המחלקה','צוותים, ביצועי החודש ותנאים להשלמה.'],division_manager:['תמונת האגף','פעילות, חריגים והתקדמות בכל המסלולים.'],admin:['ניהול התחרות','עדכון שבועי בסביבת הדגמה מקומית.'],superadmin:['ניהול מערכת','גישה, תצורה ובקרה בסביבה הסינתטית.']};
+ function stat(value,label,detail){return h('div',{class:'stat'},h('span',{class:'stat-label'},label),bdi(value,'stat-value'),detail&&h('small',{},detail));}
+@@ -137,7 +141,7 @@ function peopleTable(ps){
+  h('td',{'data-label':'חותמות'},bdi(n(p.stampCard?.stamps),'table-stamps')),
+  h('td',{'data-label':'תנאי סף'},badge(s.text,s.tone)),h('td',{},button('פתיחת כרטיס',()=>personDetail(p),'table-action','arrow')));}))));
+ }
+-function repDashboard(){const w=identity(),p=site.people.find(p=>p.key===w.personKey)||scopedPeople()[0];if(!p)return empty('כרטיס המסע בהכנה','טרם נטענו נתונים עבור המשתתף בהדגמה.');const c=p.stampCard,s=eligibility(p);return h('div',{class:'rep-dashboard'},h('div',{class:'dashboard-primary'},h('section',{class:'boarding-pass'},h('div',{class:'pass-heading'},h('span',{class:'eyebrow'},'YOUR BOARDING PASS'),icon('plane'),badge('סינתטי','accent')),h('div',{class:'pass-route'},h('div',{},h('span',{class:'tiny-label'},'נוסע/ת'),h('h2',{},p.name),h('p',{},`${sector(p.sector)} · ${p.team||''}`)),h('div',{class:'passport-stamp'},h('span',{},'BEZEQ AIRLINES'),h('strong',{},currentStop()?.en||'BEZEQ'),h('span',{},snapshotMonth()))),h('div',{class:'pass-stamps'},bdi(n(c?.stamps),n(c?.stamps).length>6?'long-number':''),h('div',{},h('strong',{},'חותמות בדרכון'),h('span',{},'כל עשייה מקרבת ליעד הבא.'))),h('div',{class:'pass-sales'},activitySummary(p.activity),h('small',{},'כמויות מתחילת התחרות · עד '+date(site.asOf))),h('div',{class:'pass-bottom'},stat(positionText(p),'מיקום במסלול'),stat(flightClass(c?.rankingPending?null:c?.class),'מחלקת טיסה'),h('div',{class:'stat'},h('span',{class:'stat-label'},'תנאי השתתפות'),badge(s.text,s.tone)))),panel('הצעד הבא שלכם',c?.pending&&h('p',{class:'notice'},String(c.pending)),(c?.lines||[]).slice(0,4).map(l=>h('div',{class:'next-milestone'},icon('ticket'),h('div',{},h('strong',{},l.label||'חותמות במסלול'),h('p',{},ruleQuantity(p,l)),h('small',{},l.next?`עוד ${n(l.next.need)} לצבירת ${n(l.next.gives)} חותמות`:'החישוב מתעדכן לפי כללי המסלול')),h('div',{class:'milestone-stamps'},bdi(n(l.stamps)),h('small',{},'חותמות')))),!c?.lines?.length&&h('p',{},'פירוט אבני הדרך יופיע לאחר אישור הכללים.'),button('לכל פרטי הכרטיס',()=>personDetail(p),'button secondary','arrow'))),h('div',{class:'dashboard-secondary'},panel('ההתקדמות שלכם במסע',h('div',{class:'weekly-stamps'},site.stops.map((st,i)=>h('div',{class:`weekly-stamp ${st.status}`},icon(st.status==='upcoming'?'lock':'check'),h('strong',{},st.he||`תחנה ${i+1}`),st.status!=='upcoming'&&activitySummary(p.activity?.weeks?.[i],'compact'),h('small',{},p.weeks?.[i]!=null?`${n(p.weeks[i])} חותמות`:st.status==='upcoming'?'בהמשך המסע':'לפי העדכון הבא')))),h('p',{class:'field-hint'},'התחנות הבאות נשארות הפתעה עד תחילת השבוע שלהן.')),panel('קרובים אליכם במסלול',peopleTable(scopedPeople().filter(x=>Math.abs(x.rankAll-p.rankAll)<=2).sort((a,b)=>a.rankAll-b.rankAll)),link('ללוח הדירוג המלא','#/ranking','panel-link','arrow'))));}
++function repDashboard(){const w=identity(),p=site.people.find(p=>p.key===w.personKey)||scopedPeople()[0];if(!p)return empty('כרטיס המסע בהכנה','טרם נטענו נתונים עבור המשתתף בהדגמה.');const c=p.stampCard,s=eligibility(p);return h('div',{class:'rep-dashboard'},h('div',{class:'dashboard-primary'},h('section',{class:'boarding-pass'},h('div',{class:'pass-heading'},h('span',{class:'eyebrow'},'YOUR BOARDING PASS'),icon('plane'),badge('סינתטי','accent')),h('div',{class:'pass-route'},h('div',{},h('span',{class:'tiny-label'},'נוסע/ת'),h('h2',{},p.name),h('p',{},`${sector(p.sector)} · ${p.team||''}`)),h('div',{class:'passport-stamp'},h('span',{},'BEZEQ AIRLINES'),h('strong',{},currentStop()?.en||'BEZEQ'),h('span',{},snapshotMonth()))),h('div',{class:'pass-stamps'},bdi(n(c?.stamps),n(c?.stamps).length>6?'long-number':''),h('div',{},h('strong',{},'חותמות בדרכון'),h('span',{},'כל עשייה מקרבת ליעד הבא.'))),h('div',{class:'pass-sales'},activitySummary(p.activity),h('small',{},'כמויות מתחילת התחרות · עד '+date(site.asOf))),h('div',{class:'pass-bottom'},stat(positionText(p),'מיקום במסלול'),stat(flightClass(c?.rankingPending?null:c?.class),'מחלקת טיסה'),h('div',{class:'stat'},h('span',{class:'stat-label'},'תנאי השתתפות'),badge(s.text,s.tone)))),panel('הצעד הבא שלכם',c?.pending&&h('p',{class:'notice'},String(c.pending)),(c?.lines||[]).slice(0,4).map(l=>h('div',{class:'next-milestone'},icon('ticket'),h('div',{},h('strong',{},l.label||'חותמות במסלול'),h('p',{},ruleQuantity(p,l)),h('small',{},l.next?`עוד ${n(l.next.need)} לצבירת ${n(l.next.gives)} חותמות`:'החישוב מתעדכן לפי כללי המסלול')),h('div',{class:'milestone-stamps'},bdi(n(l.stamps)),h('small',{},'חותמות')))),!c?.lines?.length&&h('p',{},'פירוט אבני הדרך יופיע לאחר אישור הכללים.'),button('לכל פרטי הכרטיס',()=>personDetail(p),'button secondary','arrow'))),h('div',{class:'dashboard-secondary'},panel('ההתקדמות שלכם במסע',h('div',{class:'weekly-stamps'},journeyStops().map((st,i)=>h('div',{class:`weekly-stamp ${st.status}`},icon(st.status==='upcoming'?'lock':p.weeks?.[i]==null?'clock':'check'),h('strong',{},st.he||`תחנה ${i+1}`),st.status!=='upcoming'&&activitySummary(p.activity?.weeks?.[i],'compact'),h('small',{},p.weeks?.[i]!=null?`${n(p.weeks[i])} חותמות`:st.status==='upcoming'?'בהמשך המסע':'ממתין לתוצאות השבוע')))),h('p',{class:'field-hint'},'התחנות הבאות נשארות הפתעה עד תחילת השבוע שלהן.')),panel('קרובים אליכם במסלול',peopleTable(scopedPeople().filter(x=>Math.abs(x.rankAll-p.rankAll)<=2).sort((a,b)=>a.rankAll-b.rankAll)),link('ללוח הדירוג המלא','#/ranking','panel-link','arrow'))));}
+ function teamDashboard(){const w=identity(),ps=scopedPeople(),v=site.views?.teams?.find(t=>t.name===w.team&&(!w.department||t.department===w.department)),done=ps.filter(p=>eligibility(p).tone==='success').length,pending=ps.filter(p=>eligibility(p).tone==='pending').length,total=ps.reduce((s,p)=>s+(p.stampCard?.stamps||0),0),follow=ps.filter(p=>eligibility(p).tone!=='success').sort((a,b)=>(a.stampCard?.stamps||0)-(b.stampCard?.stamps||0));return h('div',{},h('section',{class:'team-brief'},h('div',{},h('span',{class:'eyebrow'},'TEAM FLIGHT CONTROL'),h('h2',{},w.team||'הצוות שלכם'),h('p',{},'תמונת מצב צוותית: מי התקדם, מי צריך תמיכה ומה עדיין ממתין לאישור.')),h('div',{class:'brief-stats'},stat(n(ps.length),'נציגים בצוות'),stat(n(total),'חותמות משותפות'),stat(`${n(done)} / ${n(ps.length)}`,'השלימו תנאי סף'))),h('div',{class:'dashboard-primary'},h('div',{class:'scope-activity'},h('h2',{},'פעילות הצוות מתחילת התחרות'),activitySummary(summarizeActivity(ps))),panel('מפת ההתקדמות של הצוות',h('div',{class:'coverage-head'},h('strong',{},'כיסוי תנאי הסף'),bdi(ps.length?pct(done/ps.length):'—')),h('div',{class:'coverage-bar',role:'img','aria-label':`${done} השלימו תנאי סף, ${pending} ממתינים לאישור`},h('span',{class:'coverage-success',style:`flex:${done||.001}`}),h('span',{class:'coverage-pending',style:`flex:${pending||.001}`}),h('span',{class:'coverage-rest',style:`flex:${Math.max(0,ps.length-done-pending)||.001}`})),h('div',{class:'coverage-legend'},h('span',{},h('i',{class:'legend-dot success'}),'השלימו תנאי סף ',bdi(n(done))),h('span',{},h('i',{class:'legend-dot pending'}),'ממתינים לאישור ',bdi(n(pending))),h('span',{},h('i',{class:'legend-dot'}),'תנאים להשלמה ',bdi(n(ps.length-done-pending)))),h('p',{class:'field-hint'},'עמידה בתנאי סף אינה מהווה אישור לזכייה.')),targets(v,'יעדי הצוות')),panel('נציגים למעקב',h('p',{class:'panel-intro'},'המשתתפים שטרם השלימו את תנאי הסף, לפי החותמות שנצברו.'),follow.length?peopleTable(follow.slice(0,6)):empty('כל הצוות השלים את תנאי הסף','אפשר להמשיך לעקוב אחרי הדירוג והעדכונים.'),link('לכל אנשי הצוות וחיפוש','#/ranking','panel-link','arrow')));}
+ function comparison(vs){
+  const list=h('div',{class:'comparison-list'}),checkbox=h('input',{type:'checkbox','aria-label':'הצגת יחידות ללא נתונים'}),wrapper=h('div',{class:'unit-comparison'});
+@@ -187,7 +191,30 @@ function sidebar(active){const routes=[['dashboard',role==='rep'?'מבט איש
+ const titles={dashboard:['האזור האישי','המסע שלכם, בתמונה אחת.'],ranking:['לוח הדירוג','אנשים, חותמות והתקדמות במסלול.'],journey:['המסע שלנו','תשע תחנות מסביב לעולם.'],announcements:['עדכוני טיסה','החדשות וההודעות של המסע.'],rules:['כללי המסע','כל מה שכדאי לדעת לפני שממריאים.'],admin:['ניהול התחרות','מכינים, בודקים ומפרסמים בהדגמה המקומית.'],system:['ניהול מערכת','הרשאות, הגדרות ובקרה בסביבה הסינתטית.'],access:['אין גישה לעמוד','התפקיד הנוכחי אינו מורשה לפתוח את המסך המבוקש.']};
+ function accessDenied(){return h('section',{class:'access-denied'},icon('shield'),h('h2',{},'המסך זמין לתפקיד מורשה בלבד'),h('p',{},'בחרו תפקיד מתאים דרך כניסת ההדגמה או חזרו לאזור האישי שלכם.'),button('בחירת תפקיד',login,'button'),link('חזרה לאזור האישי','#/dashboard','button secondary'));}
+ function rerenderPreservingFocus(){const old=document.activeElement;const id=old?.id;const label=old?.getAttribute('aria-label')||old?.closest('form')?.querySelector('[aria-label]')?.getAttribute('aria-label');const text=old?.tagName==='BUTTON'?old.textContent:null;render();const controls=[...document.querySelectorAll('button,input,select,textarea')];const match=id?document.getElementById(id):label?controls.find(e=>e.getAttribute('aria-label')===label):text?controls.find(e=>e.tagName==='BUTTON'&&e.textContent===text&&!e.disabled&&e.getClientRects().length):null;(match||document.getElementById('air-admin-current')||document.getElementById('main-content'))?.focus({preventScroll:true});}
+-function render(){const visual=currentStop();document.documentElement.style.setProperty('--destination-photo',visual?.photo?`url("airlines-assets/${visual.photo}.${visual.photoExt||'webp'}")`:'none');document.documentElement.style.setProperty('--destination-phone',visual?.photo?`url("airlines-assets/${visual.photo}-phone.${visual.photoExt||'webp'}")`:'none');document.documentElement.style.setProperty('--destination-focus',visual?.focus||'center 43%');root.dataset.role=role||'public';let active=section();if(!['home','dashboard','ranking','journey','announcements','rules','admin','system','access'].includes(active))active='access';if((active==='admin'&&!['admin','superadmin'].includes(role))||(active==='system'&&role!=='superadmin'))active='access';root.dataset.page=active;document.title=`${(active==='dashboard'?dashboardTitles[role]?.[0]:titles[active]?.[0])||'מסביב לעולם ב־60 יום'} · BEZEQ AIRLINES · הדגמה`;const skip=link('דילוג לתוכן הראשי','#main-content','skip-link');skip.addEventListener('click',e=>{e.preventDefault();document.querySelector('#main-content')?.focus();});let main;if(active==='home')main=landing();else if(role){let content;const ctx={data,role,notify,rerender:rerenderPreservingFocus,section:active};if(active==='dashboard')content=role==='rep'?repDashboard():role==='tl'?teamDashboard():role==='dept_manager'?departmentDashboard():role==='division_manager'?divisionDashboard():role==='superadmin'?renderSystem(ctx):renderAdmin(ctx);else if(active==='ranking')content=ranking();else if(active==='admin')content=renderAdmin(ctx);else if(active==='system')content=renderSystem(ctx);else if(active==='journey')content=journey(true);else if(active==='rules')content=rules(true);else if(active==='announcements')content=announcements(true);else content=accessDenied();const t=active==='dashboard'?(dashboardTitles[role]||titles.dashboard):(titles[active]||titles.access);main=h('div',{class:'app-layout'},sidebar(active),h('main',{id:'main-content',tabindex:'-1',class:'app-main'},h('div',{class:'app-page-heading'},h('div',{},h('span',{class:'eyebrow'},'BEZEQ AIRLINES / DEMO'),h('h1',{},active==='dashboard'&&role==='rep'?`טוב לראות אתכם, ${identity().name}`:t[0]),h('p',{},t[1])),badge('נתונים סינתטיים','blue')),content));}else if(['dashboard','ranking'].includes(active))main=h('main',{id:'main-content',tabindex:'-1',class:'login-required container'},icon('ticket'),h('span',{class:'eyebrow'},'YOUR NEXT DESTINATION'),h('h1',{},'כרטיס הטיסה שלכם מחכה.'),h('p',{},'היכנסו עם אחד מתפקידי ההדגמה כדי לצפות באזור האישי ובדירוגים.'),button('כניסה להדגמה',login,'button','arrow'));else main=h('main',{id:'main-content',tabindex:'-1'},h('h1',{class:'sr-only'},titles[active]?.[0]||'המסע שלנו'),active==='journey'?journey(true):active==='rules'?rules(true):active==='announcements'?announcements(true):accessDenied());disposeTree(root);root.replaceChildren(skip,header(),demoBar(),main,footer(),mobileDock(active));mountAirlinesMotion(main,{route:active,role,stop:visual});}
++function syncDestinationSkin(){const visual=currentStop();document.documentElement.style.setProperty('--destination-photo',visual?.photo?`url("airlines-assets/${visual.photo}.${visual.photoExt||'webp'}")`:'none');document.documentElement.style.setProperty('--destination-phone',visual?.photo?`url("airlines-assets/${visual.photo}-phone.${visual.photoExt||'webp'}")`:'none');document.documentElement.style.setProperty('--destination-focus',visual?.focus||'center 43%');return visual;}
++function render(){pendingCalendarRender=false;const visual=syncDestinationSkin();root.dataset.calendarDate=presentationDate(site);root.dataset.resultsDate=site.asOf;root.dataset.role=role||'public';let active=section();if(!['home','dashboard','ranking','journey','announcements','rules','admin','system','access'].includes(active))active='access';if((active==='admin'&&!['admin','superadmin'].includes(role))||(active==='system'&&role!=='superadmin'))active='access';root.dataset.page=active;document.title=`${(active==='dashboard'?dashboardTitles[role]?.[0]:titles[active]?.[0])||'מסביב לעולם ב־60 יום'} · BEZEQ AIRLINES · הדגמה`;const skip=link('דילוג לתוכן הראשי','#main-content','skip-link');skip.addEventListener('click',e=>{e.preventDefault();document.querySelector('#main-content')?.focus();});let main;if(active==='home')main=landing();else if(role){let content;const ctx={data,role,notify,rerender:rerenderPreservingFocus,section:active};if(active==='dashboard')content=role==='rep'?repDashboard():role==='tl'?teamDashboard():role==='dept_manager'?departmentDashboard():role==='division_manager'?divisionDashboard():role==='superadmin'?renderSystem(ctx):renderAdmin(ctx);else if(active==='ranking')content=ranking();else if(active==='admin')content=renderAdmin(ctx);else if(active==='system')content=renderSystem(ctx);else if(active==='journey')content=journey(true);else if(active==='rules')content=rules(true);else if(active==='announcements')content=announcements(true);else content=accessDenied();const t=active==='dashboard'?(dashboardTitles[role]||titles.dashboard):(titles[active]||titles.access);main=h('div',{class:'app-layout'},sidebar(active),h('main',{id:'main-content',tabindex:'-1',class:'app-main'},h('div',{class:'app-page-heading'},h('div',{},h('span',{class:'eyebrow'},'BEZEQ AIRLINES / DEMO'),h('h1',{},active==='dashboard'&&role==='rep'?`טוב לראות אתכם, ${identity().name}`:t[0]),h('p',{},t[1])),badge('נתונים סינתטיים','blue')),content));}else if(['dashboard','ranking'].includes(active))main=h('main',{id:'main-content',tabindex:'-1',class:'login-required container'},icon('ticket'),h('span',{class:'eyebrow'},'YOUR NEXT DESTINATION'),h('h1',{},'כרטיס הטיסה שלכם מחכה.'),h('p',{},'היכנסו עם אחד מתפקידי ההדגמה כדי לצפות באזור האישי ובדירוגים.'),button('כניסה להדגמה',login,'button','arrow'));else main=h('main',{id:'main-content',tabindex:'-1'},h('h1',{class:'sr-only'},titles[active]?.[0]||'המסע שלנו'),active==='journey'?journey(true):active==='rules'?rules(true):active==='announcements'?announcements(true):accessDenied());disposeTree(root);root.replaceChildren(...[skip,header(),demoBar(),calendarNotice(),main,footer(),mobileDock(active)].filter(Boolean));mountAirlinesMotion(main,{route:active,role,stop:visual});}
+ window.addEventListener('hashchange',()=>{render();window.scrollTo({top:0,behavior:'instant'});document.querySelector('#main-content')?.focus({preventScroll:true});});
+ window.addEventListener('airlines:published',e=>{restorePublished();data.meta.localPublished=e.detail;});
++
++let pendingCalendarRender=false;
++function calendarNotice(){return data.meta.calendarUnavailable?h('div',{id:'calendar-status',class:'calendar-status',role:'status'},'לוח המסע לא נטען. מוצגת התצוגה האחרונה שאושרה; נתוני התוצאות לא השתנו.'):null;}
++function calendarAvailability(available){data.meta.calendarUnavailable=!available;root.dataset.calendarState=available?'ready':'unavailable';const old=document.getElementById('calendar-status');if(available)old?.remove();else if(!old)document.querySelector('.demo-bar')?.after(calendarNotice());}
++function calendarViewChanged(){
++ const active=section();
++ // Operational views have no journey labels to rebuild. Leave unsaved inputs,
++ // pagination, management filters and disclosure state entirely intact.
++ if(['admin','system','ranking','rules'].includes(active)||(active==='dashboard'&&role!=='rep')){syncDestinationSkin();root.dataset.calendarDate=presentationDate(site);return;}
++ const focused=document.activeElement;
++ if(document.querySelector('dialog[open]')||focused?.matches('input,select,textarea,[contenteditable=true]')){pendingCalendarRender=true;return;}
++ const top=scrollY,left=scrollX,open=[...root.querySelectorAll('details[open]>summary')].map(e=>e.textContent),id=focused?.id,label=focused?.getAttribute('aria-label'),href=focused?.tagName==='A'?focused.getAttribute('href'):null,text=focused?.tagName==='BUTTON'?focused.textContent:null;
++ const restore=focused&&focused!==document.body&&root.contains(focused);
++ render();
++ for(const d of root.querySelectorAll('details'))if(open.includes(d.querySelector('summary')?.textContent))d.open=true;
++ if(restore){const controls=[...root.querySelectorAll('button,a,input,select,textarea')],target=id?document.getElementById(id):label?controls.find(e=>e.getAttribute('aria-label')===label):href?controls.find(e=>e.getAttribute('href')===href):text?controls.find(e=>e.tagName==='BUTTON'&&e.textContent===text):null;target?.focus({preventScroll:true});}
++ window.scrollTo({top,left,behavior:'instant'});
++}
++const finishCalendarRefresh=()=>setTimeout(()=>{if(pendingCalendarRender)calendarViewChanged();},0);
++document.addEventListener('close',finishCalendarRefresh,true);
++document.addEventListener('focusout',finishCalendarRefresh,true);
+ render();
++watchCalendar(data,{onChange:calendarViewChanged,onAvailable:()=>calendarAvailability(true),onUnavailable:()=>calendarAvailability(false)});
+diff --git a/contests/platform/site/src/airlines/styles.css b/contests/platform/site/src/airlines/styles.css
+index 57fa74a..b1c6076 100644
+--- a/contests/platform/site/src/airlines/styles.css
++++ b/contests/platform/site/src/airlines/styles.css
+@@ -51,3 +51,5 @@
+ 
+ /* Seven-column participant tables become distinct mobile rows. */
+ @media(max-width:600px){.data-table td:nth-child(1){grid-column:1;grid-row:1/3}.data-table td:nth-child(2){grid-column:2;grid-row:1}.data-table td:nth-child(3){display:none}.data-table td:nth-child(4){grid-column:1/-1;grid-row:3;margin-top:14px;padding-top:13px;border-top:1px solid var(--line);text-align:start}.data-table td:nth-child(4):after{content:none;display:none}.data-table td:nth-child(5){grid-column:3;grid-row:1;margin-top:0;text-align:left}.data-table td:nth-child(5):after{content:'חותמות';display:block;font-size:10px;color:var(--muted);margin-top:3px}.data-table td:nth-child(6){grid-column:2;grid-row:2;margin-top:10px}.data-table td:nth-child(7){grid-column:3;grid-row:2;margin-top:5px}.data-table td:nth-child(2){overflow-wrap:anywhere}.data-table .table-stamps{white-space:nowrap}}
++
++.calendar-status{background:#eaf2f9;color:#254e70;border-bottom:1px solid #c5d8e8;padding:12px max(20px,calc((100% - 1400px)/2));font-size:14px;line-height:1.6}
+diff --git a/contests/platform/test/airlines-calendar-model.test.js b/contests/platform/test/airlines-calendar-model.test.js
+new file mode 100644
+index 0000000..e6dde09
+--- /dev/null
++++ b/contests/platform/test/airlines-calendar-model.test.js
+@@ -0,0 +1,103 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import {syntheticScenario} from '../scripts/build-airlines-preview.mjs';
++import {israelDate,millisecondsToIsraelMidnight,calendarPacket,validateCalendarPacket,applyCalendarPacket,presentationStops,presentationNow,presentationDate} from '../site/src/airlines/calendar-model.js';
++
++const fixture=syntheticScenario('2026-11-05');
++const clone=value=>structuredClone(value);
++const catalog={period:fixture.config.period,stops:fixture.config.journey.stops};
++const at=date=>new Date(date.length===10?date+'T12:00:00Z':date);
++const packet=date=>calendarPacket(catalog,at(date));
++
++test('Israeli dates and next-midnight delay use the exact winter boundary',()=>{
++ assert.equal(israelDate(at('2026-11-07T21:59:59.999Z')),'2026-11-07');
++ assert.equal(israelDate(at('2026-11-07T22:00:00.000Z')),'2026-11-08');
++ assert.equal(millisecondsToIsraelMidnight(at('2026-11-07T21:59:59.999Z')),1);
++ assert.equal(millisecondsToIsraelMidnight(at('2026-11-07T22:00:00.000Z')),24*3600000);
++});
++
++test('midnight delay covers DST days and is always positive and bounded',()=>{
++ for(const value of ['2026-03-26T22:00:00Z','2026-03-27T00:30:00Z','2026-10-24T21:00:00Z','2026-10-25T00:30:00Z','2026-11-08T09:00:00Z']){
++  const now=at(value),delay=millisecondsToIsraelMidnight(now);
++  assert.ok(delay>0&&delay<=26*3600000);
++  assert.equal(israelDate(new Date(+now+delay-1)),israelDate(now));
++  assert.notEqual(israelDate(new Date(+now+delay)),israelDate(now));
++ }
++ assert.equal(millisecondsToIsraelMidnight(at('2026-03-26T22:00:00Z')),23*3600000);
++ assert.equal(millisecondsToIsraelMidnight(at('2026-10-24T21:00:00Z')),25*3600000);
++ assert.throws(()=>israelDate(new Date(NaN)),RangeError);
++ assert.throws(()=>millisecondsToIsraelMidnight(new Date(NaN)),RangeError);
++});
++
++test('Milan calendar changes independently of the 5 November results and scoring',()=>{
++ const data=clone(fixture.data),before=clone(data),p=packet('2026-11-08');
++ assert.equal(p.now.stop,1);assert.equal(p.stops[1].he,'מילאנו');
++ assert.equal(p.stops[1].start,'2026-11-08');assert.equal(p.stops[1].end,'2026-11-12');
++ assert.deepEqual(applyCalendarPacket(data,p),{accepted:true,changed:true});
++ assert.equal(presentationStops(data.site)[1].he,'מילאנו');
++ assert.deepEqual(presentationNow(data.site),{stop:1});
++ assert.equal(presentationDate(data.site),'2026-11-08');
++ assert.equal(data.site.asOf,'2026-11-05');
++ const person=data.site.people.find(p=>p.key===data.roles.rep.personKey);
++ assert.equal(person.stampCard.stamps,378);
++ assert.equal(person.activity.groups.find(group=>group.id==='sales').quantity,137);
++ delete data.site.presentation;assert.deepEqual(data,before);
++});
++
++test('all nine canonical dates stay unchanged, with deterministic packets and no hidden metadata',()=>{
++ const before=JSON.stringify(catalog),p=packet('2026-11-07');
++ assert.deepEqual(p,packet('2026-11-07T21:59:59.999Z'));
++ assert.equal(JSON.stringify(catalog),before);
++ assert.equal(p.schema,1);assert.equal(p.synthetic,true);assert.equal(p.channel,'bezeq-airlines-calendar');
++ assert.equal(p.timeZone,'Asia/Jerusalem');assert.equal(p.publishedThrough,'2026-11-07');
++ assert.deepEqual(p.period,{start:catalog.period.start,end:catalog.period.end});
++ assert.deepEqual(p.stops.map(s=>[s.start,s.end]),catalog.stops.map(s=>[s.start,s.end]));
++ assert.equal(p.now.stop,0);
++ for(const [i,stop] of p.stops.entries())if(i){
++  assert.equal(stop.id,'stop'+(i+1));assert.equal(stop.status,'upcoming');
++  for(const [key,value] of Object.entries(stop))if(!['id','start','end','status'].includes(key))assert.deepEqual(value,key==='peaks'?[]:null,key);
++ }
++ assert.ok(!JSON.stringify(p).includes('מילאנו'));
++ assert.ok(!JSON.stringify(p).includes('milan'));
++});
++
++test('weekend fallback, next reveal, prelaunch and finale follow the calendar',()=>{
++ for(const date of ['2026-11-13','2026-11-14']){
++  const p=packet(date);assert.equal(p.now.stop,1);assert.equal(p.stops[1].status,'past');assert.equal(p.stops[2].he,null);
++ }
++ const next=packet('2026-11-15');assert.equal(next.now.stop,2);assert.equal(next.stops[2].he,'מרקש');
++ const pre=packet('2026-10-31');assert.equal(pre.now.stop,'before');assert.ok(pre.stops.every(s=>s.status==='upcoming'&&s.he===null));
++ const after=packet('2027-01-01');assert.equal(after.now.stop,'after');assert.equal(after.stops.at(-1).he,'ירושלים');assert.ok(after.stops.every(s=>s.status==='past'));
++ for(const p of [pre,next,after])assert.equal(validateCalendarPacket(fixture.data.site,p),true);
++});
++
++test('only display metadata is copied; optional supplied labels and approved peak descriptions survive',()=>{
++ const source=clone(catalog);Object.assign(source.stops[1],{en:'MILAN',airport:'MXP',photoExt:'jpg',focus:'center 43%',score:999,uid:'private-person',prize:'unapproved'});
++ source.stops[1].peaks=[{date:'2026-11-09',theme:'יום שיא מאושר',text:'פעילות',prize:'secret prize',multiplier:3,organizer:'person',themePalette:['#123456']}];
++ const p=calendarPacket(source,at('2026-11-08')),stop=p.stops[1];
++ assert.equal(stop.photoExt,'webp');assert.equal(stop.en,'MILAN');assert.equal(stop.airport,'MXP');
++ assert.equal(stop.peaks[0].theme,'יום שיא מאושר');assert.equal(stop.peaks[0].text,'פעילות');
++ for(const key of ['score','uid','prize','multiplier','organizer'])assert.ok(!JSON.stringify(p).includes('"'+key+'"'));
++ assert.equal(validateCalendarPacket(fixture.data.site,p),true);
++ const generic=packet('2026-11-08').stops[1].peaks[0];assert.equal(generic.theme,'יום שיא בסגנון איטליה');assert.equal(generic.date,null);assert.equal(generic.tbd,true);
++});
++
++test('validator rejects future leakage, altered schedules and malformed metadata without throwing',()=>{
++ const good=packet('2026-11-08'),bad=mutate=>{const p=clone(good);mutate(p);return p;};
++ const cases=[null,[],{},'packet',bad(p=>p.synthetic=false),bad(p=>p.schema=2),bad(p=>p.channel='other'),bad(p=>p.timeZone='UTC'),bad(p=>p.period.end='2027-01-01'),bad(p=>p.stops.pop()),bad(p=>p.now.stop=2),bad(p=>p.publishedThrough='2026-02-30'),bad(p=>p.publishedThrough='2026-11-08T12:00:00Z'),bad(p=>p.people=[]),bad(p=>p.stops[1].start='2026-11-07'),bad(p=>p.stops[1].end='2026-11-13'),bad(p=>p.stops[1].status='upcoming'),bad(p=>p.stops[1].photo='../private'),bad(p=>p.stops[1].photoExt='jpg'),bad(p=>p.stops[1].ll=[null,2]),bad(p=>p.stops[1].peaks[0].multiplier=3),bad(p=>p.stops[1].landmark.params={uid:'person'}),bad(p=>p.stops[2].he='מרקש'),bad(p=>p.stops[2].id='marrakech'),bad(p=>p.stops[2].photo='marrakech'),bad(p=>p.stops[2].en='MARRAKECH'),bad(p=>p.stops[2].landmark={kind:'arch'}),bad(p=>p.stops[2].peaks=[{theme:'secret'}])];
++ for(const p of cases)assert.equal(validateCalendarPacket(fixture.data.site,p),false,JSON.stringify(p));
++ for(const site of [null,{},[],{stops:[]}])assert.equal(validateCalendarPacket(site,good),false);
++});
++
++test('application requires synthetic preview, clones packets, rejects old replays and reports idempotence',()=>{
++ const data=clone(fixture.data),p=packet('2026-11-08');
++ assert.equal(presentationStops(data.site),data.site.stops);assert.equal(presentationNow(data.site),data.site.now);assert.equal(presentationDate(data.site),data.site.asOf);
++ assert.deepEqual(applyCalendarPacket(data,p),{accepted:true,changed:true});
++ assert.notEqual(data.site.presentation,p);assert.notEqual(data.site.presentation.stops,p.stops);
++ assert.deepEqual(applyCalendarPacket(data,clone(p)),{accepted:true,changed:false});
++ p.stops[1].he='mutated';assert.equal(data.site.presentation.stops[1].he,'מילאנו');
++ const before=JSON.stringify(data);
++ assert.deepEqual(applyCalendarPacket(data,packet('2026-11-07')),{accepted:false,changed:false});
++ assert.deepEqual(applyCalendarPacket(data,{}),{accepted:false,changed:false});assert.equal(JSON.stringify(data),before);
++ for(const input of [null,{}, {...clone(fixture.data),meta:{synthetic:false}}, {...clone(fixture.data),meta:{}}])assert.deepEqual(applyCalendarPacket(input,packet('2026-11-08')),{accepted:false,changed:false});
++});
+diff --git a/contests/platform/test/airlines-calendar-publish.test.js b/contests/platform/test/airlines-calendar-publish.test.js
+new file mode 100644
+index 0000000..f097ef3
+--- /dev/null
++++ b/contests/platform/test/airlines-calendar-publish.test.js
+@@ -0,0 +1,197 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import {createHash} from 'node:crypto';
++import {calendarPacket} from '../site/src/airlines/calendar-model.js';
++import {TARGET_REPOSITORY,SOURCE_COMMIT,SOURCE_TREE,SOURCE_PATH,SITE_PREFIX,FEED_PATH,STATUS_PATH,gitBlobSha,parsePinnedCatalog,parseStatus,feedSource,verifyTreeDelta,publishCalendar,createGithubApi,GithubApiError} from '../scripts/airlines-calendar-publish.mjs';
++
++const hash=value=>createHash('sha1').update(JSON.stringify(value)).digest('hex');
++const ids=['paris','milan','marrakech','las-vegas','cancun','tokyo','athens','new-delhi','jerusalem'];
++const fixture=()=>({provenance:{synthetic:true},contest:{start:'2026-11-01',end:'2026-12-31'},people:[{privateSentinel:'NEVER_PROJECT_THIS'}],results:[{amount:913}],stops:ids.map((id,i)=>({id,he:'מקום '+i,country:'ארץ '+i,start:new Date(Date.UTC(2026,10,1+i*7)).toISOString().slice(0,10),end:new Date(Date.UTC(2026,10,5+i*7)).toISOString().slice(0,10),photo:id,look:'theme'+i,line:'טקסט '+i,palette:['#112233','#445566','#778899','#aabbcc'],accent:'#abcdef',landmark:{kind:'tower',name:'מבנה '+i},winners:[{name:'NEVER_PROJECT_THIS'}]}))});
++const sourceText=value=>'window.CONTEST = '+JSON.stringify(value)+';\n';
++const catalog=()=>parsePinnedCatalog(sourceText(fixture()));
++const treeEntry=(path,sha,mode='100644')=>({path,sha,type:'blob',mode});
++const photoPrefix='contests/2026-11-year-end/site-photos/web/';
++const resultsPath=SITE_PREFIX+'/airlines-data.js';
++
++// Entirely in-memory Git/Pages API. Fixtures contain no source or employee data.
++function fakeApi({existingPacket,existingStatus,source=fixture(),missingImage,omitTargetImage,hook}={}){
++ const calls=[],blobs=new Map(),trees=new Map(),commits=new Map();
++ const putBlob=content=>{const sha=gitBlobSha(content);blobs.set(sha,content);return sha;};
++ const sourceEntries=[treeEntry(SOURCE_PATH,putBlob(sourceText(source)))];
++ for(const id of ids)for(const suffix of ['.webp','-phone.webp'])if(id+suffix!==missingImage)sourceEntries.push(treeEntry(photoPrefix+id+suffix,putBlob('synthetic image '+id+suffix)));
++ trees.set(SOURCE_TREE,{sha:SOURCE_TREE,truncated:false,tree:sourceEntries});commits.set(SOURCE_COMMIT,{tree:{sha:SOURCE_TREE}});
++ const initial=[treeEntry(resultsPath,putBlob('results dated 2026-11-05; sentinel 913')),treeEntry('legacy/executable',putBlob('legacy bytes'),'100755'),{path:'legacy',sha:hash('legacytree'),type:'tree',mode:'040000'},treeEntry('legacy/link',putBlob('../target'),'120000')];
++ if(existingPacket){initial.push(treeEntry(FEED_PATH,putBlob(feedSource(existingPacket))));for(const s of existingPacket.stops.filter(s=>s.he))for(const suffix of ['.webp','-phone.webp'])if(s.photo+suffix!==omitTargetImage)initial.push(treeEntry(SITE_PREFIX+'/airlines-assets/'+s.photo+suffix,sourceEntries.find(e=>e.path===photoPrefix+s.photo+suffix).sha));}
++ if(existingStatus!==undefined)initial.push(treeEntry(STATUS_PATH,putBlob(typeof existingStatus==='string'?existingStatus:JSON.stringify(existingStatus)+'\n')));
++ const addCommit=entries=>{const treeSha=hash(entries);trees.set(treeSha,{sha:treeSha,truncated:false,tree:entries});const sha=hash({treeSha,ordinal:commits.size});commits.set(sha,{tree:{sha:treeSha}});return sha;};
++ const state={head:addCommit(initial),latest:null,builds:0,refs:0,initial,blobs,trees,calls};
++ state.advance=()=>{const current=trees.get(commits.get(state.head).tree.sha).tree;state.head=addCommit([...current,treeEntry('unrelated-concurrent-'+commits.size,putBlob('concurrent preserved'))]);};
++ const api={async request(method,path,body){
++  calls.push({method,path,body});
++  const overridden=await hook?.({method,path,body,state});if(overridden!==undefined)return overridden;
++  if(method==='GET'&&path==='/git/ref/heads/gh-pages')return {object:{sha:state.head}};
++  if(method==='GET'&&path.startsWith('/git/commits/'))return commits.get(path.slice('/git/commits/'.length));
++  if(method==='GET'&&path.startsWith('/git/trees/'))return trees.get(path.slice('/git/trees/'.length).split('?')[0]);
++  if(method==='GET'&&path.startsWith('/git/blobs/'))return {encoding:'base64',content:Buffer.from(blobs.get(path.slice('/git/blobs/'.length))).toString('base64')};
++  if(method==='POST'&&path==='/git/blobs')return {sha:putBlob(body.content)};
++  if(method==='POST'&&path==='/git/trees'){
++   const map=new Map(trees.get(body.base_tree).tree.map(e=>[e.path,e]));for(const e of body.tree)map.set(e.path,e);
++   const entries=[...map.values()],sha=hash(entries);trees.set(sha,{sha,truncated:false,tree:entries});return {sha};
++  }
++  if(method==='POST'&&path==='/git/commits'){const sha=hash(body);commits.set(sha,{tree:{sha:body.tree},parents:body.parents});return {sha};}
++  if(method==='PATCH'&&path==='/git/refs/heads/gh-pages'){
++   assert.equal(body.force,false);if(commits.get(body.sha).parents[0]!==state.head)throw new GithubApiError(422,method,path);
++   state.refs++;state.head=body.sha;return {object:{sha:state.head}};
++  }
++  if(method==='GET'&&path==='/pages')return {build_type:'legacy',source:{branch:'gh-pages',path:'/'}};
++  if(method==='GET'&&path==='/pages/builds/latest'){if(!state.latest)throw new GithubApiError(404,method,path);return state.latest;}
++  if(method==='POST'&&path==='/pages/builds'){state.builds++;state.latest={status:'queued',commit:state.head};return state.latest;}
++  throw Error('Unhandled fake endpoint '+method+' '+path);
++ }};
++ state.current=()=>trees.get(commits.get(state.head).tree.sha).tree;
++ return {api,state};
++}
++const noRefWrites=state=>assert.equal(state.calls.filter(c=>c.method==='PATCH').length,0);
++
++test('strict immutable JSON projection excludes results, identities and future source fields',()=>{
++ const parsed=catalog();assert.equal(parsed.stops.length,9);assert.equal(parsed.stops[1].start,'2026-11-08');assert.equal(parsed.stops[1].en,'MILAN');
++ assert.equal(JSON.stringify(parsed).includes('NEVER_PROJECT_THIS'),false);assert.equal('results'in parsed,false);
++ assert.deepEqual(parsed.stops[3].landmark,{kind:'fountains',name:'מזרקות בלאג׳יו'});assert.deepEqual(parsed.stops[4].landmark,{kind:'pier',name:'מזח ודקלים'});
++ const coordinates=fixture();Object.assign(coordinates.stops[0],{dial:'+33',ll:[2.35,48.85],tz:'Europe/Paris'});assert.deepEqual(parsePinnedCatalog(sourceText(coordinates)).stops[0].ll,[2.35,48.85]);assert.equal(parsePinnedCatalog(sourceText(coordinates)).stops[0].dial,'+33');assert.equal(parsePinnedCatalog(sourceText(coordinates)).stops[0].tz,'Europe/Paris');
++ for(const text of ['window.CONTEST = {}; process.exit();','window.CONTEST = {bad};','window.CONTEST = (()=>({}))();'])assert.throws(()=>parsePinnedCatalog(text));
++ const bad=fixture();bad.provenance.synthetic=false;assert.throws(()=>parsePinnedCatalog(sourceText(bad)),/synthetic/);
++ const dates=fixture();dates.stops[1].start='2026-11-09';assert.throws(()=>parsePinnedCatalog(sourceText(dates)),/dates/);
++});
++
++test('Israel midnight advances only calendar while preserving frozen results and all unrelated modes',async()=>{
++ const {api,state}=fakeApi();
++ const first=await publishCalendar({api,now:'2026-11-07T21:59:59Z'});assert.equal(first.changed,true);
++ const resultBlob=state.current().find(e=>e.path===resultsPath);
++ const before=state.blobs.get(state.current().find(e=>e.path===FEED_PATH).sha);assert.equal(JSON.parse(before.split('=')[1].split(';window.')[0]).now.stop,0);
++ const second=await publishCalendar({api,now:'2026-11-07T22:00:00Z'});assert.equal(second.changed,true);assert.equal(second.assetCount,2);
++ const packet=JSON.parse(state.blobs.get(state.current().find(e=>e.path===FEED_PATH).sha).split('=')[1].split(';window.')[0]);
++ assert.equal(packet.now.stop,1);assert.equal(packet.publishedThrough,'2026-11-08');assert.equal(packet.stops[2].he,null);
++ assert.equal(state.current().filter(e=>e.path.startsWith(SITE_PREFIX+'/airlines-assets/')).length,4);
++ assert.deepEqual(state.current().find(e=>e.path===resultsPath),resultBlob);
++ for(const original of state.initial)assert.deepEqual(state.current().find(e=>e.path===original.path),original);
++ assert.equal(state.calls.filter(c=>c.method==='POST'&&c.path==='/git/trees').every(c=>Boolean(c.body.base_tree)),true);
++});
++
++test('same Israeli day is deterministic and no-op; unchanged packet retries failed Pages build',async()=>{
++ const {api,state}=fakeApi();await publishCalendar({api,now:'2026-11-08T01:00:00Z'});const refs=state.refs,commits=state.calls.filter(c=>c.path==='/git/commits'&&c.method==='POST').length;
++ state.latest={status:'errored',commit:state.head};const recovered=await publishCalendar({api,now:'2026-11-08T18:00:00Z'});
++ assert.equal(recovered.changed,false);assert.equal(recovered.pages.requested,true);assert.equal(state.refs,refs);assert.equal(state.builds,2);
++ const again=await publishCalendar({api,now:'2026-11-08T18:30:00Z'});assert.equal(again.pages.requested,false);assert.equal(state.refs,refs);
++ assert.equal(state.calls.filter(c=>c.path==='/git/commits'&&c.method==='POST').length,commits);
++});
++
++test('first automation run atomically adds missing provenance status; later same-day run preserves it and next day advances both files',async()=>{
++ const packet=calendarPacket(catalog(),new Date('2026-11-08T01:00:00Z'));
++ const {api,state}=fakeApi({existingPacket:packet}),originalFeed=state.current().find(e=>e.path===FEED_PATH);
++ const first=await publishCalendar({api,now:'2026-11-08T12:00:00Z',runId:'123456'});
++ assert.equal(first.changed,true);assert.equal(first.assetCount,0);assert.equal(first.pages.requested,true);
++ assert.deepEqual(state.calls.find(c=>c.method==='POST'&&c.path==='/git/trees').body.tree.map(e=>e.path),[STATUS_PATH]);
++ const statusEntry=state.current().find(e=>e.path===STATUS_PATH),statusBytes=state.blobs.get(statusEntry.sha);
++ assert.deepEqual(parseStatus(statusBytes),{schema:1,synthetic:true,timeZone:'Asia/Jerusalem',publishedThrough:'2026-11-08',sourceCommit:SOURCE_COMMIT,origin:'github-actions-calendar',publishedAt:'2026-11-08T12:00:00.000Z',runId:'123456'});
++ assert.deepEqual(state.current().find(e=>e.path===FEED_PATH),originalFeed);
++ for(const original of state.initial)assert.deepEqual(state.current().find(e=>e.path===original.path),original);
++ const sameDay=await publishCalendar({api,now:'2026-11-08T18:00:00Z',runId:'999999'});
++ assert.equal(sameDay.changed,false);assert.equal(state.refs,1);assert.deepEqual(state.current().find(e=>e.path===STATUS_PATH),statusEntry);assert.equal(state.blobs.get(statusEntry.sha),statusBytes);
++ const nextDay=await publishCalendar({api,now:'2026-11-09T12:30:00Z',runId:'234567'});
++ assert.equal(nextDay.changed,true);assert.equal(nextDay.assetCount,0);assert.equal(nextDay.pages.requested,true);
++ assert.deepEqual(state.calls.filter(c=>c.method==='POST'&&c.path==='/git/trees').at(-1).body.tree.map(e=>e.path).sort(),[FEED_PATH,STATUS_PATH].sort());
++ assert.deepEqual(parseStatus(state.blobs.get(state.current().find(e=>e.path===STATUS_PATH).sha)),{schema:1,synthetic:true,timeZone:'Asia/Jerusalem',publishedThrough:'2026-11-09',sourceCommit:SOURCE_COMMIT,origin:'github-actions-calendar',publishedAt:'2026-11-09T12:30:00.000Z',runId:'234567'});
++ for(const original of state.initial.filter(e=>e.path!==FEED_PATH))assert.deepEqual(state.current().find(e=>e.path===original.path),original);
++});
++
++test('unexpected or invalid existing automation status fails before any Git object or ref mutation',async()=>{
++ const packet=calendarPacket(catalog(),new Date('2026-11-08T12:00:00Z'));
++ const valid={schema:1,synthetic:true,timeZone:'Asia/Jerusalem',publishedThrough:'2026-11-08',sourceCommit:SOURCE_COMMIT,origin:'github-actions-calendar',publishedAt:'2026-11-08T01:00:00.000Z'};
++ for(const existingStatus of ['not JSON',{...valid,unknown:'field'},{...valid,sourceCommit:hash('other')},{...valid,origin:'manual'},{...valid,publishedAt:'invalid'},{...valid,publishedThrough:'2026-11-09'},{...valid,runId:'bad'}]){
++  const {api,state}=fakeApi({existingPacket:packet,existingStatus});
++  await assert.rejects(publishCalendar({api,now:'2026-11-08T12:00:00Z'}),/status/);noRefWrites(state);assert.equal(state.calls.some(c=>c.method==='POST'),false);
++ }
++ const preserve=fakeApi({existingPacket:packet,existingStatus:valid});assert.equal((await publishCalendar({api:preserve.api,now:'2026-11-08T18:00:00Z',runId:'999'})).changed,false);noRefWrites(preserve.state);
++ assert.deepEqual(JSON.parse(preserve.state.blobs.get(preserve.state.current().find(e=>e.path===STATUS_PATH).sha)),valid);
++});
++
++test('repairing an approved missing revealed image also updates provenance in the same tree',async()=>{
++ const packet=calendarPacket(catalog(),new Date('2026-11-08T01:00:00Z'));
++ const existingStatus={schema:1,synthetic:true,timeZone:'Asia/Jerusalem',publishedThrough:'2026-11-08',sourceCommit:SOURCE_COMMIT,origin:'github-actions-calendar',publishedAt:'2026-11-08T01:00:00.000Z',runId:'123'};
++ const {api,state}=fakeApi({existingPacket:packet,existingStatus,omitTargetImage:'milan-phone.webp'});
++ const result=await publishCalendar({api,now:'2026-11-08T18:00:00Z',runId:'456'});assert.equal(result.assetCount,1);assert.equal(result.changed,true);
++ const changed=state.calls.find(c=>c.method==='POST'&&c.path==='/git/trees').body.tree;
++ assert.deepEqual(changed.map(e=>e.path).sort(),[SITE_PREFIX+'/airlines-assets/milan-phone.webp',STATUS_PATH].sort());
++ assert.equal(parseStatus(state.blobs.get(state.current().find(e=>e.path===STATUS_PATH).sha)).publishedAt,'2026-11-08T18:00:00.000Z');
++ assert.equal(parseStatus(state.blobs.get(state.current().find(e=>e.path===STATUS_PATH).sha)).runId,'456');
++});
++
++test('malformed source and missing approved image fail before creating any Git object',async()=>{
++ for(const options of [{source:{...fixture(),provenance:{synthetic:false}}},{missingImage:'milan-phone.webp'}]){
++  const {api,state}=fakeApi(options);await assert.rejects(publishCalendar({api,now:'2026-11-08T12:00:00Z'}));noRefWrites(state);
++  assert.equal(state.calls.some(c=>['POST','PATCH'].includes(c.method)),false);
++ }
++});
++
++test('existing asset mismatch refuses overwrite and earlier day refuses calendar rollback',async()=>{
++ const packet=calendarPacket(catalog(),new Date('2026-11-08T12:00:00Z'));
++ const mismatch=fakeApi({existingPacket:packet,hook:({method,path,state})=>{if(method==='GET'&&path.startsWith('/git/trees/')&&!path.includes(SOURCE_TREE)){const t=structuredClone(state.trees.get(path.slice('/git/trees/'.length).split('?')[0]));t.tree.find(e=>e.path.endsWith('/milan.webp')).sha=hash('different asset');return t;}}});
++ await assert.rejects(publishCalendar({api:mismatch.api,now:'2026-11-08T12:00:00Z'}),/differs/);noRefWrites(mismatch.state);
++ const rollback=fakeApi({existingPacket:packet});await assert.rejects(publishCalendar({api:rollback.api,now:'2026-11-07T12:00:00Z'}),/rollback/);noRefWrites(rollback.state);
++});
++
++test('concurrent branch advance rebuilds from newest tree without losing concurrent blob',async()=>{
++ let reads=0;const {api,state}=fakeApi({hook:({method,path,state})=>{if(method==='GET'&&path==='/git/ref/heads/gh-pages'&&++reads===2)state.advance();}});
++ const result=await publishCalendar({api,now:'2026-11-08T12:00:00Z'});assert.equal(result.changed,true);assert.equal(state.refs,1);
++ assert.equal(state.current().some(e=>e.path.startsWith('unrelated-concurrent-')),true);
++});
++
++test('a race between last head check and non-force update is retried safely',async()=>{
++ let raced=false;const {api,state}=fakeApi({hook:({method,path,state})=>{if(method==='PATCH'&&!raced){raced=true;state.advance();throw new GithubApiError(422,method,path);}}});
++ await publishCalendar({api,now:'2026-11-08T12:00:00Z'});assert.equal(state.refs,1);assert.equal(state.current().some(e=>e.path.startsWith('unrelated-concurrent-')),true);
++});
++
++test('persistent concurrency exhausts bounded retries without ref mutation',async()=>{
++ let reads=0;const {api,state}=fakeApi({hook:({method,path,state})=>{if(method==='GET'&&path==='/git/ref/heads/gh-pages'&&++reads%2===0)state.advance();}});
++ await assert.rejects(publishCalendar({api,now:'2026-11-08T12:00:00Z',maxAttempts:2}),/bounded/);noRefWrites(state);
++});
++
++test('tree verification rejects unrelated modification, deletion, mode drift and injected addition',()=>{
++ const before={tree:[treeEntry('unrelated',hash('a'),'100755')]},feed=treeEntry(FEED_PATH,hash('feed'));
++ for(const entries of [[],[treeEntry('unrelated',hash('b'),'100755'),feed],[treeEntry('unrelated',hash('a')),feed],[...before.tree,feed,treeEntry('injected',hash('extra'))]])assert.throws(()=>verifyTreeDelta(before,{tree:entries},[feed]));
++ assert.doesNotThrow(()=>verifyTreeDelta(before,{tree:[...before.tree,feed]},[feed]));
++});
++
++test('API errors before mutation and Pages build failures remain visible and recoverable',async()=>{
++ const denied=fakeApi({hook:({method,path})=>{if(path.startsWith('/git/trees/'))throw new GithubApiError(403,method,path);}});
++ await assert.rejects(publishCalendar({api:denied.api,now:'2026-11-08T12:00:00Z'}),/403/);noRefWrites(denied.state);
++ let failed=false;const retry=fakeApi({hook:({method,path})=>{if(path==='/pages/builds'&&!failed){failed=true;throw new GithubApiError(503,method,path);}}});
++ await assert.rejects(publishCalendar({api:retry.api,now:'2026-11-08T12:00:00Z'}),/503/);assert.equal(retry.state.refs,1);
++ const recovered=await publishCalendar({api:retry.api,now:'2026-11-08T13:00:00Z'});assert.equal(recovered.changed,false);assert.equal(recovered.pages.requested,true);assert.equal(retry.state.refs,1);
++});
++
++test('wrong Pages source or a mutated resulting tree fail before ref mutation',async()=>{
++ const wrong=fakeApi({hook:({method,path})=>{if(path==='/pages')return {build_type:'legacy',source:{branch:'main',path:'/'}};}});
++ await assert.rejects(publishCalendar({api:wrong.api,now:'2026-11-08T12:00:00Z'}),/gh-pages/);noRefWrites(wrong.state);assert.equal(wrong.state.calls.some(c=>c.method==='POST'),false);
++ const tampered=fakeApi({hook:({method,path,state})=>{
++  if(method==='GET'&&path.startsWith('/git/trees/')&&state.calls.some(c=>c.path==='/git/trees'&&c.method==='POST')){
++   const tree=structuredClone(state.trees.get(path.slice('/git/trees/'.length).split('?')[0]));tree.tree.find(e=>e.path===resultsPath).mode='100755';return tree;
++  }
++ }});
++ await assert.rejects(publishCalendar({api:tampered.api,now:'2026-11-08T12:00:00Z'}),/Unrelated blob or mode/);noRefWrites(tampered.state);
++});
++
++test('repository guard, pinned tree integrity and year bounds fail closed',async()=>{
++ const wrong=fakeApi();await assert.rejects(publishCalendar({api:wrong.api,repository:'other/repo',now:'2026-11-08T12:00:00Z'}),/guard/);assert.equal(wrong.state.calls.length,0);
++ const pinned=fakeApi({hook:({method,path})=>{if(path==='/git/commits/'+SOURCE_COMMIT)return {tree:{sha:hash('wrong')}};if(path==='/git/trees/'+hash('wrong')+'?recursive=1')return {sha:hash('wrong'),tree:[]};}});
++ await assert.rejects(publishCalendar({api:pinned.api,now:'2026-11-08T12:00:00Z'}),/Pinned source tree/);noRefWrites(pinned.state);
++ for(const now of ['2026-10-30T12:00:00Z','2027-01-02T12:00:00Z','2027-11-08T12:00:00Z']){const f=fakeApi();assert.equal((await publishCalendar({api:f.api,now})).reason,'outside-2026-calendar');assert.equal(f.state.calls.length,0);}
++ const final=fakeApi();const ended=await publishCalendar({api:final.api,now:'2026-12-31T22:03:00Z'});assert.equal(ended.date,'2027-01-01');
++});
++
++test('native API client pins HTTPS repository and never follows redirects or leaks credentials',async()=>{
++ const captured=[];const api=createGithubApi({token:'TEST_TOKEN_DO_NOT_LOG',fetchImpl:async(url,init)=>{captured.push({url,init});return {ok:false,status:403};}});
++ await assert.rejects(api.request('GET','/pages'),error=>error.message==='GitHub API GET /pages failed (403)'&&!error.message.includes('TEST_TOKEN'));
++ assert.equal(captured[0].url,'https://api.github.com/repos/'+TARGET_REPOSITORY+'/pages');assert.equal(captured[0].init.redirect,'error');
++ await assert.rejects(api.request('GET','https://other.invalid'),/Invalid GitHub API path/);await assert.rejects(api.request('GET','/../secrets'),/Invalid GitHub API path/);
++});
+diff --git a/contests/platform/test/browser/airlines-calendar-replay.mjs b/contests/platform/test/browser/airlines-calendar-replay.mjs
+new file mode 100644
+index 0000000..b67f3c0
+--- /dev/null
++++ b/contests/platform/test/browser/airlines-calendar-replay.mjs
+@@ -0,0 +1,14 @@
++// Existing visual/interaction regressions use an explicit historical calendar
++// fixture. Calendar-live QA separately exercises the actual independent channel.
++import fs from 'node:fs';import path from 'node:path';import {fileURLToPath} from 'node:url';
++import {calendarPacket} from '../../site/src/airlines/calendar-model.js';
++import {parsePinnedCatalog,feedSource} from '../../scripts/airlines-calendar-publish.mjs';
++const platform=fileURLToPath(new URL('../../',import.meta.url));
++export const approvedCalendarCatalog=()=>parsePinnedCatalog(fs.readFileSync(path.join(process.env.AIRLINES_APPROVED_PREVIEW||'/workspace/bezeq-soho-live-preview','contests/2026-11-year-end/concepts/live-site/site/demo-data/week-9.js'),'utf8'));
++export function calendarReplaySource(asOf){return feedSource(calendarPacket(approvedCalendarCatalog(),new Date(asOf+'T12:00:00Z')));}
++export async function calendarReplay(context,asOf){
++ if(!asOf)asOf=JSON.parse(fs.readFileSync(path.join(platform,'exports/airlines-preview/contests/2026-11-year-end/concepts/live-site/site/airlines-build.json'),'utf8')).asOf;
++ const content=calendarReplaySource(asOf);
++ await context.route(url=>url.pathname.endsWith('/airlines-calendar.js'),r=>r.fulfill({contentType:'text/javascript',body:content}));
++ return context;
++}

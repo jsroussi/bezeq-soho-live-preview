@@ -1,0 +1,13 @@
+{
+  "source": "9a4212932cae3dad7b55550e6762a4a810967d2b",
+  "note": "Full repository suite executed with PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium. All browser reports match the final built artifact. Historical responsive checks are complemented by seven current-Milan axe scans and 25 independent calendar checks.",
+  "repositoryTests": {
+    "total": 334,
+    "passed": 333,
+    "failed": 0,
+    "skipped": 1,
+    "skip": "Managed local Chromium blocks file:// polling; real folder writes passed."
+  },
+  "calendarProvenanceGuard": "Differing local catalog bytes rejected before build/publication.",
+  "testCommand": "PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium node --test 'test/*.test.js'"
+}
