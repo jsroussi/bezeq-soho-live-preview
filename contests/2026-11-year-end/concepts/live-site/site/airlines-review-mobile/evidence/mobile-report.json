@@ -1,0 +1,98 @@
+{
+  "startedAt": "2026-11-08T07:05:05.999Z",
+  "browser": "System Chromium, emulated touch (not physical iOS/Android)",
+  "checks": [
+    {
+      "id": "mobile-landing-320",
+      "passed": true
+    },
+    {
+      "id": "touch-itinerary-320",
+      "passed": true
+    },
+    {
+      "id": "mobile-landing-360",
+      "passed": true
+    },
+    {
+      "id": "touch-itinerary-360",
+      "passed": true
+    },
+    {
+      "id": "mobile-landing-390",
+      "passed": true
+    },
+    {
+      "id": "touch-itinerary-390",
+      "passed": true
+    },
+    {
+      "id": "mobile-landing-430",
+      "passed": true
+    },
+    {
+      "id": "touch-itinerary-430",
+      "passed": true
+    },
+    {
+      "id": "mobile-landing-600",
+      "passed": true
+    },
+    {
+      "id": "touch-itinerary-600",
+      "passed": true
+    },
+    {
+      "id": "dock-role-rep",
+      "passed": true
+    },
+    {
+      "id": "dock-role-tl",
+      "passed": true
+    },
+    {
+      "id": "dock-role-dept_manager",
+      "passed": true
+    },
+    {
+      "id": "dock-role-division_manager",
+      "passed": true
+    },
+    {
+      "id": "dock-role-admin",
+      "passed": true
+    },
+    {
+      "id": "dock-role-superadmin",
+      "passed": true
+    },
+    {
+      "id": "public-login-and-focus",
+      "passed": true
+    },
+    {
+      "id": "short-viewport-600-360",
+      "passed": true
+    },
+    {
+      "id": "short-viewport-390-640",
+      "passed": true
+    },
+    {
+      "id": "enlarged-text-320",
+      "passed": true
+    },
+    {
+      "id": "desktop-preserved",
+      "passed": true
+    }
+  ],
+  "buildHashes": {
+    "index.html": "96f31550fcad75716a020abaa6bfc4cd955b9226f66598884f2ee5a2f44c31a0",
+    "airlines.js": "3fcf50f5e3b541c1ddd74b4b6da48d0880c410f9a599edf16a630c7d6d3a3edd",
+    "airlines.css": "d3a2aa3668095f11c9d6fba97f3421de004213ba137fe79b76d1400003aa441a",
+    "airlines-data.js": "b2cfff3429a9d7c2e52ae2603365e22813e2ec8925ba668b7501704fd4f6ce14"
+  },
+  "finishedAt": "2026-11-08T07:06:56.122Z",
+  "passed": true
+}

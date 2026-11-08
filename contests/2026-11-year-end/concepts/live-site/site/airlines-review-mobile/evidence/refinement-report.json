@@ -1,0 +1,87 @@
+{
+  "startedAt": "2026-11-08T07:05:06.083Z",
+  "checks": [
+    {
+      "id": "assets-and-lazy-390",
+      "passed": true
+    },
+    {
+      "id": "quantity-details-390",
+      "passed": true
+    },
+    {
+      "id": "pagination-export-pending-390",
+      "passed": true
+    },
+    {
+      "id": "management-pending-390",
+      "passed": true
+    },
+    {
+      "id": "all-role-scopes-390",
+      "passed": true
+    },
+    {
+      "id": "assets-and-lazy-1440",
+      "passed": true
+    },
+    {
+      "id": "quantity-details-1440",
+      "passed": true
+    },
+    {
+      "id": "pagination-export-pending-1440",
+      "passed": true
+    },
+    {
+      "id": "management-pending-1440",
+      "passed": true
+    },
+    {
+      "id": "all-role-scopes-1440",
+      "passed": true
+    },
+    {
+      "id": "menu-320",
+      "passed": true
+    },
+    {
+      "id": "admin-first-action",
+      "passed": true
+    },
+    {
+      "id": "excel-retry",
+      "passed": true
+    },
+    {
+      "id": "storage-blocked",
+      "passed": true
+    },
+    {
+      "id": "storage-quota",
+      "passed": true
+    },
+    {
+      "id": "worst-case-320",
+      "passed": true
+    },
+    {
+      "id": "large-font-390",
+      "passed": true
+    },
+    {
+      "id": "large-font-1440",
+      "passed": true
+    }
+  ],
+  "buildHashes": {
+    "index.html": "96f31550fcad75716a020abaa6bfc4cd955b9226f66598884f2ee5a2f44c31a0",
+    "airlines.js": "3fcf50f5e3b541c1ddd74b4b6da48d0880c410f9a599edf16a630c7d6d3a3edd",
+    "airlines.css": "d3a2aa3668095f11c9d6fba97f3421de004213ba137fe79b76d1400003aa441a",
+    "airlines-data.js": "b2cfff3429a9d7c2e52ae2603365e22813e2ec8925ba668b7501704fd4f6ce14",
+    "airlines-bootstrap.js": "e4bfe195fdbff548682d90dfe5c350ef0d4d00b9f431f9cf13b8cd15e7bea655",
+    "airlines-excel.js": "8ac6d9e9165f0c52dd76a2229b091014b9e5b9c446f954b4792732c8720da48e"
+  },
+  "passed": true,
+  "finishedAt": "2026-11-08T07:06:34.844Z"
+}

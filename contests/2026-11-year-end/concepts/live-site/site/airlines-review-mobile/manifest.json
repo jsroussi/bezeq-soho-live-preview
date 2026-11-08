@@ -1,0 +1,400 @@
+{
+  "sourceCommit": "83880b6cb1d3e65d726e577163e4d9960a1071b6",
+  "files": [
+    {
+      "name": "DESIGN-SYSTEM.md",
+      "bytes": 1970,
+      "sha256": "ea1cca47594a04394ab5eac1dd34c476f60a96505e6b3a8047f10671519a3773"
+    },
+    {
+      "name": "MOBILE-DESIGN.md",
+      "bytes": 2594,
+      "sha256": "5d3b2811e79618f6bbc6d0e719898259d50c182ec5c6fedb5a3fc33506bf049c"
+    },
+    {
+      "name": "PUBLIC-AUDIT.md",
+      "bytes": 1549,
+      "sha256": "73bb539c14904e33c238949b039ba8cfb93e140daeeb34f307a0f356703b0410"
+    },
+    {
+      "name": "PUBLIC-HANDOFF.md",
+      "bytes": 12328,
+      "sha256": "c6135dab3d9d88dc5da89bde92b55afb5c60e2148b5be31720e7f76746c53c26"
+    },
+    {
+      "name": "PUBLIC-SKILLS.md",
+      "bytes": 5328,
+      "sha256": "48381b368edc2210bd7a24860b03735618d416b5034fa0fdaf2b1509c60e2341"
+    },
+    {
+      "name": "README.md",
+      "bytes": 953,
+      "sha256": "2dd2e28ff170b7c22d43f337b093bbe74e5fa4c2beb277ae2f9ff1b58ffa21a1"
+    },
+    {
+      "name": "evidence/admin-report.json",
+      "bytes": 481,
+      "sha256": "bdb8ed0c284f80e2f4d65b8d55137f97d4de528ba5b753df837c1d7f9d4185ed"
+    },
+    {
+      "name": "evidence/calendar-report.json",
+      "bytes": 1047,
+      "sha256": "723206c61695b315c9652fcea2ac61b27cac64a92b801817af911be554c37418"
+    },
+    {
+      "name": "evidence/mobile/admin-390-viewport.png",
+      "bytes": 45418,
+      "sha256": "82a48bc9f4e981c991fc78c385cb84a1de5c5711156b95a17992967e736b1f61"
+    },
+    {
+      "name": "evidence/mobile/before-public-390.png",
+      "bytes": 722790,
+      "sha256": "1a45452ed965ddf3c7d6a27cf539d3784e4145916d0f7f3e941bfe44aec7c638"
+    },
+    {
+      "name": "evidence/mobile/before-rep-390.png",
+      "bytes": 145200,
+      "sha256": "88bf391f4279f154d179373c2bcff6ad330cdb7b4506d42707c9e266e2bb9497"
+    },
+    {
+      "name": "evidence/mobile/dept_manager-390-viewport.png",
+      "bytes": 141753,
+      "sha256": "1748f9f6bf077cbd7c6e515881515dde99c52e3cb60c33469bb03c298db96499"
+    },
+    {
+      "name": "evidence/mobile/division_manager-390-viewport.png",
+      "bytes": 142782,
+      "sha256": "f24a5d461653547a1264eb40cdc21d03ccf1446e6b26d695a1f109a3181123ed"
+    },
+    {
+      "name": "evidence/mobile/enlarged-320-viewport.png",
+      "bytes": 58595,
+      "sha256": "e57467826cb46f2a9366658a077e145293bc5ba66d7afba1e1411b3d3b5b600e"
+    },
+    {
+      "name": "evidence/mobile/enlarged-320.png",
+      "bytes": 193329,
+      "sha256": "9734257fedb97230bcc59fef9568850888c1acfd050fac3d1b3a31e10d237356"
+    },
+    {
+      "name": "evidence/mobile/public-1440-viewport.png",
+      "bytes": 1376546,
+      "sha256": "b134abea56891dd6bd56f2e995a6a1cc79fe71aa3d3610be779372f1ea94b9cf"
+    },
+    {
+      "name": "evidence/mobile/public-320-viewport.png",
+      "bytes": 212253,
+      "sha256": "3e7ded582c9b4f3e736c2d5a233033119c5c63358270858e99b622e83ad40575"
+    },
+    {
+      "name": "evidence/mobile/public-360-viewport.png",
+      "bytes": 231465,
+      "sha256": "033b8f33287a11dca9a551aa97740621979ee93293185fbd15e2fd499abd48d5"
+    },
+    {
+      "name": "evidence/mobile/public-390-viewport.png",
+      "bytes": 238239,
+      "sha256": "a9fb13a4079914b9092986408dab14fb36e8b082a2c82b29e2d318e765b87ebf"
+    },
+    {
+      "name": "evidence/mobile/public-390.png",
+      "bytes": 388053,
+      "sha256": "b897111d06c9e9872ae08b62d2083e82d530b5da1ea999786dc8be6bae1b29b8"
+    },
+    {
+      "name": "evidence/mobile/public-430-viewport.png",
+      "bytes": 241268,
+      "sha256": "401ad5e603bc9ec61bbc6b958410fb772d0d96a131ee8b4392495729ed8ea68c"
+    },
+    {
+      "name": "evidence/mobile/public-600-viewport.png",
+      "bytes": 316675,
+      "sha256": "25608e76a68b43dc107976f043ce09fb0bc4c0ec05ed13ebc68b8635f639678f"
+    },
+    {
+      "name": "evidence/mobile/rep-390-viewport.png",
+      "bytes": 153771,
+      "sha256": "5c66793d257f59db86d86f5af784f6de28c43d5ebdf6c3e737178a59ea8c4a42"
+    },
+    {
+      "name": "evidence/mobile/short-390-640-viewport.png",
+      "bytes": 29422,
+      "sha256": "d1de4a162b64580eaeb7410696caebe1b88c4ba58edb9c70ab7ed02376908c16"
+    },
+    {
+      "name": "evidence/mobile/short-600-360-viewport.png",
+      "bytes": 20485,
+      "sha256": "a3bef5de20eddc89f0d3d0164e2e7719d89621ce00bb19c12ef362f5031f6f8c"
+    },
+    {
+      "name": "evidence/mobile/superadmin-390-viewport.png",
+      "bytes": 47148,
+      "sha256": "f02111d43f0606ecc86d733eea0a07a6ba1d5732a7ed5d81e665f182506e5571"
+    },
+    {
+      "name": "evidence/mobile/tl-390-viewport.png",
+      "bytes": 143190,
+      "sha256": "e25972a462dfb79a51aec153cfc63d0688697e791f3ef5b8e03bc54d0296faa7"
+    },
+    {
+      "name": "evidence/mobile-report.json",
+      "bytes": 2019,
+      "sha256": "ad6702f5f853b9a09b05346f5d2a84f8ab858c4445c55607f18fbb2b3d8296e9"
+    },
+    {
+      "name": "evidence/motion/arrival-1440.png",
+      "bytes": 1240732,
+      "sha256": "daa1c99addbbe4f3aca7ac6025a1371241f9eb793a7b990ff65dd97cd744c65a"
+    },
+    {
+      "name": "evidence/motion/arrival-1440.webm",
+      "bytes": 2431659,
+      "sha256": "01b5096470b9a0fbb9f4f893e1d7a1845553d46a09a2c93a0d87b98b0fe19a56"
+    },
+    {
+      "name": "evidence/motion/arrival-390.png",
+      "bytes": 247064,
+      "sha256": "8f429bf32d7cff4c346fff6ee57db68cdd191af449a89249137685e9c35278ce"
+    },
+    {
+      "name": "evidence/motion/arrival-390.webm",
+      "bytes": 802278,
+      "sha256": "71e53a2d777ae24573a9afb38ced620766afd1305a3dde576bee1135bf805026"
+    },
+    {
+      "name": "evidence/motion/boarding-1440.png",
+      "bytes": 184519,
+      "sha256": "20623189eaccbd3ce145a6656e5be2fed9a344e476adaea4db1ea1813025529c"
+    },
+    {
+      "name": "evidence/motion/boarding-390.png",
+      "bytes": 250129,
+      "sha256": "a17b4cdbbb4ba9154780f0eb70a0b9e08353732bc059c0d5c604d446b35fc4eb"
+    },
+    {
+      "name": "evidence/motion-report.json",
+      "bytes": 1289,
+      "sha256": "2a995de3e169888ed45a379c1904cf4c282348a784abe0205bcde0e846426476"
+    },
+    {
+      "name": "evidence/performance-report.json",
+      "bytes": 3232,
+      "sha256": "0e035b7a412aeff77339cf7e18b81a7b985c339efc53d387fa486287ad3166e7"
+    },
+    {
+      "name": "evidence/refinement-report.json",
+      "bytes": 1922,
+      "sha256": "2761d7c970745898868e6c39eeda4e47ed27422c79ad48d3d94bad6800610b2c"
+    },
+    {
+      "name": "evidence/repository-tests.json",
+      "bytes": 498,
+      "sha256": "d97a628e7654bb11b7b3678400bf7dfc89da86fd84a62921816908a9cc075941"
+    },
+    {
+      "name": "evidence/responsive-report.json",
+      "bytes": 23184,
+      "sha256": "27f49f38de6fc731a369b050fcdb0c27e0f902c25cbe047e9b054e3fea7b558d"
+    },
+    {
+      "name": "evidence/screenshots/admin-1440.png",
+      "bytes": 158727,
+      "sha256": "c7cec3eb561e446fbeace2b2bee4d46f819d24eb9a496870104129fb41e4c986"
+    },
+    {
+      "name": "evidence/screenshots/admin-390.png",
+      "bytes": 73040,
+      "sha256": "1c7b5b4fec6e0bd2b45e62e2ee33c0dd5d498cc6658b277ca2fd924308375f8c"
+    },
+    {
+      "name": "evidence/screenshots/dept_manager-1440.png",
+      "bytes": 148343,
+      "sha256": "2ee1bc361662b643d67447bbff0c1179e69debfb53417c13c9d900d435e2094e"
+    },
+    {
+      "name": "evidence/screenshots/dept_manager-390.png",
+      "bytes": 220800,
+      "sha256": "ff92d8550ae90ea9d5168d0a87bcb5ffe9e10a1649741b36aedb037aa44e1020"
+    },
+    {
+      "name": "evidence/screenshots/division_manager-1440.png",
+      "bytes": 251150,
+      "sha256": "c2c2225ef13f39dd99420ccd01db64d275944a1478b4550d858fece83737b579"
+    },
+    {
+      "name": "evidence/screenshots/division_manager-390.png",
+      "bytes": 315490,
+      "sha256": "43ae71a913068a582437dc6c134107f14797942296e9201ba7c33d0636850394"
+    },
+    {
+      "name": "evidence/screenshots/public-1440.png",
+      "bytes": 2094752,
+      "sha256": "da399a8e2d532ee2caea5475d6abfd85d328c8df04150d2076d4bd056c3ee447"
+    },
+    {
+      "name": "evidence/screenshots/public-320.png",
+      "bytes": 360884,
+      "sha256": "a11a84e79dd78fdfcccdb802453886c63a09eee3ef04afae3fe0bf32b8937813"
+    },
+    {
+      "name": "evidence/screenshots/public-390.png",
+      "bytes": 388046,
+      "sha256": "60c1db3595a0a773b7f1aa3925cb1b49224d888bdcf1295a59ceb015398db158"
+    },
+    {
+      "name": "evidence/screenshots/rep-1440.png",
+      "bytes": 177325,
+      "sha256": "a30c37276571df81987a8a3b8972aeeb7217bf09f6dcab83daa6ad8502cb78e8"
+    },
+    {
+      "name": "evidence/screenshots/rep-390.png",
+      "bytes": 245792,
+      "sha256": "b2ab342f0d33026530b06fc1e873ca741247071cc864319b20533d29c8ea6abb"
+    },
+    {
+      "name": "evidence/screenshots/superadmin-1440.png",
+      "bytes": 146585,
+      "sha256": "eb649f6e1c9e5067cb3536206d0400f1293e2ef61d4d381b86ad7e29f29b6133"
+    },
+    {
+      "name": "evidence/screenshots/superadmin-390.png",
+      "bytes": 99203,
+      "sha256": "7f0b552e1c3a35ff9797b68fd40259e549e936f73777eeb15312808068744477"
+    },
+    {
+      "name": "evidence/screenshots/tl-1440.png",
+      "bytes": 156297,
+      "sha256": "a3fb5604d2bad18a60a3f0b2354fcd3308a48eac2a9a5bc5784bc74ef71da3e1"
+    },
+    {
+      "name": "evidence/screenshots/tl-390.png",
+      "bytes": 224549,
+      "sha256": "2f92ea3348cfe8ceba6b91dfe8a05b6d64fac4e6a4f59e2da2e80f62781de73d"
+    },
+    {
+      "name": "release.json",
+      "bytes": 7506,
+      "sha256": "f2d7ebaf01ae44926c24c52c41845993703856354f51026f3545bc374d40c151"
+    },
+    {
+      "name": "source/contests/platform/scripts/build-airlines-preview.mjs",
+      "bytes": 14216,
+      "sha256": "74c681dae90b03073d17fae04d1c7a33d36650765c64a18930b8ad6f6fcc0c9c"
+    },
+    {
+      "name": "source/contests/platform/scripts/check-airlines-admin.mjs",
+      "bytes": 9004,
+      "sha256": "6b54cd7cb6fb54d4561421986273582b7ae13c9b5aabcc874eafdbdacbe71ab9"
+    },
+    {
+      "name": "source/contests/platform/scripts/check-airlines-calendar.mjs",
+      "bytes": 3559,
+      "sha256": "8805537cabab5a58b2a984276654c59471b318f7c90bba93df1b15e4598d501b"
+    },
+    {
+      "name": "source/contests/platform/scripts/check-airlines-mobile.mjs",
+      "bytes": 10965,
+      "sha256": "90f356c2b459a66c417a4e6fb4795756a74a07cd55dabaafe70b9fd8f17f3cee"
+    },
+    {
+      "name": "source/contests/platform/scripts/check-airlines-motion.mjs",
+      "bytes": 6183,
+      "sha256": "a7aea416f829ee9d38dc56504b7c0f9404afbe4c77c95a1ceedd6b61b28887c2"
+    },
+    {
+      "name": "source/contests/platform/scripts/check-airlines-preview.mjs",
+      "bytes": 9854,
+      "sha256": "364c41af969a61fd46dfe01b3de95ee0f7c5e3b02ba40100859a6cb0a2fdefab"
+    },
+    {
+      "name": "source/contests/platform/scripts/check-airlines-refinement.mjs",
+      "bytes": 13359,
+      "sha256": "2338c9aafc3425ebc8afa346bdb6ec4ee2b62c066b964c26092c1171cbd37481"
+    },
+    {
+      "name": "source/contests/platform/scripts/measure-airlines-performance.mjs",
+      "bytes": 2111,
+      "sha256": "4453bbf7776db2c7b587df72a5006b0625c909b135d61a06ceb445551f8af74e"
+    },
+    {
+      "name": "source/contests/platform/scripts/package-airlines-review.mjs",
+      "bytes": 11241,
+      "sha256": "a131f71682875efe242fef6a8edcea4650ce5c0d3b609ae081d374c319745136"
+    },
+    {
+      "name": "source/contests/platform/scripts/verify-airlines-live.mjs",
+      "bytes": 1384,
+      "sha256": "87fb327719cae614a807e38a7ef2c4cc21cd23962b660395b0ead6333de793b7"
+    },
+    {
+      "name": "source/contests/platform/site/src/airlines/activity.js",
+      "bytes": 4689,
+      "sha256": "3dd1a5caf4f1efcdc2885c4ac4714cae0dc3783ea4465f28802cc96442167c37"
+    },
+    {
+      "name": "source/contests/platform/site/src/airlines/admin.css",
+      "bytes": 10547,
+      "sha256": "51a61a7eb7c70cba58658aa9f3b407ba8ba5db01beb7760caf02729489e7ddfc"
+    },
+    {
+      "name": "source/contests/platform/site/src/airlines/admin.js",
+      "bytes": 27850,
+      "sha256": "18c4ceb6b216640e93cbc0bb5e52926483509b1cce9e021fda983818b9a85a65"
+    },
+    {
+      "name": "source/contests/platform/site/src/airlines/excel.js",
+      "bytes": 55,
+      "sha256": "8f266b2585c882ddd835786269de55085c514664d1986bd06fa55f71502626b4"
+    },
+    {
+      "name": "source/contests/platform/site/src/airlines/main.js",
+      "bytes": 54470,
+      "sha256": "0c082483020a0be004eaa6b5050719409fac8c6d78f5d09f7a6cb6ab1e6c6290"
+    },
+    {
+      "name": "source/contests/platform/site/src/airlines/mobile.css",
+      "bytes": 13514,
+      "sha256": "3f18fd601a06be2d27c90c212c366f725d024f5187fb2ac78385a8002b0e9041"
+    },
+    {
+      "name": "source/contests/platform/site/src/airlines/model.js",
+      "bytes": 3606,
+      "sha256": "cd21bd30b69a471eee89b63daa24313691a2f6781d2c79d9855958f13844ffb3"
+    },
+    {
+      "name": "source/contests/platform/site/src/airlines/motion.js",
+      "bytes": 6361,
+      "sha256": "8aa32574b99dc8dcc7f4776788ca1e81cb3fb0b81a11ffd486b9058ac84eca7f"
+    },
+    {
+      "name": "source/contests/platform/site/src/airlines/styles.css",
+      "bytes": 54961,
+      "sha256": "089680394b0cae108031ab422967baff493ddd26d969d3760168533b206ea661"
+    },
+    {
+      "name": "source/contests/platform/site/src/airlines/ui.js",
+      "bytes": 3172,
+      "sha256": "da12f73f6625e0fb69e01d43827a06ce8c2cfd181bb3be59caf0d15d730969ce"
+    },
+    {
+      "name": "source/contests/platform/test/airlines-activity.test.js",
+      "bytes": 4330,
+      "sha256": "e2a5a381d615586b3d692a6a1f14b86729bce8d1c9ad105a2e90e2e513832de3"
+    },
+    {
+      "name": "source/contests/platform/test/airlines-data.test.js",
+      "bytes": 2166,
+      "sha256": "eb439d8fbd97d44d325c9b1fb49e2e3763131b514a464e2498e4f8f80020ad34"
+    },
+    {
+      "name": "source/contests/platform/test/airlines-model.test.js",
+      "bytes": 1799,
+      "sha256": "876de838a28b1dbd743ea3e122a0ecb159309778a276b158ecff7127b9460555"
+    },
+    {
+      "name": "source.patch",
+      "bytes": 276017,
+      "sha256": "ec75ecdfe21073b81605a0df7c376cce2dbf1cd7ab1a18f9e1e6e23908248a8e"
+    }
+  ]
+}

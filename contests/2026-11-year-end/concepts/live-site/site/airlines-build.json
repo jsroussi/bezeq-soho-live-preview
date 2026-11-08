@@ -1,11 +1,11 @@
 {
-  "sourceCommit": "bf3136f01a03678d0715dec782e56d14dd743f28",
+  "sourceCommit": "83880b6cb1d3e65d726e577163e4d9960a1071b6",
   "synthetic": true,
   "seed": 20261101,
   "asOf": "2026-11-05",
   "people": 60,
   "scope": "contests/2026-11-year-end/concepts/live-site/site",
-  "initialJavaScriptGzipBytes": 73305,
+  "initialJavaScriptGzipBytes": 74398,
   "initialScripts": [
     "airlines-data.js",
     "airlines-bootstrap.js",
